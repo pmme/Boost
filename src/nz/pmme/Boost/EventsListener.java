@@ -28,9 +28,12 @@ public class EventsListener implements Listener
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event)
     {
         if(event.getRightClicked() instanceof Player) {
-            Player player = (Player)event.getRightClicked();
-            Vector vectorBoost = new Vector(0.0,10.0,0.0);
-            player.setVelocity(vectorBoost);
+            Player otherPlayer = (Player)event.getRightClicked();
+            Player thisPlayer = event.getPlayer();
+            double deltaX = otherPlayer.getLocation().getX() - thisPlayer.getLocation().getX();
+            double deltaZ = otherPlayer.getLocation().getZ() - thisPlayer.getLocation().getZ();
+            Vector vectorBoost = new Vector( deltaX, 3.0, deltaZ );
+            otherPlayer.setVelocity(vectorBoost);
         }
     }
 }
