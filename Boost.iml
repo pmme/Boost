@@ -13,7 +13,11 @@
           <root url="jar://$MODULE_DIR$/../../Spigot/1.9.2/Spigot/Spigot-API/target/spigot-api-1.9.2-R0.1-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../Spigot/1.9.2/Spigot/Spigot-API/src/main/java" />
+          <root url="file://$MODULE_DIR$/../../Spigot/1.9.2/Spigot/Spigot-API/src/main/javadoc" />
+          <root url="file://$MODULE_DIR$/../../Spigot/1.9.2/Spigot/Spigot-API/src/test/java" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>
