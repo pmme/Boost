@@ -7,12 +7,26 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Main extends JavaPlugin
 {
+    private boolean boostEnabled = false;
     @Override
     public void onEnable() {
-        this.getServer().getPluginManager().registerEvents(new EventsListener(this), this);
+        this.getCommand( "boost" ).setExecutor( new Command_Boost(this) );
+        this.getServer().getPluginManager().registerEvents( new EventsListener(this), this );
     }
 
     @Override
     public void onDisable() {
+    }
+
+    public boolean isBoostEnabled() {
+        return boostEnabled;
+    }
+
+    public void enableBoost() {
+        boostEnabled = true;
+    }
+
+    public void disableBoost() {
+        boostEnabled = false;
     }
 }

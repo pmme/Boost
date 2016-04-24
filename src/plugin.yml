@@ -2,3 +2,7 @@ name: Boost
 version: 0.1
 author: pmme
 main: nz.pmme.Boost.Main
+commands:
+  boost:
+    description: Turn ON or OFF the Boost game.
+    usage: /boost <on/off>
