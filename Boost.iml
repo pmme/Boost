@@ -20,5 +20,6 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Spigot-API" level="project" />
   </component>
 </module>
