@@ -1,6 +1,7 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Utils.TargetBlockFinder;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -21,7 +22,9 @@ public class EventsListener implements Listener
 {
     private static final double BOOST_VERTICAL_VELOCITY = 2.0;
     private static final double BOOST_MAX_HORIZONTAL_VELOCITY = 2.5;    // NOTE: Horizontal velocity is scaled much smaller than vertical in Minecraft.
-    public static final double BOOST_MIN_HORIZONTAL_VELOCITY = 0.1;
+    private static final double BOOST_MED_HORIZONTAL_VELOCITY = 1.25;
+    private static final double BOOST_MIN_HORIZONTAL_VELOCITY = 0.1;
+    private static final Vector VECTOR_UP = new Vector( 0, 1, 0 );
     private Main plugin;
 
     public EventsListener(Main plugin) {
@@ -48,7 +51,27 @@ public class EventsListener implements Listener
                 case PHYSICAL:
                     break;
             }
-//            if( targetBlock != null ) targetBlock.setType( event.getMaterial() );
+            if( targetBlock != null )
+            {
+                final Player thisPlayer = event.getPlayer();
+
+                // Check if there is a player standing on the target block.
+                // Note: Compare as vectors to avoid needless world check and to omit irrelevant yaw and pitch comparison.
+                final Vector targetPotentialPlayerPosition = targetBlock.getLocation().toVector().add( VECTOR_UP );
+                for( Player otherPlayer : event.getPlayer().getWorld().getPlayers() ) {
+                    if( otherPlayer.getLocation().toVector().equals( targetPotentialPlayerPosition ) )
+                    {
+                        // Calculate a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
+                        Vector vectorToOtherPlayer = new Vector( otherPlayer.getLocation().getX() - thisPlayer.getLocation().getX(), 0.0, otherPlayer.getLocation().getZ() - thisPlayer.getLocation().getZ() );
+                        vectorToOtherPlayer.normalize();
+                        vectorToOtherPlayer.multiply( BOOST_MED_HORIZONTAL_VELOCITY );
+
+                        // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
+                        Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), BOOST_VERTICAL_VELOCITY, vectorToOtherPlayer.getZ() );
+                        otherPlayer.setVelocity( vectorBoost );
+                    }
+                }
+            }
         }
     }
 
@@ -58,8 +81,8 @@ public class EventsListener implements Listener
         if( plugin.isBoostEnabled() ) {
             if( event.getRightClicked() instanceof LivingEntity/*Player*/ )     // Enabled animal testing for Boost.
             {
-                LivingEntity otherPlayer = (LivingEntity)event.getRightClicked();
-                Player thisPlayer = event.getPlayer();
+                final LivingEntity otherPlayer = (LivingEntity)event.getRightClicked();
+                final Player thisPlayer = event.getPlayer();
 
                 // Get the normalized vector to the other player. Don't use the normalize() method though because we want the distance and it involves Math.sqrt, so we normalize ourselves.
                 Vector vectorToOtherPlayer = new Vector( otherPlayer.getLocation().getX() - thisPlayer.getLocation().getX(), 0.0, otherPlayer.getLocation().getZ() - thisPlayer.getLocation().getZ() );
