@@ -63,7 +63,16 @@ public class EventsListener implements Listener
                     {
                         // Calculate a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
                         Vector vectorToOtherPlayer = new Vector( otherPlayer.getLocation().getX() - thisPlayer.getLocation().getX(), 0.0, otherPlayer.getLocation().getZ() - thisPlayer.getLocation().getZ() );
-                        vectorToOtherPlayer.normalize();
+                        double distanceBetweenPlayers = vectorToOtherPlayer.length();
+                        if( distanceBetweenPlayers > 0.0 ) {
+                            vectorToOtherPlayer.multiply( 1.0 / distanceBetweenPlayers );      // vectorToOtherPlayer is now a unit vector.
+                        } else {
+                            // Players are in the exact same spot and cannot be normalised OR the player is boosting themselves.
+                            // Set a unit vector in the direction the player is facing.
+                            vectorToOtherPlayer.setX( -Math.sin( thisPlayer.getLocation().getYaw() ) );
+                            vectorToOtherPlayer.setZ( Math.cos( thisPlayer.getLocation().getYaw() ) );
+                            vectorToOtherPlayer.setY( 0.0 );
+                        }
                         vectorToOtherPlayer.multiply( BOOST_MED_HORIZONTAL_VELOCITY );
 
                         // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
@@ -87,7 +96,15 @@ public class EventsListener implements Listener
                 // Get the normalized vector to the other player. Don't use the normalize() method though because we want the distance and it involves Math.sqrt, so we normalize ourselves.
                 Vector vectorToOtherPlayer = new Vector( otherPlayer.getLocation().getX() - thisPlayer.getLocation().getX(), 0.0, otherPlayer.getLocation().getZ() - thisPlayer.getLocation().getZ() );
                 double distanceBetweenPlayers = vectorToOtherPlayer.length();
-                vectorToOtherPlayer.multiply( 1.0 / distanceBetweenPlayers );      // vectorToOtherPlayer is now a unit vector.
+                if( distanceBetweenPlayers > 0.0 ) {
+                    vectorToOtherPlayer.multiply( 1.0 / distanceBetweenPlayers );      // vectorToOtherPlayer is now a unit vector.
+                } else {
+                    // Players are in the exact same spot and cannot be normalised OR the player is boosting themselves.
+                    // Set a unit vector in the direction the player is facing.
+                    vectorToOtherPlayer.setX( -Math.sin( thisPlayer.getLocation().getYaw() ) );
+                    vectorToOtherPlayer.setZ( Math.cos( thisPlayer.getLocation().getYaw() ) );
+                    vectorToOtherPlayer.setY( 0.0 );
+                }
 
                 // Calculate a horizontal boost velocity that is greater the closer you are to the target.
                 double horizontalVelocity = BOOST_MAX_HORIZONTAL_VELOCITY - distanceBetweenPlayers;
