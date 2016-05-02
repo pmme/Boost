@@ -58,8 +58,14 @@ public class EventsListener implements Listener
                 // Check if there is a player standing on the target block.
                 // Note: Compare as vectors to avoid needless world check and to omit irrelevant yaw and pitch comparison.
                 final Vector targetPotentialPlayerPosition = targetBlock.getLocation().toVector().add( VECTOR_UP );
+                final int targetPosX = targetPotentialPlayerPosition.getBlockX();
+                final int targetPosY = targetPotentialPlayerPosition.getBlockY();
+                final int targetPosZ = targetPotentialPlayerPosition.getBlockZ();
                 for( Player otherPlayer : event.getPlayer().getWorld().getPlayers() ) {
-                    if( otherPlayer.getLocation().toVector().equals( targetPotentialPlayerPosition ) )
+                    final int otherPlayerX = otherPlayer.getLocation().getBlockX();
+                    final int otherPlayerY = otherPlayer.getLocation().getBlockY();
+                    final int otherPlayerZ = otherPlayer.getLocation().getBlockZ();
+                    if( targetPosX == otherPlayerX  &&  targetPosY == otherPlayerY  &&  targetPosZ == otherPlayerZ )
                     {
                         // Calculate a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
                         Vector vectorToOtherPlayer = new Vector( otherPlayer.getLocation().getX() - thisPlayer.getLocation().getX(), 0.0, otherPlayer.getLocation().getZ() - thisPlayer.getLocation().getZ() );
@@ -69,6 +75,7 @@ public class EventsListener implements Listener
                         } else {
                             // Players are in the exact same spot and cannot be normalised OR the player is boosting themselves.
                             // Set a unit vector in the direction the player is facing.
+//TODO: This is working out wrong
                             vectorToOtherPlayer.setX( -Math.sin( thisPlayer.getLocation().getYaw() ) );
                             vectorToOtherPlayer.setZ( Math.cos( thisPlayer.getLocation().getYaw() ) );
                             vectorToOtherPlayer.setY( 0.0 );
@@ -101,6 +108,7 @@ public class EventsListener implements Listener
                 } else {
                     // Players are in the exact same spot and cannot be normalised OR the player is boosting themselves.
                     // Set a unit vector in the direction the player is facing.
+//TODO: This is working out wrong
                     vectorToOtherPlayer.setX( -Math.sin( thisPlayer.getLocation().getYaw() ) );
                     vectorToOtherPlayer.setZ( Math.cos( thisPlayer.getLocation().getYaw() ) );
                     vectorToOtherPlayer.setY( 0.0 );
