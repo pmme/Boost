@@ -75,9 +75,8 @@ public class EventsListener implements Listener
                         } else {
                             // Players are in the exact same spot and cannot be normalised OR the player is boosting themselves.
                             // Set a unit vector in the direction the player is facing.
-//TODO: This is working out wrong
-                            vectorToOtherPlayer.setX( -Math.sin( thisPlayer.getLocation().getYaw() ) );
-                            vectorToOtherPlayer.setZ( Math.cos( thisPlayer.getLocation().getYaw() ) );
+                            vectorToOtherPlayer.setX( -Math.sin( Math.toRadians( thisPlayer.getLocation().getYaw() ) ) );
+                            vectorToOtherPlayer.setZ( Math.cos( Math.toRadians( thisPlayer.getLocation().getYaw() ) ) );
                             vectorToOtherPlayer.setY( 0.0 );
                         }
                         vectorToOtherPlayer.multiply( BOOST_MED_HORIZONTAL_VELOCITY );
@@ -108,9 +107,8 @@ public class EventsListener implements Listener
                 } else {
                     // Players are in the exact same spot and cannot be normalised OR the player is boosting themselves.
                     // Set a unit vector in the direction the player is facing.
-//TODO: This is working out wrong
-                    vectorToOtherPlayer.setX( -Math.sin( thisPlayer.getLocation().getYaw() ) );
-                    vectorToOtherPlayer.setZ( Math.cos( thisPlayer.getLocation().getYaw() ) );
+                    vectorToOtherPlayer.setX( -Math.sin( Math.toRadians( thisPlayer.getLocation().getYaw() ) ) );
+                    vectorToOtherPlayer.setZ( Math.cos( Math.toRadians( thisPlayer.getLocation().getYaw() ) ) );
                     vectorToOtherPlayer.setY( 0.0 );
                 }
 
