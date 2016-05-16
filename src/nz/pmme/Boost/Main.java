@@ -7,7 +7,9 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Main extends JavaPlugin
 {
+    private Players players = new Players( this );
     private boolean boostEnabled = false;
+
     @Override
     public void onEnable() {
         this.getCommand( "boost" ).setExecutor( new Command_Boost(this) );
@@ -28,5 +30,9 @@ public class Main extends JavaPlugin
 
     public void disableBoost() {
         boostEnabled = false;
+    }
+
+    public Players getPlayers() {
+        return players;
     }
 }

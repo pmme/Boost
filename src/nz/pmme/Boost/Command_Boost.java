@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  * Created by paul on 24-Apr-16.
@@ -35,15 +36,40 @@ public class Command_Boost implements CommandExecutor
         }
         else if( args.length > 0 )
         {
-            if( args[0].equalsIgnoreCase( "on" ) ) {
-                sender.sendMessage( boostEnabledMessage );
-                plugin.enableBoost();
-                return true;
-            }
-            else if( args[0].equalsIgnoreCase( "off" ) ) {
-                sender.sendMessage( boostDisabledMessage );
-                plugin.disableBoost();
-                return true;
+            String boostCommand = args[0].toLowerCase();
+            switch( boostCommand )
+            {
+                case "on":
+                    sender.sendMessage( boostEnabledMessage );
+                    plugin.enableBoost();
+                    return true;
+
+                case "off":
+                    sender.sendMessage( boostDisabledMessage );
+                    plugin.disableBoost();
+                    return true;
+
+                case "join":
+                    if( sender instanceof Player ) {
+                        plugin.getPlayers().join( (Player)sender );
+                    } else {
+                        displayNoConsoleMessage( sender );
+                    }
+                    return true;
+
+                case "leave":
+                    if( sender instanceof Player ) {
+                        plugin.getPlayers().leave( (Player)sender );
+                    } else {
+                        displayNoConsoleMessage( sender );
+                    }
+                    return true;
+
+                case "start":
+                    return true;
+
+                case "end":
+                    return true;
             }
         }
         displayCommandUsage( sender );
