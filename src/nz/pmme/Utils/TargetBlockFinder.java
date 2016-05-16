@@ -67,7 +67,7 @@ public class TargetBlockFinder
      */
     public final Block getCurrentBlock()
     {
-        if( this.distanceToTarget > this.MAXIMUM_FINDER_RANGE || this.targetY < 0 || this.targetY > this.world.getMaxHeight() ) {
+        if( this.distanceToTarget > MAXIMUM_FINDER_RANGE || this.targetY < 0 || this.targetY > this.world.getMaxHeight() ) {
             return null;
         }
         return this.world.getBlockAt( this.targetX, this.targetY, this.targetZ );
@@ -80,7 +80,7 @@ public class TargetBlockFinder
     {
         int x, y, z;
         do {
-            this.distanceToTarget += this.FINDER_VECTOR_STEP;
+            this.distanceToTarget += FINDER_VECTOR_STEP;
             x = NumberConversions.floor( this.playerX + this.playerViewUnitVector.getX() * this.distanceToTarget );
             y = NumberConversions.floor( this.playerY + this.playerViewUnitVector.getY() * this.distanceToTarget );
             z = NumberConversions.floor( this.playerZ + this.playerViewUnitVector.getZ() * this.distanceToTarget );
