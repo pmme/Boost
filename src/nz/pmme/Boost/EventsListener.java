@@ -3,7 +3,6 @@ package nz.pmme.Boost;
 import nz.pmme.Utils.TargetBlockFinder;
 import nz.pmme.Utils.VectorToOtherPlayer;
 import org.bukkit.block.Block;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,7 +11,11 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
+
+import java.util.List;
 
 
 /**
@@ -34,7 +37,12 @@ public class EventsListener implements Listener
     @EventHandler
     public void onPlayerInteract( PlayerInteractEvent event )
     {
-        if( plugin.isBoostEnabled() ) {
+        if( plugin.isBoostEnabled() )
+        {
+            final Player thisPlayer = event.getPlayer();
+            final Game playersGame = plugin.getGameManager().getPlayersGame( thisPlayer );
+            if( playersGame == null ) return;
+
             Block targetBlock = null;
             switch( event.getAction() ) {
                 case LEFT_CLICK_BLOCK:
@@ -51,16 +59,18 @@ public class EventsListener implements Listener
             }
             if( targetBlock != null )
             {
-                final Player thisPlayer = event.getPlayer();
-
                 // Check if there is a player standing on the target block.
                 // Note: Compare as vectors to avoid needless world check and to omit irrelevant yaw and pitch comparison.
                 final Vector targetPotentialPlayerPosition = targetBlock.getLocation().toVector().add( VECTOR_UP );
                 final int targetPosX = targetPotentialPlayerPosition.getBlockX();
                 final int targetPosY = targetPotentialPlayerPosition.getBlockY();
                 final int targetPosZ = targetPotentialPlayerPosition.getBlockZ();
-                for( Player otherPlayer : event.getPlayer().getWorld().getPlayers() )
+
+                List<Player> otherPlayers = playersGame.getPlayerList();
+                for( Player otherPlayer : otherPlayers )
                 {
+                    if( otherPlayer == event.getPlayer() ) continue;
+
                     final int otherPlayerX = otherPlayer.getLocation().getBlockX();
                     final int otherPlayerY = otherPlayer.getLocation().getBlockY();
                     final int otherPlayerZ = otherPlayer.getLocation().getBlockZ();
@@ -84,20 +94,24 @@ public class EventsListener implements Listener
     public void onPlayerInteractEntity( PlayerInteractEntityEvent event )
     {
         if( plugin.isBoostEnabled() ) {
-            if( event.getRightClicked() instanceof LivingEntity/*Player*/ )     // Enabled animal testing for Boost.
+            if( event.getRightClicked() instanceof Player )
             {
-                final LivingEntity otherPlayer = (LivingEntity)event.getRightClicked();
                 final Player thisPlayer = event.getPlayer();
-                VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
+                final Player otherPlayer = (Player)event.getRightClicked();
+                if( plugin.getGameManager().activeInSameGame( thisPlayer, otherPlayer ) )
+                {
+                    VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
 
-                // Calculate a horizontal boost velocity that is greater the closer you are to the target.
-                double horizontalVelocity = BOOST_MAX_HORIZONTAL_VELOCITY - vectorToOtherPlayer.getDistanceBetweenPlayers();
-                if( horizontalVelocity < BOOST_MIN_HORIZONTAL_VELOCITY ) horizontalVelocity = BOOST_MIN_HORIZONTAL_VELOCITY;
-                vectorToOtherPlayer.multiply( horizontalVelocity );
+                    // Calculate a horizontal boost velocity that is greater the closer you are to the target.
+                    double horizontalVelocity = BOOST_MAX_HORIZONTAL_VELOCITY - vectorToOtherPlayer.getDistanceBetweenPlayers();
+                    if( horizontalVelocity < BOOST_MIN_HORIZONTAL_VELOCITY )
+                        horizontalVelocity = BOOST_MIN_HORIZONTAL_VELOCITY;
+                    vectorToOtherPlayer.multiply( horizontalVelocity );
 
-                // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
-                Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), BOOST_VERTICAL_VELOCITY, vectorToOtherPlayer.getZ() );
-                otherPlayer.setVelocity( vectorBoost );
+                    // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
+                    Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), BOOST_VERTICAL_VELOCITY, vectorToOtherPlayer.getZ() );
+                    otherPlayer.setVelocity( vectorBoost );
+                }
             }
         }
     }
@@ -118,10 +132,31 @@ public class EventsListener implements Listener
     public void onEntityDamage( EntityDamageEvent event )
     {
         if( plugin.isBoostEnabled() ) {
-            if( event.getEntity() instanceof LivingEntity/*Player*/ )
-            {
-                event.setCancelled( true );
+            if( event.getEntity() instanceof Player ) {
+                if( plugin.getGameManager().isPlaying( (Player)event.getEntity() ) ) {
+                    event.setCancelled( true );
+                }
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerMove( PlayerMoveEvent event )
+    {
+        if( plugin.isBoostEnabled() ) {
+            Game game = plugin.getGameManager().getPlayersGame( event.getPlayer() );
+            if( game == null ) return;
+            if( game.isActiveInGame( event.getPlayer() ) ) {
+                if( event.getTo().getBlockY() == game.getGroundLevel() ) {
+                    game.setPlayerLost( event.getPlayer() );
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit( PlayerQuitEvent event )
+    {
+        plugin.getGameManager().leaveGame( event.getPlayer() );
     }
 }

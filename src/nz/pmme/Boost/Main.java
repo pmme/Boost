@@ -7,8 +7,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Main extends JavaPlugin
 {
-    private Players players = new Players( this );
-    private boolean boostEnabled = false;
+    private GameManager gameManager = new GameManager( this );
+    private boolean boostEnabled = true;
 
     @Override
     public void onEnable() {
@@ -18,6 +18,7 @@ public class Main extends JavaPlugin
 
     @Override
     public void onDisable() {
+        this.getGameManager().clearAllGames();
     }
 
     public boolean isBoostEnabled() {
@@ -29,10 +30,11 @@ public class Main extends JavaPlugin
     }
 
     public void disableBoost() {
+        this.getGameManager().clearAllGames();
         boostEnabled = false;
     }
 
-    public Players getPlayers() {
-        return players;
+    public GameManager getGameManager() {
+        return gameManager;
     }
 }

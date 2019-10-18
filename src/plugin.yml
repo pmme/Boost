@@ -1,8 +1,15 @@
 name: Boost
-version: 0.1
+version: 0.2
 author: pmme
+api-version: 1.13
 main: nz.pmme.Boost.Main
 commands:
   boost:
-    description: Turn ON or OFF the Boost game.
-    usage: /boost <on/off>
+    description: 'Boost commands'
+    usage: 'Enter "/boost" with no options for help'
+    aliases: bb
+
+permissions:
+  boost.join:
+    description: 'Permission to join a Boost game'
+    default: true
