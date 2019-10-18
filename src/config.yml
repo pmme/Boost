@@ -1,0 +1,9 @@
+games:
+  #Sample game configuration
+  Arena1:
+    name: '&aArena1'
+    ground: 64
+    countdown: 30
+    minplayers: 2
+    maxplayers: 0
+

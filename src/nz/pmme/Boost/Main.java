@@ -12,6 +12,9 @@ public class Main extends JavaPlugin
 
     @Override
     public void onEnable() {
+        this.saveDefaultConfig();
+        this.loadConfig();
+
         this.getCommand( "boost" ).setExecutor( new Command_Boost(this) );
         this.getServer().getPluginManager().registerEvents( new EventsListener(this), this );
     }
@@ -36,5 +39,12 @@ public class Main extends JavaPlugin
 
     public GameManager getGameManager() {
         return gameManager;
+    }
+
+    public void loadConfig()
+    {
+        this.reloadConfig();
+        // TODO: load config stuff like...
+        //messageWinner = this.getConfig().getString( "message.winner" );
     }
 }

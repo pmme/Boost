@@ -16,6 +16,7 @@ public class Command_Boost implements CommandExecutor
 
     private static final String boostEnabledMessage = ChatColor.GREEN + "Boost enabled";
     private static final String boostDisabledMessage = ChatColor.GRAY + "Boost disabled";
+    private static final String boostConfigReloaded = ChatColor.GREEN + "Boost config reloaded";
     private static final String[] boostCommandUsage = {
             ChatColor.DARK_AQUA + "Boost command usage:",
             ChatColor.WHITE + "/boost join Arena1" + ChatColor.DARK_AQUA + " - Join the named game.",
@@ -59,6 +60,12 @@ public class Command_Boost implements CommandExecutor
                 case "off":
                     sender.sendMessage( boostDisabledMessage );
                     plugin.disableBoost();
+                    return true;
+
+                case "reload":
+                    plugin.getGameManager().clearAllGames();
+                    plugin.loadConfig();
+                    sender.sendMessage( boostConfigReloaded );
                     return true;
 
                 case "creategame":
