@@ -30,6 +30,14 @@ public class Game
         this.gameState = GameState.STOPPED;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public int getPlayerCount() {
+        return players.size();
+    }
+
     public void setQueuing() {
         gameState = GameState.QUEUING;
     }
@@ -125,9 +133,21 @@ public class Game
         return playerInfo.isActive();
     }
 
+    public String getPlayerStateText( Player player )
+    {
+        PlayerInfo playerInfo = players.get( player.getUniqueId() );
+        if( playerInfo == null ) return "Not in game";
+        return playerInfo.getPlayerStateText();
+    }
+
     public boolean isRunning()
     {
         return gameState == GameState.RUNNING;
+    }
+
+    public String getGameStateText()
+    {
+        return gameState.toString();
     }
 
     // TODO: Should have some other game state checking, potentially called from the commands.

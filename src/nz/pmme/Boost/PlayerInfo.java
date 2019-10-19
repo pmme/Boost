@@ -29,4 +29,8 @@ public class PlayerInfo
     public void setLost() {
         playerGameState = PlayerGameState.LOST;
     }
+
+    public String getPlayerStateText() {
+        return playerGameState.toString();
+    }
 }

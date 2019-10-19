@@ -164,6 +164,23 @@ public class Command_Boost implements CommandExecutor
                         return true;
                     }
                     return true;
+
+                case "status":
+                    sender.sendMessage( plugin.isBoostEnabled() ? boostEnabledMessage : boostDisabledMessage );
+                    sender.sendMessage( "Boost games:" );
+                    for( Game game : plugin.getGameManager().getGames() )
+                    {
+                        sender.sendMessage( "- " + game.getName() + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players." );
+                    }
+                    if( sender instanceof Player ) {
+                        Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
+                        if( game != null ) {
+                            sender.sendMessage( "You are " + game.getPlayerStateText( (Player)sender ) + " in game " + game.getName() + ", which is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players." );
+                        } else {
+                            sender.sendMessage( "Not currently in a game." );
+                        }
+                    }
+                    return true;
             }
         }
         displayCommandUsage( sender );
