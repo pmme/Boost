@@ -22,6 +22,7 @@ public class Main extends JavaPlugin
     @Override
     public void onDisable() {
         this.getGameManager().clearAllGames();
+        this.disableBoost();
     }
 
     public boolean isBoostEnabled() {
@@ -33,7 +34,6 @@ public class Main extends JavaPlugin
     }
 
     public void disableBoost() {
-        this.getGameManager().clearAllGames();
         boostEnabled = false;
     }
 

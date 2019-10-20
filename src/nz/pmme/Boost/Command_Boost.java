@@ -33,6 +33,7 @@ public class Command_Boost implements CommandExecutor
     private static final String boostGameDoesNotExist = ChatColor.RED + "No Boost game with that name.";
     private static final String boostGameAlreadyRunning = ChatColor.RED + "That Boost game is already running.";
     private static final String boostGameNotRunning = ChatColor.RED + "That Boost game is not running.";
+    private static final String boostGamesCleared = ChatColor.DARK_AQUA + "All Boost games cleared.";
 
     public Command_Boost( Main plugin ) {
         this.plugin = plugin;
@@ -66,6 +67,11 @@ public class Command_Boost implements CommandExecutor
                     plugin.getGameManager().clearAllGames();
                     plugin.loadConfig();
                     sender.sendMessage( boostConfigReloaded );
+                    return true;
+
+                case "cleargames":
+                    plugin.getGameManager().clearAllGames();
+                    sender.sendMessage( boostGamesCleared );
                     return true;
 
                 case "creategame":

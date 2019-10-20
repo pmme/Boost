@@ -93,12 +93,12 @@ public class GameManager
         playersInGames.remove( player.getUniqueId() );
     }
 
-    // TODO: This stops the games but does not remove them.
     public void clearAllGames()
     {
-        for( Game game : games.values() )
-        {
+        for( Game game : games.values() ) {
             game.end();
         }
+        games.clear();
+        playersInGames.clear();
     }
 }
