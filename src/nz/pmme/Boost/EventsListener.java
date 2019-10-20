@@ -2,6 +2,7 @@ package nz.pmme.Boost;
 
 import nz.pmme.Utils.TargetBlockFinder;
 import nz.pmme.Utils.VectorToOtherPlayer;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,9 +30,21 @@ public class EventsListener implements Listener
     private static final double BOOST_BLOCK_HIT_HORIZONTAL_VELOCITY = BOOST_MAX_HORIZONTAL_VELOCITY;
     private static final Vector VECTOR_UP = new Vector( 0, 1, 0 );
     private Main plugin;
+    private static final int targetDistance = 1;
 
     public EventsListener(Main plugin) {
         this.plugin = plugin;
+    }
+
+    public boolean inTargetBox( Vector targetPosition, Location playerPosition )
+    {
+        if(     Math.abs( playerPosition.getBlockX()-targetPosition.getBlockX() ) <= targetDistance
+            &&  Math.abs( playerPosition.getBlockY()-targetPosition.getBlockY() ) <= targetDistance
+            &&  Math.abs( playerPosition.getBlockZ()-targetPosition.getBlockZ() ) <= targetDistance )
+        {
+            return true;
+        }
+        return false;
     }
 
     @EventHandler
@@ -42,6 +55,7 @@ public class EventsListener implements Listener
             final Player thisPlayer = event.getPlayer();
             final Game playersGame = plugin.getGameManager().getPlayersGame( thisPlayer );
             if( playersGame == null ) return;
+            if( !playersGame.isActiveInGame( thisPlayer ) ) return;
 
             Block targetBlock = null;
             switch( event.getAction() ) {
@@ -60,21 +74,12 @@ public class EventsListener implements Listener
             if( targetBlock != null )
             {
                 // Check if there is a player standing on the target block.
-                // Note: Compare as vectors to avoid needless world check and to omit irrelevant yaw and pitch comparison.
                 final Vector targetPotentialPlayerPosition = targetBlock.getLocation().toVector().add( VECTOR_UP );
-                final int targetPosX = targetPotentialPlayerPosition.getBlockX();
-                final int targetPosY = targetPotentialPlayerPosition.getBlockY();
-                final int targetPosZ = targetPotentialPlayerPosition.getBlockZ();
 
-                List<Player> otherPlayers = playersGame.getPlayerList();
+                List<Player> otherPlayers = playersGame.getActivePlayerList();
                 for( Player otherPlayer : otherPlayers )
                 {
-                    if( otherPlayer == event.getPlayer() ) continue;
-
-                    final int otherPlayerX = otherPlayer.getLocation().getBlockX();
-                    final int otherPlayerY = otherPlayer.getLocation().getBlockY();
-                    final int otherPlayerZ = otherPlayer.getLocation().getBlockZ();
-                    if( targetPosX == otherPlayerX  &&  targetPosY == otherPlayerY  &&  targetPosZ == otherPlayerZ )
+                    if( inTargetBox( targetPotentialPlayerPosition, otherPlayer.getLocation() ) )
                     {
                         VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
 
