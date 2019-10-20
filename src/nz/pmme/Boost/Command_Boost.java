@@ -2,6 +2,8 @@ package nz.pmme.Boost;
 
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -96,8 +98,7 @@ public class Command_Boost implements CommandExecutor
                             return true;
                         }
                         if( args.length == 3 ) {
-                            int newGround = Integer.valueOf( args[2] );
-                            game.setGroundLevel( newGround );
+                            game.setGroundLevel( Integer.valueOf( args[2] ) );
                             return true;
                         } else {
                             if( sender instanceof Player ) {
@@ -107,6 +108,52 @@ public class Command_Boost implements CommandExecutor
                             }
                             return true;
                         }
+                    }
+                    break;
+
+                case "setspawn":
+                    if( args.length > 1 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            sender.sendMessage( boostGameDoesNotExist );
+                            return true;
+                        }
+                        if( args.length == 6 )
+                        {
+                            World world = plugin.getServer().getWorld( args[2] );
+                            if( world != null ) {
+                                Location spawn = new Location( world, Double.valueOf( args[3] ), Double.valueOf( args[4] ), Double.valueOf( args[5] ) );
+                                if( spawn != null ) {
+                                    game.setSpawn( spawn );
+                                } else {
+                                    sender.sendMessage( ChatColor.RED + "Failed to create location to set spawn." );
+                                }
+                            } else {
+                                sender.sendMessage( ChatColor.RED + "Failed to find world named " + args[2] );
+                            }
+                            return true;
+                        }
+                        else if( args.length == 2 )
+                        {
+                            if( sender instanceof Player ) {
+                                game.setSpawn( ((Player)sender).getLocation() );
+                            } else {
+                                displayNoConsoleMessage( sender );
+                            }
+                            return true;
+                        }
+                    }
+                    break;
+
+                case "setspread":
+                    if( args.length == 3 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            sender.sendMessage( boostGameDoesNotExist );
+                            return true;
+                        }
+                        game.setSpawnSpread( Integer.valueOf( args[2] ) );
+                        return true;
                     }
                     break;
 
@@ -172,19 +219,21 @@ public class Command_Boost implements CommandExecutor
                         game.end();
                         return true;
                     }
-                    return true;
+                    break;
 
                 case "status":
                     sender.sendMessage( plugin.isBoostEnabled() ? boostEnabledMessage : boostDisabledMessage );
                     sender.sendMessage( "Boost games:" );
                     for( Game game : plugin.getGameManager().getGames() )
                     {
-                        sender.sendMessage( "- " + game.getName() + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players." );
+                        String message = "- " + game.getDisplayName() + "/" + game.getName() + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players.";
+                        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
                     }
                     if( sender instanceof Player ) {
                         Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
                         if( game != null ) {
-                            sender.sendMessage( "You are " + game.getPlayerStateText( (Player)sender ) + " in game " + game.getName() + ", which is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players." );
+                            String message = "You are " + game.getPlayerStateText( (Player)sender ) + " in game " + game.getDisplayName() + "/" + game.getName() + ", which is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players.";
+                            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
                         } else {
                             sender.sendMessage( "Not currently in a game." );
                         }

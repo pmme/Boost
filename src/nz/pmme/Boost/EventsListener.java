@@ -31,7 +31,7 @@ public class EventsListener implements Listener
         this.plugin = plugin;
     }
 
-    public boolean inTargetBox( Vector targetPosition, Location playerPosition )
+    private boolean inTargetBox( Vector targetPosition, Location playerPosition )
     {
         int yDelta = playerPosition.getBlockY() - targetPosition.getBlockY();
         if(     Math.abs( playerPosition.getBlockX() - targetPosition.getBlockX() ) <= plugin.getLoadedConfig().getTargetDistanceH()
