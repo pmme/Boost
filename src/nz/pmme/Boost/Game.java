@@ -76,9 +76,21 @@ public class Game
     {
         players.remove( player.getUniqueId() );
         player.sendMessage( boostLeaveMessage );
-        if( gameState == GameState.RUNNING && players.size() <= 1 )
+        if( gameState == GameState.RUNNING )
         {
-            this.end();
+            List<Player> activePlayers = getActivePlayerList();
+            if( activePlayers.size() <= 1 )
+            {
+                gameState = GameState.STOPPED;
+                if( activePlayers.size() == 1 )
+                {
+                    String message = boostWinner.replaceAll( "%player%", activePlayers.get( 0 ).getDisplayName() );
+                    for( PlayerInfo playerInfo : players.values() ) {
+                        playerInfo.getPlayer().sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
+                    }
+                }
+                this.end();
+            }
         }
     }
 
@@ -117,9 +129,12 @@ public class Game
             if( activePlayers.size() <= 1 )
             {
                 gameState = GameState.STOPPED;
-                String message = boostWinner.replaceAll( "%player%", activePlayers.get(0).getDisplayName() );
-                for( PlayerInfo playerInfo : players.values() ) {
-                    playerInfo.getPlayer().sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
+                if( activePlayers.size() == 1 )
+                {
+                    String message = boostWinner.replaceAll( "%player%", activePlayers.get( 0 ).getDisplayName() );
+                    for( PlayerInfo playerInfo : players.values() ) {
+                        playerInfo.getPlayer().sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
+                    }
                 }
                 this.end();
             }
@@ -149,8 +164,6 @@ public class Game
     {
         return gameState.toString();
     }
-
-    // TODO: Should have some other game state checking, potentially called from the commands.
 
     public boolean start()
     {
