@@ -1,5 +1,6 @@
 package nz.pmme.Boost;
 
+import nz.pmme.Boost.Config.Config;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -9,11 +10,11 @@ public class Main extends JavaPlugin
 {
     private GameManager gameManager = new GameManager( this );
     private boolean boostEnabled = true;
+    private Config config = new Config( this );
 
     @Override
     public void onEnable() {
-        this.saveDefaultConfig();
-        this.loadConfig();
+        config.init();
 
         this.getCommand( "boost" ).setExecutor( new Command_Boost(this) );
         this.getServer().getPluginManager().registerEvents( new EventsListener(this), this );
@@ -41,10 +42,7 @@ public class Main extends JavaPlugin
         return gameManager;
     }
 
-    public void loadConfig()
-    {
-        this.reloadConfig();
-        // TODO: load config stuff like...
-        //messageWinner = this.getConfig().getString( "message.winner" );
+    public Config getLoadedConfig() {
+        return config;
     }
 }

@@ -1,9 +1,17 @@
+physics:
+  vertical_velocity: 2.0;
+  max_horizontal_velocity: 2.5;
+  min_horizontal_velocity: 0.1;
+  block_hit_horizontal_velocity: 2.5;
+  target_box_width: 3
+  target_box_height: 1
+
 games:
   #Sample game configuration
   Arena1:
     name: '&aArena1'
     ground: 64
     countdown: 30
-    minplayers: 2
-    maxplayers: 0
+    min_players: 2
+    max_players: 0
 

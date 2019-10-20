@@ -24,13 +24,8 @@ import java.util.List;
  */
 public class EventsListener implements Listener
 {
-    private static final double BOOST_VERTICAL_VELOCITY = 2.0;
-    private static final double BOOST_MAX_HORIZONTAL_VELOCITY = 2.5;    // NOTE: Horizontal velocity is scaled much smaller than vertical in Minecraft.
-    private static final double BOOST_MIN_HORIZONTAL_VELOCITY = 0.1;
-    private static final double BOOST_BLOCK_HIT_HORIZONTAL_VELOCITY = BOOST_MAX_HORIZONTAL_VELOCITY;
     private static final Vector VECTOR_UP = new Vector( 0, 1, 0 );
     private Main plugin;
-    private static final int targetDistance = 1;
 
     public EventsListener(Main plugin) {
         this.plugin = plugin;
@@ -38,9 +33,10 @@ public class EventsListener implements Listener
 
     public boolean inTargetBox( Vector targetPosition, Location playerPosition )
     {
-        if(     Math.abs( playerPosition.getBlockX()-targetPosition.getBlockX() ) <= targetDistance
-            &&  Math.abs( playerPosition.getBlockY()-targetPosition.getBlockY() ) <= targetDistance
-            &&  Math.abs( playerPosition.getBlockZ()-targetPosition.getBlockZ() ) <= targetDistance )
+        int yDelta = playerPosition.getBlockY() - targetPosition.getBlockY();
+        if(     Math.abs( playerPosition.getBlockX() - targetPosition.getBlockX() ) <= plugin.getLoadedConfig().getTargetDistanceH()
+            &&  yDelta >= 0 && yDelta <= plugin.getLoadedConfig().getTargetDistanceV()
+            &&  Math.abs( playerPosition.getBlockZ() - targetPosition.getBlockZ() ) <= plugin.getLoadedConfig().getTargetDistanceH() )
         {
             return true;
         }
@@ -84,10 +80,10 @@ public class EventsListener implements Listener
                         VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
 
                         // Set a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
-                        vectorToOtherPlayer.multiply( BOOST_BLOCK_HIT_HORIZONTAL_VELOCITY );
+                        vectorToOtherPlayer.multiply( plugin.getLoadedConfig().getBlock_hit_horizontal_velocity() );
 
                         // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
-                        Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), BOOST_VERTICAL_VELOCITY, vectorToOtherPlayer.getZ() );
+                        Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
                         otherPlayer.setVelocity( vectorBoost );
                     }
                 }
@@ -108,13 +104,13 @@ public class EventsListener implements Listener
                     VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
 
                     // Calculate a horizontal boost velocity that is greater the closer you are to the target.
-                    double horizontalVelocity = BOOST_MAX_HORIZONTAL_VELOCITY - vectorToOtherPlayer.getDistanceBetweenPlayers();
-                    if( horizontalVelocity < BOOST_MIN_HORIZONTAL_VELOCITY )
-                        horizontalVelocity = BOOST_MIN_HORIZONTAL_VELOCITY;
+                    double horizontalVelocity = plugin.getLoadedConfig().getMax_horizontal_velocity() - vectorToOtherPlayer.getDistanceBetweenPlayers();
+                    if( horizontalVelocity < plugin.getLoadedConfig().getMin_horizontal_velocity() )
+                        horizontalVelocity = plugin.getLoadedConfig().getMin_horizontal_velocity();
                     vectorToOtherPlayer.multiply( horizontalVelocity );
 
                     // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
-                    Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), BOOST_VERTICAL_VELOCITY, vectorToOtherPlayer.getZ() );
+                    Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
                     otherPlayer.setVelocity( vectorBoost );
                 }
             }

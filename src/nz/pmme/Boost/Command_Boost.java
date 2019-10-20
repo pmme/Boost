@@ -65,7 +65,7 @@ public class Command_Boost implements CommandExecutor
 
                 case "reload":
                     plugin.getGameManager().clearAllGames();
-                    plugin.loadConfig();
+                    plugin.getLoadedConfig().reload();
                     sender.sendMessage( boostConfigReloaded );
                     return true;
 
