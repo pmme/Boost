@@ -2,9 +2,12 @@ package nz.pmme.Boost;
 
 import nz.pmme.Boost.Enums.GameState;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -220,6 +223,8 @@ public class Game
             playerInfo.getPlayer().teleport( location );
             playerInfo.setActive();
             playerInfo.getPlayer().sendMessage( boostGameStarted );
+            playerInfo.getPlayer().getInventory().setItemInMainHand( new ItemStack( Material.DIAMOND_HOE ) );
+            playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
         }
         return true;
     }

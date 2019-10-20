@@ -1,6 +1,7 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Boost.Enums.PlayerGameState;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 public class PlayerInfo
@@ -12,6 +13,7 @@ public class PlayerInfo
     {
         this.player = player;
         this.playerGameState = PlayerGameState.QUEUED;
+        player.setGameMode( GameMode.ADVENTURE );
     }
 
     public Player getPlayer() {
@@ -28,6 +30,7 @@ public class PlayerInfo
 
     public void setLost() {
         playerGameState = PlayerGameState.LOST;
+        player.setGameMode( GameMode.SPECTATOR );
     }
 
     public String getPlayerStateText() {
