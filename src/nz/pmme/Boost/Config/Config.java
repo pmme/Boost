@@ -1,6 +1,9 @@
 package nz.pmme.Boost.Config;
 
 import nz.pmme.Boost.Main;
+import org.bukkit.configuration.ConfigurationSection;
+
+import java.util.Set;
 
 public class Config
 {
@@ -12,6 +15,8 @@ public class Config
     private double max_horizontal_velocity;
     private double min_horizontal_velocity;
     private double block_hit_horizontal_velocity;
+
+    private Set<String> gameList = null;
 
     public Config( Main plugin )
     {
@@ -39,6 +44,9 @@ public class Config
         max_horizontal_velocity = plugin.getConfig().getDouble( "physics.max_horizontal_velocity" );
         min_horizontal_velocity = plugin.getConfig().getDouble( "physics.min_horizontal_velocity" );
         block_hit_horizontal_velocity = plugin.getConfig().getDouble( "physics.block_hit_horizontal_velocity" );
+
+        ConfigurationSection gamesSection = plugin.getConfig().getConfigurationSection( "games" );
+        if( gamesSection != null ) gameList = gamesSection.getKeys( false );
     }
 
     public int getTargetDistanceH() { return targetDistanceH; }
@@ -47,4 +55,6 @@ public class Config
     public double getMax_horizontal_velocity() { return max_horizontal_velocity; }
     public double getMin_horizontal_velocity() { return min_horizontal_velocity;}
     public double getBlock_hit_horizontal_velocity() { return block_hit_horizontal_velocity; }
+
+    public Set<String> getGameList() { return gameList; }
 }

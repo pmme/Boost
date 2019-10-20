@@ -22,6 +22,14 @@ public class GameManager
         this.plugin = plugin;
     }
 
+    public void createConfiguredGames() throws GameAlreadyExistsException
+    {
+        for( String gameName : plugin.getLoadedConfig().getGameList() )
+        {
+            this.createGame( gameName );
+        }
+    }
+
     public Game createGame( String gameName ) throws GameAlreadyExistsException
     {
         if( games.containsKey( gameName.toLowerCase() ) ) {
