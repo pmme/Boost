@@ -5,8 +5,8 @@ import org.bukkit.entity.Player;
 
 public class PlayerInfo
 {
-    Player player;
-    PlayerGameState playerGameState;
+    private Player player;
+    private PlayerGameState playerGameState;
 
     public PlayerInfo( Player player )
     {
