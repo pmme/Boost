@@ -14,6 +14,8 @@ games:
     countdown: 30
     min_players: 2
     max_players: 0
+    auto_queue: true
+    countdown_announce_time: 10
     game_start:
       world: world
       x: 100

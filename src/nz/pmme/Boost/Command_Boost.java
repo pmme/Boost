@@ -25,8 +25,16 @@ public class Command_Boost implements CommandExecutor
             ChatColor.WHITE + "/boost leave" + ChatColor.DARK_AQUA + " - Leave your current game.",
             ChatColor.WHITE + "/boost creategame Arena1" + ChatColor.DARK_AQUA + " - Create a game with the specified name.",
             ChatColor.WHITE + "/boost setground Arena1 [yPos]" + ChatColor.DARK_AQUA + " - Set the losing ground level for the named game.",
+            ChatColor.WHITE + "/boost setstart" + ChatColor.DARK_AQUA + " - Set the start spawn position.",
+            ChatColor.WHITE + "/boost setlobby" + ChatColor.DARK_AQUA + " - Set the lobby spawn position.",
+            ChatColor.WHITE + "/boost setloss" + ChatColor.DARK_AQUA + " - Set the spawn position for losing players.",
+            ChatColor.WHITE + "/boost setspread" + ChatColor.DARK_AQUA + " - Set the spread from the start spawn position.",
+            ChatColor.WHITE + "/boost queue Arena1" + ChatColor.DARK_AQUA + " - Start queuing the named game.",
             ChatColor.WHITE + "/boost start Arena1" + ChatColor.DARK_AQUA + " - Force-start the named game.",
             ChatColor.WHITE + "/boost end Arena1" + ChatColor.DARK_AQUA + " - Force-end the named game.",
+            ChatColor.WHITE + "/boost cleargames" + ChatColor.DARK_AQUA + " - End all games.",
+            ChatColor.WHITE + "/boost status" + ChatColor.DARK_AQUA + " - Get a debug list of games and current player.",
+            ChatColor.WHITE + "/boost reload" + ChatColor.DARK_AQUA + " - End all games, reload config, and re-initialise.",
             ChatColor.WHITE + "/boost on" + ChatColor.DARK_AQUA + " - Turn the Boost game and controls on.",
             ChatColor.WHITE + "/boost off" + ChatColor.DARK_AQUA + " - Turn the Boost game and controls off."
     };
@@ -35,6 +43,7 @@ public class Command_Boost implements CommandExecutor
     private static final String boostGameDoesNotExist = ChatColor.RED + "No Boost game with that name.";
     private static final String boostGameAlreadyRunning = ChatColor.RED + "That Boost game is already running.";
     private static final String boostGameNotRunning = ChatColor.RED + "That Boost game is not running.";
+    private static final String boostGameAlreadyQueuing = ChatColor.RED + "That Boost game is already queuing.";
     private static final String boostGamesCleared = ChatColor.DARK_AQUA + "All Boost games cleared.";
 
     public Command_Boost( Main plugin ) {
@@ -193,6 +202,30 @@ public class Command_Boost implements CommandExecutor
                     }
                     break;
 
+                case "queue":
+                    if( !plugin.isBoostEnabled() ) {
+                        sender.sendMessage( boostDisabledMessage );
+                        return true;
+                    }
+                    if( args.length == 2 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            sender.sendMessage( boostGameDoesNotExist );
+                            return true;
+                        }
+                        if( game.isRunning() ) {
+                            sender.sendMessage( boostGameAlreadyRunning );
+                            return true;
+                        }
+                        if( game.isQueuing() ) {
+                            sender.sendMessage( boostGameAlreadyQueuing );
+                            return true;
+                        }
+                        game.startQueuing();
+                        return true;
+                    }
+                    break;
+
                 case "start":
                     if( !plugin.isBoostEnabled() ) {
                         sender.sendMessage( boostDisabledMessage );
@@ -220,11 +253,11 @@ public class Command_Boost implements CommandExecutor
                             sender.sendMessage( boostGameDoesNotExist );
                             return true;
                         }
-                        if( !game.isRunning() ) {
+                        if( !game.isRunning() && !game.isQueuing() ) {
                             sender.sendMessage( boostGameNotRunning );
                             return true;
                         }
-                        game.end();
+                        game.end( false );
                         return true;
                     }
                     break;
@@ -235,6 +268,7 @@ public class Command_Boost implements CommandExecutor
                     for( Game game : plugin.getGameManager().getGames() )
                     {
                         String message = "- " + game.getDisplayName() + "/" + game.getName() + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players.";
+                        if( game.isQueuing() ) message += " " + game.getRemainingQueueTime() + "s before start.";
                         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
                     }
                     if( sender instanceof Player ) {

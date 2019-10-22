@@ -36,7 +36,6 @@ public class GameManager
             throw new GameAlreadyExistsException();
         }
         Game game = new Game( plugin, gameName );
-        game.setQueuing();
         games.put( gameName.toLowerCase(), game );
         return game;
     }
@@ -104,7 +103,7 @@ public class GameManager
     public void clearAllGames()
     {
         for( Game game : games.values() ) {
-            game.end();
+            game.end( true );
         }
         games.clear();
         playersInGames.clear();

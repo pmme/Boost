@@ -8,6 +8,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -20,18 +22,29 @@ public class Game
     private GameState gameState;
     private Map< UUID, PlayerInfo > players = new HashMap<>();
     private int groundLevel;
+    private int countdown;
+    private int minPlayers;
+    private int maxPlayers;
+    private boolean autoQueue;
+
     private SpawnLocation lobbySpawn;
     private SpawnLocation startSpawn;
     private SpawnLocation lossSpawn;
     private int spawnSpread;
 
+    private int countdownAnnounceTime;
+    private int remainingQueueTime;
+    private BukkitTask queueTask;
+
     private static final String boostJoinMessage = ChatColor.DARK_AQUA + "Joined Boost game";
     private static final String boostNoJoinRunningMessage = ChatColor.RED + "You cannot join that game because it is already running.";
     private static final String boostNoJoinStoppedMessage = ChatColor.RED + "You cannot join that game because it is stopped.";
+    private static final String boostNoJoinGameFullMessage = ChatColor.RED + "You cannot join that game because it is already full.";
     private static final String boostLeaveMessage = ChatColor.DARK_AQUA + "Left Boost game";
     private static final String boostLostMessage = ChatColor.DARK_PURPLE + "Your out!";
     private static final String boostGameStarted = ChatColor.LIGHT_PURPLE + "Boost game has started!";
     private static final String boostGameEnded = ChatColor.LIGHT_PURPLE + "Boost game has ended!";
+    private static final String boostGameStartsIn = ChatColor.LIGHT_PURPLE + "Game starts in %time% seconds ...";
     private static final String boostWinner = ChatColor.GREEN + "!!Player %player% is the the winner!!";
 
     private String configPath( String subPath ) {
@@ -47,10 +60,19 @@ public class Game
         this.displayName = plugin.getConfig().getString( this.configPath( "name" ), this.name );
         this.groundLevel = plugin.getConfig().getInt( this.configPath( "ground" ), 64 );
 
+        this.countdown = plugin.getConfig().getInt( this.configPath( "countdown" ), 30 );
+        this.minPlayers = plugin.getConfig().getInt( this.configPath( "min_players" ), 2 );
+        this.maxPlayers = plugin.getConfig().getInt( this.configPath( "max_players" ), 0 );
+        this.autoQueue = plugin.getConfig().getBoolean( this.configPath( "auto_queue" ), true );
+
         this.lobbySpawn = new SpawnLocation( plugin, name, "game_lobby" );
         this.startSpawn = new SpawnLocation( plugin, name, "game_start" );
         this.lossSpawn = new SpawnLocation( plugin, name, "game_loss" );
         this.spawnSpread = plugin.getConfig().getInt( this.configPath( "game_start.spread" ), 4 );
+
+        this.countdownAnnounceTime = plugin.getConfig().getInt( this.configPath( "countdown_announce_time" ), 10 );
+
+        if( this.autoQueue ) this.startQueuing();
     }
 
     public String getName() {
@@ -65,8 +87,50 @@ public class Game
         return players.size();
     }
 
-    public void setQueuing() {
+    public int getCountdown() {
+        return countdown;
+    }
+
+    public int getRemainingQueueTime() {
+        return remainingQueueTime;
+    }
+
+    public int getMinPlayers() {
+        return minPlayers;
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public void startQueuing()
+    {
         gameState = GameState.QUEUING;
+        remainingQueueTime = this.getCountdown();
+        BukkitRunnable queueRunnable = new BukkitRunnable()
+        {
+            @Override
+            public void run() {
+                if( !plugin.isBoostEnabled() ) return;
+                if( getPlayerCount() < Game.this.getMinPlayers() ) {
+                    remainingQueueTime = Game.this.getCountdown();
+                } else {
+                    if( remainingQueueTime <= 0 ) {
+                        this.cancel();
+                        Game.this.start();
+                    } else {
+                        if( remainingQueueTime % countdownAnnounceTime == 0 || remainingQueueTime <= 5 ) {
+                            String message = ChatColor.translateAlternateColorCodes( '&', boostGameStartsIn.replaceAll( "%time%", String.valueOf( remainingQueueTime ) ) );
+                            for( PlayerInfo playerInfo : players.values() ) {
+                                playerInfo.getPlayer().sendMessage( message );
+                            }
+                        }
+                        --remainingQueueTime;
+                    }
+                }
+            }
+        };
+        queueTask = queueRunnable.runTaskTimer( plugin, 1L, 20L/*ticksPerSecond*/ );
     }
 
     public int getGroundLevel()
@@ -118,6 +182,10 @@ public class Game
             }
             return true;
         }
+        if( this.getMaxPlayers() > 0 && this.getPlayerCount() >= this.getMaxPlayers() )
+        {
+            player.sendMessage( boostNoJoinGameFullMessage );
+        }
         players.put( player.getUniqueId(), new PlayerInfo( player ) );
         player.teleport( lobbySpawn.getSpawn() );
         player.setGameMode( GameMode.ADVENTURE );
@@ -146,7 +214,7 @@ public class Game
                         playerInfo.getPlayer().sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
                     }
                 }
-                this.end();
+                this.end( false );
             }
         }
     }
@@ -196,7 +264,7 @@ public class Game
                         playerInfo.getPlayer().sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
                     }
                 }
-                this.end();
+                this.end( false );
             }
         }
     }
@@ -220,6 +288,11 @@ public class Game
         return gameState == GameState.RUNNING;
     }
 
+    public boolean isQueuing()
+    {
+        return gameState == GameState.QUEUING;
+    }
+
     public String getGameStateText()
     {
         return gameState.toString();
@@ -227,6 +300,7 @@ public class Game
 
     public boolean start()
     {
+        if( queueTask != null && !queueTask.isCancelled() ) queueTask.cancel();
         gameState = GameState.RUNNING;
         for( PlayerInfo playerInfo : players.values() )
         {
@@ -243,8 +317,10 @@ public class Game
         return true;
     }
 
-    public boolean end()
+    public boolean end( boolean noAutoQueue )
     {
+        boolean wasQueuing = ( gameState == GameState.QUEUING || ( queueTask != null && !queueTask.isCancelled() ) );
+        if( queueTask != null && !queueTask.isCancelled() ) queueTask.cancel();  // Cancel the queue in case it's queuing rather than running.
         gameState = GameState.STOPPED;
         for( PlayerInfo playerInfo : players.values() )
         {
@@ -255,7 +331,7 @@ public class Game
             plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
         }
         players.clear();
-        gameState = GameState.QUEUING;
+        if( autoQueue && !wasQueuing && !noAutoQueue ) this.startQueuing();    // Don't restart queuing if we were in the queuing state when end was called.
         return true;
     }
 }
