@@ -14,10 +14,22 @@ games:
     countdown: 30
     min_players: 2
     max_players: 0
-    spawn:
+    game_start:
+      world: world
+      x: 100
+      y: 64
+      z: 0
+      spread: 4
+    game_loss:
       world: world
       x: 0
       y: 64
       z: 0
-      spread: 4
+      yaw: 0
+    game_lobby:
+      world: world
+      x: 0
+      y: 64
+      z: 0
+      yaw: 0
 

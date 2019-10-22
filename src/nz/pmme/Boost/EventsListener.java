@@ -133,11 +133,11 @@ public class EventsListener implements Listener
     public void onEntityDamage( EntityDamageEvent event )
     {
         if( plugin.isBoostEnabled() ) {
-            if( event.getEntity() instanceof Player ) {
-                if( plugin.getGameManager().isPlaying( (Player)event.getEntity() ) ) {
+//            if( event.getEntity() instanceof Player ) {
+//                if( plugin.getGameManager().isPlaying( (Player)event.getEntity() ) ) {
                     event.setCancelled( true );
-                }
-            }
+//                }
+//            }
         }
     }
 

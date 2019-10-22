@@ -111,7 +111,9 @@ public class Command_Boost implements CommandExecutor
                     }
                     break;
 
-                case "setspawn":
+                case "setstart":
+                case "setlobby":
+                case "setloss":
                     if( args.length > 1 ) {
                         Game game = plugin.getGameManager().getGame( args[1] );
                         if( game == null ) {
@@ -124,7 +126,11 @@ public class Command_Boost implements CommandExecutor
                             if( world != null ) {
                                 Location spawn = new Location( world, Double.valueOf( args[3] ), Double.valueOf( args[4] ), Double.valueOf( args[5] ) );
                                 if( spawn != null ) {
-                                    game.setSpawn( spawn );
+                                    switch( boostCommand ) {
+                                        case "setstart": game.setStartSpawn( spawn ); break;
+                                        case "setlobby": game.setLobbySpawn( spawn ); break;
+                                        case "setloss": game.setLossSpawn( spawn ); break;
+                                    }
                                 } else {
                                     sender.sendMessage( ChatColor.RED + "Failed to create location to set spawn." );
                                 }
@@ -136,9 +142,11 @@ public class Command_Boost implements CommandExecutor
                         else if( args.length == 2 )
                         {
                             if( sender instanceof Player ) {
-                                game.setSpawn( ((Player)sender).getLocation() );
-                            } else {
-                                displayNoConsoleMessage( sender );
+                                switch( boostCommand ) {
+                                    case "setstart": game.setStartSpawn( ((Player)sender).getLocation() ); break;
+                                    case "setlobby": game.setLobbySpawn( ((Player)sender).getLocation() ); break;
+                                    case "setloss": game.setLossSpawn( ((Player)sender).getLocation() ); break;
+                                }
                             }
                             return true;
                         }

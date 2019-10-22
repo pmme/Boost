@@ -1,11 +1,11 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Boost.Enums.GameState;
+import nz.pmme.Boost.Config.SpawnLocation;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -20,7 +20,9 @@ public class Game
     private GameState gameState;
     private Map< UUID, PlayerInfo > players = new HashMap<>();
     private int groundLevel;
-    private Location spawn;
+    private SpawnLocation lobbySpawn;
+    private SpawnLocation startSpawn;
+    private SpawnLocation lossSpawn;
     private int spawnSpread;
 
     private static final String boostJoinMessage = ChatColor.DARK_AQUA + "Joined Boost game";
@@ -44,14 +46,11 @@ public class Game
 
         this.displayName = plugin.getConfig().getString( this.configPath( "name" ), this.name );
         this.groundLevel = plugin.getConfig().getInt( this.configPath( "ground" ), 64 );
-        World spawnWorld = plugin.getServer().getWorld( plugin.getConfig().getString( this.configPath( "spawn.world" ), "world" ) );
-        if( spawnWorld != null ) {
-            int spawnX = plugin.getConfig().getInt( this.configPath( "spawn.x" ), 0 );
-            int spawnY = plugin.getConfig().getInt( this.configPath( "spawn.y" ), 64 );
-            int spawnZ = plugin.getConfig().getInt( this.configPath( "spawn.z" ), 0 );
-            this.spawn = new Location( spawnWorld, spawnX, spawnY, spawnZ );
-        }
-        this.spawnSpread = plugin.getConfig().getInt( this.configPath( "spawn.spread" ), 4 );
+
+        this.lobbySpawn = new SpawnLocation( plugin, name, "game_lobby" );
+        this.startSpawn = new SpawnLocation( plugin, name, "game_start" );
+        this.lossSpawn = new SpawnLocation( plugin, name, "game_loss" );
+        this.spawnSpread = plugin.getConfig().getInt( this.configPath( "game_start.spread" ), 4 );
     }
 
     public String getName() {
@@ -82,20 +81,25 @@ public class Game
         plugin.saveConfig();
     }
 
-    public void setSpawn( Location spawn )
+    public void setLobbySpawn( Location spawn )
     {
-        this.spawn = spawn;
-        plugin.getConfig().set( configPath("spawn.world" ), this.spawn.getWorld().getName() );
-        plugin.getConfig().set( configPath("spawn.x" ), this.spawn.getBlockX() );
-        plugin.getConfig().set( configPath("spawn.y" ), this.spawn.getBlockY() );
-        plugin.getConfig().set( configPath("spawn.z" ), this.spawn.getBlockZ() );
-        plugin.saveConfig();
+        lobbySpawn.setSpawn( spawn );
+    }
+
+    public void setStartSpawn( Location spawn )
+    {
+        startSpawn.setSpawn( spawn );
+    }
+
+    public void setLossSpawn( Location spawn )
+    {
+        lossSpawn.setSpawn( spawn );
     }
 
     public void setSpawnSpread( int spread )
     {
         this.spawnSpread = spread;
-        plugin.getConfig().set( configPath("spawn.spread" ), this.spawnSpread );
+        plugin.getConfig().set( configPath("game_start.spread" ), this.spawnSpread );
         plugin.saveConfig();
     }
 
@@ -115,6 +119,8 @@ public class Game
             return true;
         }
         players.put( player.getUniqueId(), new PlayerInfo( player ) );
+        player.teleport( lobbySpawn.getSpawn() );
+        player.setGameMode( GameMode.ADVENTURE );
         player.sendMessage( boostJoinMessage );
         return true;
     }
@@ -122,7 +128,11 @@ public class Game
     public void leave( Player player )
     {
         players.remove( player.getUniqueId() );
+        player.teleport( lobbySpawn.getSpawn() );
+        player.setGameMode( GameMode.ADVENTURE );
         player.sendMessage( boostLeaveMessage );
+        player.getInventory().clear();
+
         if( gameState == GameState.RUNNING )
         {
             List<Player> activePlayers = getActivePlayerList();
@@ -170,7 +180,10 @@ public class Game
         {
             PlayerInfo payerInfoLost = players.get( player.getUniqueId() );
             if( payerInfoLost != null ) payerInfoLost.setLost();
+            player.teleport( lossSpawn.getSpawn() );
+            player.setGameMode( GameMode.SPECTATOR );
             player.sendMessage( boostLostMessage );
+            player.getInventory().clear();
 
             List<Player> activePlayers = getActivePlayerList();
             if( activePlayers.size() <= 1 )
@@ -217,14 +230,15 @@ public class Game
         gameState = GameState.RUNNING;
         for( PlayerInfo playerInfo : players.values() )
         {
-            Location location = new Location( spawn.getWorld(), spawn.getX(), spawn.getY(), spawn.getZ(), (float)( Math.random() * 360.0 ), 0 );
+            // TODO: Probably worth making PlayerInfo a PlayerControl class, then adding startGame() to it. Needs spawn point and spread.
+            Location location = new Location( startSpawn.getSpawn().getWorld(), startSpawn.getSpawn().getX(), startSpawn.getSpawn().getY(), startSpawn.getSpawn().getZ(), (float)( Math.random() * 360.0 ), 0 );
             Vector spreadVector = new Vector( Math.random()*spawnSpread, 0, 0 ).rotateAroundY( Math.random() * 360.0 );
             location.add( spreadVector );
             playerInfo.getPlayer().teleport( location );
-            playerInfo.setActive();
+            playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
             playerInfo.getPlayer().sendMessage( boostGameStarted );
             playerInfo.getPlayer().getInventory().setItemInMainHand( new ItemStack( Material.DIAMOND_HOE ) );
-            playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
+            playerInfo.setActive();
         }
         return true;
     }
@@ -234,7 +248,10 @@ public class Game
         gameState = GameState.STOPPED;
         for( PlayerInfo playerInfo : players.values() )
         {
+            playerInfo.getPlayer().teleport( lobbySpawn.getSpawn() );
+            playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
             playerInfo.getPlayer().sendMessage( boostGameEnded );
+            playerInfo.getPlayer().getInventory().clear();
             plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
         }
         players.clear();
