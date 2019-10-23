@@ -1,6 +1,5 @@
 package nz.pmme.Boost;
 
-import nz.pmme.Utils.TargetBlockFinder;
 import nz.pmme.Utils.VectorToOtherPlayer;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -61,8 +60,7 @@ public class EventsListener implements Listener
                     break;
                 case LEFT_CLICK_AIR:
                 case RIGHT_CLICK_AIR:
-                    TargetBlockFinder targetBlockFinder = new TargetBlockFinder( event.getPlayer() );
-                    targetBlock = targetBlockFinder.getTargetBlock();
+                    targetBlock = event.getPlayer().getTargetBlock( null, playersGame.getTargetDist() );
                     break;
                 case PHYSICAL:
                     break;

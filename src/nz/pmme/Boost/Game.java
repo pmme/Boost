@@ -22,6 +22,7 @@ public class Game
     private GameState gameState;
     private Map< UUID, PlayerInfo > players = new HashMap<>();
     private int groundLevel;
+    private int targetDist;
     private int countdown;
     private int minPlayers;
     private int maxPlayers;
@@ -59,6 +60,7 @@ public class Game
 
         this.displayName = plugin.getConfig().getString( this.configPath( "name" ), this.name );
         this.groundLevel = plugin.getConfig().getInt( this.configPath( "ground" ), 64 );
+        this.targetDist = plugin.getConfig().getInt( this.configPath( "target_dist" ), 150 );
 
         this.countdown = plugin.getConfig().getInt( this.configPath( "countdown" ), 30 );
         this.minPlayers = plugin.getConfig().getInt( this.configPath( "min_players" ), 2 );
@@ -143,6 +145,11 @@ public class Game
         groundLevel = newGround;
         plugin.getConfig().set( configPath( "ground" ), groundLevel );
         plugin.saveConfig();
+    }
+
+    public int getTargetDist()
+    {
+        return targetDist;
     }
 
     public void setLobbySpawn( Location spawn )
