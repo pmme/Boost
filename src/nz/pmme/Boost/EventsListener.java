@@ -1,11 +1,14 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Utils.VectorToOtherPlayer;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -49,40 +52,79 @@ public class EventsListener implements Listener
         {
             final Player thisPlayer = event.getPlayer();
             final Game playersGame = plugin.getGameManager().getPlayersGame( thisPlayer );
-            if( playersGame == null ) return;
-            if( !playersGame.isActiveInGame( thisPlayer ) ) return;
-
-            Block targetBlock = null;
-            switch( event.getAction() ) {
-                case LEFT_CLICK_BLOCK:
-                case RIGHT_CLICK_BLOCK:
-                    targetBlock = event.getClickedBlock();
-                    break;
-                case LEFT_CLICK_AIR:
-                case RIGHT_CLICK_AIR:
-                    targetBlock = event.getPlayer().getTargetBlock( null, playersGame.getTargetDist() );
-                    break;
-                case PHYSICAL:
-                    break;
-            }
-            if( targetBlock != null )
+            if( playersGame == null )
             {
-                // Check if there is a player standing on the target block.
-                final Vector targetPotentialPlayerPosition = targetBlock.getLocation().toVector().add( VECTOR_UP );
-
-                List<Player> otherPlayers = playersGame.getActivePlayerList();
-                for( Player otherPlayer : otherPlayers )
+                if( event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK )
                 {
-                    if( inTargetBox( targetPotentialPlayerPosition, otherPlayer.getLocation() ) )
+                    if( event.getClickedBlock().getState() instanceof Sign )
                     {
-                        VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
+                        Sign sign = (Sign)event.getClickedBlock().getState();
+                        String[] lines = sign.getLines();
+                        if( lines.length >= 3 )
+                        {
+                            if( ChatColor.stripColor( lines[0] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignTitle() ) )
+                            {
+                                if( ChatColor.stripColor( lines[1] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignJoin() ) )
+                                {
+                                    plugin.getGameManager().joinGame( thisPlayer, ChatColor.stripColor( lines[2] ) );
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if( event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK )
+                {
+                    if( event.getClickedBlock().getState() instanceof Sign )
+                    {
+                        Sign sign = (Sign)event.getClickedBlock().getState();
+                        String[] lines = sign.getLines();
+                        if( lines.length >= 2 )
+                        {
+                            if( ChatColor.stripColor( lines[0] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignTitle() ) )
+                            {
+                                if( ChatColor.stripColor( lines[1] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignLeave() ) )
+                                {
+                                    plugin.getGameManager().leaveGame( thisPlayer );
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+                if( !playersGame.isActiveInGame( thisPlayer ) ) return;
+                Block targetBlock = null;
+                switch( event.getAction() ) {
+                    case LEFT_CLICK_BLOCK:
+                    case RIGHT_CLICK_BLOCK:
+                        targetBlock = event.getClickedBlock();
+                        break;
+                    case LEFT_CLICK_AIR:
+                    case RIGHT_CLICK_AIR:
+                        targetBlock = event.getPlayer().getTargetBlock( null, playersGame.getTargetDist() );
+                        break;
+                    case PHYSICAL:
+                        break;
+                }
+                if( targetBlock != null ) {
+                    // Check if there is a player standing on the target block.
+                    final Vector targetPotentialPlayerPosition = targetBlock.getLocation().toVector().add( VECTOR_UP );
 
-                        // Set a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
-                        vectorToOtherPlayer.multiply( plugin.getLoadedConfig().getBlock_hit_horizontal_velocity() );
+                    List< Player > otherPlayers = playersGame.getActivePlayerList();
+                    for( Player otherPlayer : otherPlayers ) {
+                        if( inTargetBox( targetPotentialPlayerPosition, otherPlayer.getLocation() ) ) {
+                            VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
 
-                        // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
-                        Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
-                        otherPlayer.setVelocity( vectorBoost );
+                            // Set a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
+                            vectorToOtherPlayer.multiply( plugin.getLoadedConfig().getBlock_hit_horizontal_velocity() );
+
+                            // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
+                            Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
+                            otherPlayer.setVelocity( vectorBoost );
+                        }
                     }
                 }
             }

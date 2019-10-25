@@ -6,6 +6,11 @@ physics:
   target_box_width: 3
   target_box_height: 1
 
+signs:
+  title: '&l&5[Boost]'
+  join: 'Click to join'
+  leave: 'Click to leave'
+
 games:
   #Sample game configuration
   Arena1:

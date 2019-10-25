@@ -267,7 +267,7 @@ public class Command_Boost implements CommandExecutor
                     sender.sendMessage( "Boost games:" );
                     for( Game game : plugin.getGameManager().getGames() )
                     {
-                        String message = "- " + game.getDisplayName() + "/" + game.getName() + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players.";
+                        String message = "- " + game.getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players.";
                         if( game.isQueuing() ) message += " " + game.getRemainingQueueTime() + "s before start.";
                         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
                     }
