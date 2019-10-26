@@ -98,8 +98,8 @@ public class GameManager
             player.sendMessage( boostNotInGameMessage );
             return;
         }
+        this.removePlayer( player );
         game.leave( player );
-        playersInGames.remove( player.getUniqueId() );
     }
 
     public void removePlayer( Player player )

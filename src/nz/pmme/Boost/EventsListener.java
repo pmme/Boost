@@ -29,6 +29,8 @@ public class EventsListener implements Listener
     private static final Vector VECTOR_UP = new Vector( 0, 1, 0 );
     private Main plugin;
 
+    private static final String boostErrorInSignMessage = ChatColor.RED + "Error in Boost sign format.";
+
     public EventsListener(Main plugin) {
         this.plugin = plugin;
     }
@@ -52,79 +54,61 @@ public class EventsListener implements Listener
         {
             final Player thisPlayer = event.getPlayer();
             final Game playersGame = plugin.getGameManager().getPlayersGame( thisPlayer );
-            if( playersGame == null )
+
+            if( event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK )
             {
-                if( event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK )
+                if( event.getClickedBlock().getState() instanceof Sign )
                 {
-                    if( event.getClickedBlock().getState() instanceof Sign )
+                    Sign sign = (Sign)event.getClickedBlock().getState();
+                    String[] lines = sign.getLines();
+                    if( lines.length > 1 && ChatColor.stripColor( lines[0] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignTitle() ) )
                     {
-                        Sign sign = (Sign)event.getClickedBlock().getState();
-                        String[] lines = sign.getLines();
-                        if( lines.length >= 3 )
-                        {
-                            if( ChatColor.stripColor( lines[0] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignTitle() ) )
-                            {
-                                if( ChatColor.stripColor( lines[1] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignJoin() ) )
-                                {
-                                    plugin.getGameManager().joinGame( thisPlayer, ChatColor.stripColor( lines[2] ) );
-                                    return;
-                                }
+                        if( ChatColor.stripColor( lines[1] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignJoin() ) && lines.length >= 3 ) {
+                            if( playersGame == null ) {
+                                plugin.getGameManager().joinGame( thisPlayer, ChatColor.stripColor( lines[2] ) );
                             }
+                            return;
+                        } else if( ChatColor.stripColor( lines[1] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignLeave() ) ) {
+                            plugin.getGameManager().leaveGame( thisPlayer );
+                            return;
                         }
+                        thisPlayer.sendMessage( boostErrorInSignMessage );
+                        return;
                     }
                 }
             }
-            else
-            {
-                if( event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK )
-                {
-                    if( event.getClickedBlock().getState() instanceof Sign )
-                    {
-                        Sign sign = (Sign)event.getClickedBlock().getState();
-                        String[] lines = sign.getLines();
-                        if( lines.length >= 2 )
-                        {
-                            if( ChatColor.stripColor( lines[0] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignTitle() ) )
-                            {
-                                if( ChatColor.stripColor( lines[1] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignLeave() ) )
-                                {
-                                    plugin.getGameManager().leaveGame( thisPlayer );
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-                if( !playersGame.isActiveInGame( thisPlayer ) ) return;
-                Block targetBlock = null;
-                switch( event.getAction() ) {
-                    case LEFT_CLICK_BLOCK:
-                    case RIGHT_CLICK_BLOCK:
-                        targetBlock = event.getClickedBlock();
-                        break;
-                    case LEFT_CLICK_AIR:
-                    case RIGHT_CLICK_AIR:
-                        targetBlock = event.getPlayer().getTargetBlock( null, playersGame.getGameConfig().getTargetDist() );
-                        break;
-                    case PHYSICAL:
-                        break;
-                }
-                if( targetBlock != null ) {
-                    // Check if there is a player standing on the target block.
-                    final Vector targetPotentialPlayerPosition = targetBlock.getLocation().toVector().add( VECTOR_UP );
 
-                    List< Player > otherPlayers = playersGame.getActivePlayerList();
-                    for( Player otherPlayer : otherPlayers ) {
-                        if( inTargetBox( targetPotentialPlayerPosition, otherPlayer.getLocation() ) ) {
-                            VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
+            if( playersGame == null ) return;
+            if( !playersGame.isActiveInGame( thisPlayer ) ) return;
 
-                            // Set a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
-                            vectorToOtherPlayer.multiply( plugin.getLoadedConfig().getBlock_hit_horizontal_velocity() );
+            Block targetBlock = null;
+            switch( event.getAction() ) {
+                case LEFT_CLICK_BLOCK:
+                case RIGHT_CLICK_BLOCK:
+                    targetBlock = event.getClickedBlock();
+                    break;
+                case LEFT_CLICK_AIR:
+                case RIGHT_CLICK_AIR:
+                    targetBlock = event.getPlayer().getTargetBlock( null, playersGame.getGameConfig().getTargetDist() );
+                    break;
+                case PHYSICAL:
+                    break;
+            }
+            if( targetBlock != null ) {
+                // Check if there is a player standing on the target block.
+                final Vector targetPotentialPlayerPosition = targetBlock.getLocation().toVector().add( VECTOR_UP );
 
-                            // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
-                            Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
-                            otherPlayer.setVelocity( vectorBoost );
-                        }
+                List< Player > otherPlayers = playersGame.getActivePlayerList();
+                for( Player otherPlayer : otherPlayers ) {
+                    if( inTargetBox( targetPotentialPlayerPosition, otherPlayer.getLocation() ) ) {
+                        VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
+
+                        // Set a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
+                        vectorToOtherPlayer.multiply( plugin.getLoadedConfig().getBlock_hit_horizontal_velocity() );
+
+                        // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
+                        Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
+                        otherPlayer.setVelocity( vectorBoost );
                     }
                 }
             }
