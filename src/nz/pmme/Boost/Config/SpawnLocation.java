@@ -8,20 +8,29 @@ public class SpawnLocation
 {
     private Main plugin;
     private Location spawn;
-    private String gameSpawnConfig;
+    private String configPath;
 
-    public SpawnLocation( Main plugin, String gameName, String spawnConfig )
+    public SpawnLocation( Main plugin, String spawnConfigPath )
     {
         this.plugin = plugin;
-        gameSpawnConfig = "games." + gameName + "." + spawnConfig + ".";
-        World spawnWorld = plugin.getServer().getWorld( plugin.getConfig().getString( gameSpawnConfig + "world", "world" ) );
+        this.configPath = spawnConfigPath + ".";
+        World spawnWorld = plugin.getServer().getWorld( plugin.getConfig().getString( configPath + "world", "world" ) );
         if( spawnWorld != null ) {
-            int spawnX = plugin.getConfig().getInt( gameSpawnConfig + "x", 0 );
-            int spawnY = plugin.getConfig().getInt( gameSpawnConfig + "y", 64 );
-            int spawnZ = plugin.getConfig().getInt( gameSpawnConfig + "z", 0 );
-            int spawnYaw = plugin.getConfig().getInt( gameSpawnConfig + "yaw", 0 );
+            int spawnX = plugin.getConfig().getInt( configPath + "x", 0 );
+            int spawnY = plugin.getConfig().getInt( configPath + "y", 64 );
+            int spawnZ = plugin.getConfig().getInt( configPath + "z", 0 );
+            int spawnYaw = plugin.getConfig().getInt( configPath + "yaw", 0 );
             spawn = new Location( spawnWorld, spawnX, spawnY, spawnZ, (float)spawnYaw, 0.0F );
         }
+    }
+
+    public void setConfig()
+    {
+        if( spawn.getWorld() != null ) plugin.getConfig().set( configPath + "world", spawn.getWorld().getName() );
+        plugin.getConfig().set( configPath + "x", spawn.getBlockX() );
+        plugin.getConfig().set( configPath + "y", spawn.getBlockY() );
+        plugin.getConfig().set( configPath + "z", spawn.getBlockZ() );
+        plugin.getConfig().set( configPath + "yaw", (int)spawn.getYaw() );
     }
 
     public Location getSpawn() {
@@ -31,11 +40,7 @@ public class SpawnLocation
     public void setSpawn( Location spawn )
     {
         this.spawn = spawn;
-        if( spawn.getWorld() != null ) plugin.getConfig().set( gameSpawnConfig + "world", spawn.getWorld().getName() );
-        plugin.getConfig().set( gameSpawnConfig + "x", spawn.getBlockX() );
-        plugin.getConfig().set( gameSpawnConfig + "y", spawn.getBlockY() );
-        plugin.getConfig().set( gameSpawnConfig + "z", spawn.getBlockZ() );
-        plugin.getConfig().set( gameSpawnConfig + "yaw", (int)spawn.getYaw() );
+        this.setConfig();
         plugin.saveConfig();
     }
 }

@@ -1,5 +1,6 @@
 package nz.pmme.Boost;
 
+import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -22,21 +23,27 @@ public class GameManager
         this.plugin = plugin;
     }
 
-    public void createConfiguredGames() throws GameAlreadyExistsException
+    public void createConfiguredGames()
     {
-        for( String gameName : plugin.getLoadedConfig().getGameList() )
+        for( GameConfig gameConfig : plugin.getLoadedConfig().getGameList() )
         {
-            this.createGame( gameName );
+            this.createGame( gameConfig );
         }
     }
 
-    public Game createGame( String gameName ) throws GameAlreadyExistsException
+    public Game createNewGame( String gameName ) throws GameAlreadyExistsException
     {
         if( games.containsKey( gameName.toLowerCase() ) ) {
             throw new GameAlreadyExistsException();
         }
-        Game game = new Game( plugin, gameName );
-        games.put( gameName.toLowerCase(), game );
+        GameConfig gameConfig = plugin.getLoadedConfig().createNewGameConfig( gameName );
+        return this.createGame( gameConfig );
+    }
+
+    public Game createGame( GameConfig gameConfig )
+    {
+        Game game = new Game( plugin, gameConfig );
+        games.put( gameConfig.getName().toLowerCase(), game );
         return game;
     }
 

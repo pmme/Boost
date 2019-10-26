@@ -77,9 +77,7 @@ public class Command_Boost implements CommandExecutor
                 case "reload":
                     plugin.getGameManager().clearAllGames();
                     plugin.getLoadedConfig().reload();
-                    try {
-                        plugin.getGameManager().createConfiguredGames();
-                    } catch( GameAlreadyExistsException e ) {}
+                    plugin.getGameManager().createConfiguredGames();
                     sender.sendMessage( boostConfigReloaded );
                     return true;
 
@@ -91,7 +89,7 @@ public class Command_Boost implements CommandExecutor
                 case "creategame":
                     if( args.length == 2 ) {
                         try {
-                            plugin.getGameManager().createGame( args[1] );
+                            plugin.getGameManager().createNewGame( args[1] );
                         } catch( GameAlreadyExistsException e ) {
                             sender.sendMessage( boostGameAlreadyExists );
                         }
@@ -107,11 +105,11 @@ public class Command_Boost implements CommandExecutor
                             return true;
                         }
                         if( args.length == 3 ) {
-                            game.setGroundLevel( Integer.valueOf( args[2] ) );
+                            game.getGameConfig().setGroundLevel( Integer.valueOf( args[2] ) );
                             return true;
                         } else {
                             if( sender instanceof Player ) {
-                                game.setGroundLevel( ((Player)sender).getLocation().getBlockY() );
+                                game.getGameConfig().setGroundLevel( ((Player)sender).getLocation().getBlockY() );
                             } else {
                                 displayNoConsoleMessage( sender );
                             }
@@ -136,9 +134,9 @@ public class Command_Boost implements CommandExecutor
                                 Location spawn = new Location( world, Double.valueOf( args[3] ), Double.valueOf( args[4] ), Double.valueOf( args[5] ) );
                                 if( spawn != null ) {
                                     switch( boostCommand ) {
-                                        case "setstart": game.setStartSpawn( spawn ); break;
-                                        case "setlobby": game.setLobbySpawn( spawn ); break;
-                                        case "setloss": game.setLossSpawn( spawn ); break;
+                                        case "setstart": game.getGameConfig().setStartSpawn( spawn ); break;
+                                        case "setlobby": game.getGameConfig().setLobbySpawn( spawn ); break;
+                                        case "setloss": game.getGameConfig().setLossSpawn( spawn ); break;
                                     }
                                 } else {
                                     sender.sendMessage( ChatColor.RED + "Failed to create location to set spawn." );
@@ -152,9 +150,9 @@ public class Command_Boost implements CommandExecutor
                         {
                             if( sender instanceof Player ) {
                                 switch( boostCommand ) {
-                                    case "setstart": game.setStartSpawn( ((Player)sender).getLocation() ); break;
-                                    case "setlobby": game.setLobbySpawn( ((Player)sender).getLocation() ); break;
-                                    case "setloss": game.setLossSpawn( ((Player)sender).getLocation() ); break;
+                                    case "setstart": game.getGameConfig().setStartSpawn( ((Player)sender).getLocation() ); break;
+                                    case "setlobby": game.getGameConfig().setLobbySpawn( ((Player)sender).getLocation() ); break;
+                                    case "setloss": game.getGameConfig().setLossSpawn( ((Player)sender).getLocation() ); break;
                                 }
                             }
                             return true;
@@ -169,7 +167,7 @@ public class Command_Boost implements CommandExecutor
                             sender.sendMessage( boostGameDoesNotExist );
                             return true;
                         }
-                        game.setSpawnSpread( Integer.valueOf( args[2] ) );
+                        game.getGameConfig().setSpawnSpread( Integer.valueOf( args[2] ) );
                         return true;
                     }
                     break;
@@ -267,14 +265,14 @@ public class Command_Boost implements CommandExecutor
                     sender.sendMessage( "Boost games:" );
                     for( Game game : plugin.getGameManager().getGames() )
                     {
-                        String message = "- " + game.getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players.";
+                        String message = "- " + game.getGameConfig().getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players.";
                         if( game.isQueuing() ) message += " " + game.getRemainingQueueTime() + "s before start.";
                         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
                     }
                     if( sender instanceof Player ) {
                         Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
                         if( game != null ) {
-                            String message = "You are " + game.getPlayerStateText( (Player)sender ) + " in game " + game.getDisplayName() + "/" + game.getName() + ", which is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players.";
+                            String message = "You are " + game.getPlayerStateText( (Player)sender ) + " in game " + game.getGameConfig().getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players.";
                             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
                         } else {
                             sender.sendMessage( "Not currently in a game." );

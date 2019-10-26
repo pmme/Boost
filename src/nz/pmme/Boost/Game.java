@@ -1,7 +1,7 @@
 package nz.pmme.Boost;
 
+import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Enums.GameState;
-import nz.pmme.Boost.Config.SpawnLocation;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -17,23 +17,10 @@ import java.util.*;
 public class Game
 {
     private Main plugin;
-    private String name;
-    private String displayName;
+    private GameConfig gameConfig;
     private GameState gameState;
     private Map< UUID, PlayerInfo > players = new HashMap<>();
-    private int groundLevel;
-    private int targetDist;
-    private int countdown;
-    private int minPlayers;
-    private int maxPlayers;
-    private boolean autoQueue;
 
-    private SpawnLocation lobbySpawn;
-    private SpawnLocation startSpawn;
-    private SpawnLocation lossSpawn;
-    private int spawnSpread;
-
-    private int countdownAnnounceTime;
     private int remainingQueueTime;
     private BukkitTask queueTask;
 
@@ -48,80 +35,44 @@ public class Game
     private static final String boostGameStartsIn = ChatColor.LIGHT_PURPLE + "Game starts in %time% seconds ...";
     private static final String boostWinner = ChatColor.GREEN + "!!Player %player% is the the winner!!";
 
-    private String configPath( String subPath ) {
-        return "games." + this.name + "." + subPath;
-    }
-
-    public Game( Main plugin, String name )
+    public Game( Main plugin, GameConfig gameConfig )
     {
         this.plugin = plugin;
-        this.name = name;
+        this.gameConfig = gameConfig;
         this.gameState = GameState.STOPPED;
 
-        this.displayName = plugin.getConfig().getString( this.configPath( "name" ), this.name );
-        this.groundLevel = plugin.getConfig().getInt( this.configPath( "ground" ), 64 );
-        this.targetDist = plugin.getConfig().getInt( this.configPath( "target_dist" ), 150 );
-
-        this.countdown = plugin.getConfig().getInt( this.configPath( "countdown" ), 30 );
-        this.minPlayers = plugin.getConfig().getInt( this.configPath( "min_players" ), 2 );
-        this.maxPlayers = plugin.getConfig().getInt( this.configPath( "max_players" ), 0 );
-        this.autoQueue = plugin.getConfig().getBoolean( this.configPath( "auto_queue" ), true );
-
-        this.lobbySpawn = new SpawnLocation( plugin, name, "game_lobby" );
-        this.startSpawn = new SpawnLocation( plugin, name, "game_start" );
-        this.lossSpawn = new SpawnLocation( plugin, name, "game_loss" );
-        this.spawnSpread = plugin.getConfig().getInt( this.configPath( "game_start.spread" ), 4 );
-
-        this.countdownAnnounceTime = plugin.getConfig().getInt( this.configPath( "countdown_announce_time" ), 10 );
-
-        if( this.autoQueue ) this.startQueuing();
+        if( this.gameConfig.isAutoQueue() ) this.startQueuing();
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getDisplayName() {
-        return displayName;
+    public GameConfig getGameConfig() {
+        return gameConfig;
     }
 
     public int getPlayerCount() {
         return players.size();
     }
 
-    public int getCountdown() {
-        return countdown;
-    }
-
     public int getRemainingQueueTime() {
         return remainingQueueTime;
-    }
-
-    public int getMinPlayers() {
-        return minPlayers;
-    }
-
-    public int getMaxPlayers() {
-        return maxPlayers;
     }
 
     public void startQueuing()
     {
         gameState = GameState.QUEUING;
-        remainingQueueTime = this.getCountdown();
+        remainingQueueTime = gameConfig.getCountdown();
         BukkitRunnable queueRunnable = new BukkitRunnable()
         {
             @Override
             public void run() {
                 if( !plugin.isBoostEnabled() ) return;
-                if( getPlayerCount() < Game.this.getMinPlayers() ) {
-                    remainingQueueTime = Game.this.getCountdown();
+                if( getPlayerCount() < gameConfig.getMinPlayers() ) {
+                    remainingQueueTime = gameConfig.getCountdown();
                 } else {
                     if( remainingQueueTime <= 0 ) {
                         this.cancel();
                         Game.this.start();
                     } else {
-                        if( remainingQueueTime % countdownAnnounceTime == 0 || remainingQueueTime <= 5 ) {
+                        if( remainingQueueTime % gameConfig.getCountdownAnnounceTime() == 0 || remainingQueueTime <= 5 ) {
                             String message = ChatColor.translateAlternateColorCodes( '&', boostGameStartsIn.replaceAll( "%time%", String.valueOf( remainingQueueTime ) ) );
                             for( PlayerInfo playerInfo : players.values() ) {
                                 playerInfo.getPlayer().sendMessage( message );
@@ -133,45 +84,6 @@ public class Game
             }
         };
         queueTask = queueRunnable.runTaskTimer( plugin, 1L, 20L/*ticksPerSecond*/ );
-    }
-
-    public int getGroundLevel()
-    {
-        return groundLevel;
-    }
-
-    public void setGroundLevel( int newGround )
-    {
-        groundLevel = newGround;
-        plugin.getConfig().set( configPath( "ground" ), groundLevel );
-        plugin.saveConfig();
-    }
-
-    public int getTargetDist()
-    {
-        return targetDist;
-    }
-
-    public void setLobbySpawn( Location spawn )
-    {
-        lobbySpawn.setSpawn( spawn );
-    }
-
-    public void setStartSpawn( Location spawn )
-    {
-        startSpawn.setSpawn( spawn );
-    }
-
-    public void setLossSpawn( Location spawn )
-    {
-        lossSpawn.setSpawn( spawn );
-    }
-
-    public void setSpawnSpread( int spread )
-    {
-        this.spawnSpread = spread;
-        plugin.getConfig().set( configPath("game_start.spread" ), this.spawnSpread );
-        plugin.saveConfig();
     }
 
     public boolean join( Player player )
@@ -189,12 +101,12 @@ public class Game
             }
             return true;
         }
-        if( this.getMaxPlayers() > 0 && this.getPlayerCount() >= this.getMaxPlayers() )
+        if( gameConfig.getMaxPlayers() > 0 && this.getPlayerCount() >= gameConfig.getMaxPlayers() )
         {
             player.sendMessage( boostNoJoinGameFullMessage );
         }
         players.put( player.getUniqueId(), new PlayerInfo( player ) );
-        player.teleport( lobbySpawn.getSpawn() );
+        player.teleport( gameConfig.getLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
         player.sendMessage( boostJoinMessage );
         return true;
@@ -203,7 +115,7 @@ public class Game
     public void leave( Player player )
     {
         players.remove( player.getUniqueId() );
-        player.teleport( lobbySpawn.getSpawn() );
+        player.teleport( gameConfig.getLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
         player.sendMessage( boostLeaveMessage );
         player.getInventory().clear();
@@ -255,7 +167,7 @@ public class Game
         {
             PlayerInfo payerInfoLost = players.get( player.getUniqueId() );
             if( payerInfoLost != null ) payerInfoLost.setLost();
-            player.teleport( lossSpawn.getSpawn() );
+            player.teleport( gameConfig.getLossSpawn() );
             player.setGameMode( GameMode.SPECTATOR );
             player.sendMessage( boostLostMessage );
             player.getInventory().clear();
@@ -312,8 +224,8 @@ public class Game
         for( PlayerInfo playerInfo : players.values() )
         {
             // TODO: Probably worth making PlayerInfo a PlayerControl class, then adding startGame() to it. Needs spawn point and spread.
-            Location location = new Location( startSpawn.getSpawn().getWorld(), startSpawn.getSpawn().getX(), startSpawn.getSpawn().getY(), startSpawn.getSpawn().getZ(), (float)( Math.random() * 360.0 ), 0 );
-            Vector spreadVector = new Vector( Math.random()*spawnSpread, 0, 0 ).rotateAroundY( Math.random() * 360.0 );
+            Location location = new Location( gameConfig.getStartSpawn().getWorld(), gameConfig.getStartSpawn().getX(), gameConfig.getStartSpawn().getY(), gameConfig.getStartSpawn().getZ(), (float)( Math.random() * 360.0 ), 0 );
+            Vector spreadVector = new Vector( Math.random()*gameConfig.getSpawnSpread(), 0, 0 ).rotateAroundY( Math.random() * 360.0 );
             location.add( spreadVector );
             playerInfo.getPlayer().teleport( location );
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
@@ -331,14 +243,14 @@ public class Game
         gameState = GameState.STOPPED;
         for( PlayerInfo playerInfo : players.values() )
         {
-            playerInfo.getPlayer().teleport( lobbySpawn.getSpawn() );
+            playerInfo.getPlayer().teleport( gameConfig.getLobbySpawn() );
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
             playerInfo.getPlayer().sendMessage( boostGameEnded );
             playerInfo.getPlayer().getInventory().clear();
             plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
         }
         players.clear();
-        if( autoQueue && !wasQueuing && !noAutoQueue ) this.startQueuing();    // Don't restart queuing if we were in the queuing state when end was called.
+        if( gameConfig.isAutoQueue() && !wasQueuing && !noAutoQueue ) this.startQueuing();    // Don't restart queuing if we were in the queuing state when end was called.
         return true;
     }
 }

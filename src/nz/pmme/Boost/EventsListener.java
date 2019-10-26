@@ -36,9 +36,9 @@ public class EventsListener implements Listener
     private boolean inTargetBox( Vector targetPosition, Location playerPosition )
     {
         int yDelta = playerPosition.getBlockY() - targetPosition.getBlockY();
-        if(     Math.abs( playerPosition.getBlockX() - targetPosition.getBlockX() ) <= plugin.getLoadedConfig().getTargetDistanceH()
-            &&  yDelta >= 0 && yDelta <= plugin.getLoadedConfig().getTargetDistanceV()
-            &&  Math.abs( playerPosition.getBlockZ() - targetPosition.getBlockZ() ) <= plugin.getLoadedConfig().getTargetDistanceH() )
+        if(     Math.abs( playerPosition.getBlockX() - targetPosition.getBlockX() ) <= plugin.getLoadedConfig().getTargetBoxH()
+            &&  yDelta >= 0 && yDelta <= plugin.getLoadedConfig().getTargetBoxV()
+            &&  Math.abs( playerPosition.getBlockZ() - targetPosition.getBlockZ() ) <= plugin.getLoadedConfig().getTargetBoxH() )
         {
             return true;
         }
@@ -104,7 +104,7 @@ public class EventsListener implements Listener
                         break;
                     case LEFT_CLICK_AIR:
                     case RIGHT_CLICK_AIR:
-                        targetBlock = event.getPlayer().getTargetBlock( null, playersGame.getTargetDist() );
+                        targetBlock = event.getPlayer().getTargetBlock( null, playersGame.getGameConfig().getTargetDist() );
                         break;
                     case PHYSICAL:
                         break;
@@ -188,7 +188,7 @@ public class EventsListener implements Listener
             Game game = plugin.getGameManager().getPlayersGame( event.getPlayer() );
             if( game == null ) return;
             if( game.isActiveInGame( event.getPlayer() ) ) {
-                if( event.getTo() != null && event.getTo().getBlockY() <= game.getGroundLevel() ) {
+                if( event.getTo() != null && event.getTo().getBlockY() <= game.getGameConfig().getGroundLevel() ) {
                     game.setPlayerLost( event.getPlayer() );
                 }
             }
