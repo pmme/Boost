@@ -3,6 +3,7 @@ package nz.pmme.Boost;
 import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -114,5 +115,25 @@ public class GameManager
         }
         games.clear();
         playersInGames.clear();
+    }
+
+    public void displayStatus( CommandSender sender )
+    {
+        sender.sendMessage( "Boost games:" );
+        for( Game game : plugin.getGameManager().getGames() )
+        {
+            String message = "- " + game.getGameConfig().getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players.";
+            if( game.isQueuing() ) message += " " + game.getRemainingQueueTime() + "s before start.";
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
+        }
+        if( sender instanceof Player ) {
+            Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
+            if( game != null ) {
+                String message = "You are " + game.getPlayerStateText( (Player)sender ) + " in game " + game.getGameConfig().getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players.";
+                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
+            } else {
+                sender.sendMessage( "Not currently in a game." );
+            }
+        }
     }
 }

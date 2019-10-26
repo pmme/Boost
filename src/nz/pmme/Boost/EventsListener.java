@@ -63,13 +63,15 @@ public class EventsListener implements Listener
                     String[] lines = sign.getLines();
                     if( lines.length > 1 && ChatColor.stripColor( lines[0] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignTitle() ) )
                     {
-                        if( ChatColor.stripColor( lines[1] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignJoin() ) && lines.length >= 3 ) {
-                            if( playersGame == null ) {
-                                plugin.getGameManager().joinGame( thisPlayer, ChatColor.stripColor( lines[2] ) );
-                            }
+                        String strippedLine1 = ChatColor.stripColor( lines[1] );
+                        if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignJoin() ) && lines.length >= 3 ) {
+                            plugin.getGameManager().joinGame( thisPlayer, ChatColor.stripColor( lines[2] ) );
                             return;
-                        } else if( ChatColor.stripColor( lines[1] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignLeave() ) ) {
+                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignLeave() ) ) {
                             plugin.getGameManager().leaveGame( thisPlayer );
+                            return;
+                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatus() ) ) {
+                            plugin.getGameManager().displayStatus( thisPlayer );
                             return;
                         }
                         thisPlayer.sendMessage( boostErrorInSignMessage );

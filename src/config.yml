@@ -7,9 +7,10 @@ physics:
   target_box_height: 1
 
 signs:
-  title: '&l&5[Boost]'
+  title: '[Boost]'
   join: 'Click to join'
   leave: 'Click to leave'
+  status: 'Click for status'
 
 games:
   #Sample game configuration

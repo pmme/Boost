@@ -261,23 +261,7 @@ public class Command_Boost implements CommandExecutor
                     break;
 
                 case "status":
-                    sender.sendMessage( plugin.isBoostEnabled() ? boostEnabledMessage : boostDisabledMessage );
-                    sender.sendMessage( "Boost games:" );
-                    for( Game game : plugin.getGameManager().getGames() )
-                    {
-                        String message = "- " + game.getGameConfig().getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players.";
-                        if( game.isQueuing() ) message += " " + game.getRemainingQueueTime() + "s before start.";
-                        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
-                    }
-                    if( sender instanceof Player ) {
-                        Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
-                        if( game != null ) {
-                            String message = "You are " + game.getPlayerStateText( (Player)sender ) + " in game " + game.getGameConfig().getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players.";
-                            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
-                        } else {
-                            sender.sendMessage( "Not currently in a game." );
-                        }
-                    }
+                    plugin.getGameManager().displayStatus( sender );
                     return true;
             }
         }

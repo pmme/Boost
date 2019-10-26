@@ -21,6 +21,7 @@ public class Config
     private String signTitle;
     private String signJoin;
     private String signLeave;
+    private String signStatus;
 
     private List<GameConfig> gameConfigList = new ArrayList<>();
 
@@ -55,6 +56,7 @@ public class Config
         signTitle = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.title", "[Boost]" ) );
         signJoin = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.join", "Click to join" ) );
         signLeave = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.leave", "Click to leave" ) );
+        signStatus = ChatColor.translateAlternateColorCodes(  '&', plugin.getConfig().getString( "signs.status", "Click for status" ) );
 
         ConfigurationSection gamesSection = plugin.getConfig().getConfigurationSection( "games" );
         if( gamesSection != null ) {
@@ -76,6 +78,7 @@ public class Config
     public String getSignTitle() { return signTitle; }
     public String getSignJoin() { return signJoin; }
     public String getSignLeave() { return signLeave; }
+    public String getSignStatus() { return signStatus; }
 
     public List<GameConfig> getGameList() { return gameConfigList; }
 
