@@ -18,6 +18,9 @@ public class GameManager
     private static final String boostAlreadyInGameMessage = ChatColor.RED + "You are already in a Boost game.";
     private static final String boostNotInGameMessage = ChatColor.RED + "You are not in a Boost game.";
     private static final String boostGameDoesNotExistMessage = ChatColor.RED + "No Boost game with that name.";
+    private static final String boostGameAlreadyQueuingMessage = ChatColor.RED + "That Boost game is already queuing.";
+    private static final String boostGameAlreadyRunningMessage = ChatColor.RED + "That Boost game is already running.";
+    private static final String boostGameNotRunningMessage = ChatColor.RED + "That Boost game is not running.";
 
     public GameManager( Main plugin )
     {
@@ -106,6 +109,52 @@ public class GameManager
     public void removePlayer( Player player )
     {
         playersInGames.remove( player.getUniqueId() );
+    }
+
+    public void queueGame( String gameName, CommandSender sender )
+    {
+        Game game = this.getGame( gameName );
+        if( game == null ) {
+            sender.sendMessage( boostGameDoesNotExistMessage );
+            return;
+        }
+        if( game.isRunning() ) {
+            sender.sendMessage( boostGameAlreadyRunningMessage );
+            return;
+        }
+        if( game.isQueuing() ) {
+            sender.sendMessage( boostGameAlreadyQueuingMessage );
+            return;
+        }
+        game.startQueuing();
+    }
+
+    public void startGame( String gameName, CommandSender sender )
+    {
+        Game game = this.getGame( gameName );
+        if( game == null ) {
+            sender.sendMessage( boostGameDoesNotExistMessage );
+            return;
+        }
+        if( game.isRunning() ) {
+            sender.sendMessage( boostGameAlreadyRunningMessage );
+            return;
+        }
+        game.start();
+    }
+
+    public void endGame( String gameName, CommandSender sender )
+    {
+        Game game = this.getGame( gameName );
+        if( game == null ) {
+            sender.sendMessage( boostGameDoesNotExistMessage );
+            return;
+        }
+        if( !game.isRunning() && !game.isQueuing() ) {
+            sender.sendMessage( boostGameNotRunningMessage );
+            return;
+        }
+        game.end( false );
     }
 
     public void clearAllGames()

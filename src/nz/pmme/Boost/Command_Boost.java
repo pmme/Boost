@@ -41,9 +41,6 @@ public class Command_Boost implements CommandExecutor
     private static final String boostNoConsoleMessage = "This Boost command must be used by an active player.";
     private static final String boostGameAlreadyExists = ChatColor.RED + "That Boost game already exists.";
     private static final String boostGameDoesNotExist = ChatColor.RED + "No Boost game with that name.";
-    private static final String boostGameAlreadyRunning = ChatColor.RED + "That Boost game is already running.";
-    private static final String boostGameNotRunning = ChatColor.RED + "That Boost game is not running.";
-    private static final String boostGameAlreadyQueuing = ChatColor.RED + "That Boost game is already queuing.";
     private static final String boostGamesCleared = ChatColor.DARK_AQUA + "All Boost games cleared.";
 
     public Command_Boost( Main plugin ) {
@@ -206,20 +203,7 @@ public class Command_Boost implements CommandExecutor
                         return true;
                     }
                     if( args.length == 2 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            sender.sendMessage( boostGameDoesNotExist );
-                            return true;
-                        }
-                        if( game.isRunning() ) {
-                            sender.sendMessage( boostGameAlreadyRunning );
-                            return true;
-                        }
-                        if( game.isQueuing() ) {
-                            sender.sendMessage( boostGameAlreadyQueuing );
-                            return true;
-                        }
-                        game.startQueuing();
+                        plugin.getGameManager().queueGame( args[1], sender );
                         return true;
                     }
                     break;
@@ -230,32 +214,14 @@ public class Command_Boost implements CommandExecutor
                         return true;
                     }
                     if( args.length == 2 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            sender.sendMessage( boostGameDoesNotExist );
-                            return true;
-                        }
-                        if( game.isRunning() ) {
-                            sender.sendMessage( boostGameAlreadyRunning );
-                            return true;
-                        }
-                        game.start();
+                        plugin.getGameManager().startGame( args[1], sender );
                         return true;
                     }
                     break;
 
                 case "end":
                     if( args.length == 2 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            sender.sendMessage( boostGameDoesNotExist );
-                            return true;
-                        }
-                        if( !game.isRunning() && !game.isQueuing() ) {
-                            sender.sendMessage( boostGameNotRunning );
-                            return true;
-                        }
-                        game.end( false );
+                        plugin.getGameManager().endGame( args[1], sender );
                         return true;
                     }
                     break;
