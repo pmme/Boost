@@ -3,13 +3,25 @@ package nz.pmme.Boost.Config;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 
 public class Config
 {
     private Main plugin;
+
+    private File messagesConfigFile = null;
+    private FileConfiguration messagesConfig = null;
+    private EnumMap< Messages, String > messages = new EnumMap<>( Messages.class );
+    private List<String> commandUsage = new ArrayList<>();
 
     private int targetBoxH;
     private int targetBoxV;
@@ -33,14 +45,36 @@ public class Config
     public void init()
     {
         plugin.saveDefaultConfig();
+        if( this.messagesConfigFile == null ) {
+            // Same as JavaPlugin.init
+            this.messagesConfigFile = new File( plugin.getDataFolder(), "messages.yml" );
+        }
+        // Same as JavaPlugin.saveDefaultConfig
+        if( !this.messagesConfigFile.exists() ) {
+            plugin.saveResource( "messages.yml", false );
+        }
+        this.createMessagesConfig();
         this.load();
     }
 
     public void reload()
     {
         plugin.reloadConfig();
+        this.createMessagesConfig();
+        this.messages.clear();
+        this.commandUsage.clear();
         this.gameConfigList.clear();
         this.load();
+    }
+
+    private void createMessagesConfig()
+    {
+        // Same as JavaPlugin.reloadConfig
+        this.messagesConfig = YamlConfiguration.loadConfiguration( this.messagesConfigFile );
+        InputStream defConfigStream = plugin.getResource("messages.yml");
+        if( defConfigStream != null ) {
+            this.messagesConfig.setDefaults( YamlConfiguration.loadConfiguration( new InputStreamReader( defConfigStream, StandardCharsets.UTF_8 ) ) );
+        }
     }
 
     private void load()
@@ -60,11 +94,17 @@ public class Config
 
         ConfigurationSection gamesSection = plugin.getConfig().getConfigurationSection( "games" );
         if( gamesSection != null ) {
-            for( String gameName : gamesSection.getKeys( false ) )
-            {
+            for( String gameName : gamesSection.getKeys( false ) ) {
                 GameConfig gameConfig = new GameConfig( plugin, gameName );
                 gameConfigList.add( gameConfig );
             }
+        }
+        for( Messages message : Messages.values() ) {
+            String messageText = messagesConfig.getString( message.getPath() );
+            messages.put( message, messageText != null ? ChatColor.translateAlternateColorCodes( '&', messageText ) : "Missing message: " + message.getPath() );
+        }
+        for( String string : messagesConfig.getStringList( "command_usage" ) ) {
+            commandUsage.add( ChatColor.translateAlternateColorCodes( '&', string ) );
         }
     }
 
@@ -90,4 +130,7 @@ public class Config
         gameConfigList.add( gameConfig );
         return gameConfig;
     }
+
+    public String getMessage( Messages message ) { return messages.get( message ); }
+    public String[] getCommandUsage() { return commandUsage.toArray(new String[0]); }
 }

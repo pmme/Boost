@@ -1,5 +1,6 @@
 package nz.pmme.Boost;
 
+import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Utils.VectorToOtherPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -28,8 +29,6 @@ public class EventsListener implements Listener
 {
     private static final Vector VECTOR_UP = new Vector( 0, 1, 0 );
     private Main plugin;
-
-    private static final String boostErrorInSignMessage = ChatColor.RED + "Error in Boost sign format.";
 
     public EventsListener(Main plugin) {
         this.plugin = plugin;
@@ -74,7 +73,7 @@ public class EventsListener implements Listener
                             plugin.getGameManager().displayStatus( thisPlayer );
                             return;
                         }
-                        thisPlayer.sendMessage( boostErrorInSignMessage );
+                        thisPlayer.sendMessage( plugin.getLoadedConfig().getMessage( Messages.ERROR_IN_SIGN ) );
                         return;
                     }
                 }

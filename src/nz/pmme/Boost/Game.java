@@ -1,8 +1,8 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Boost.Config.GameConfig;
+import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,17 +23,6 @@ public class Game
 
     private int remainingQueueTime;
     private BukkitTask queueTask;
-
-    private static final String boostJoinMessage = ChatColor.DARK_AQUA + "Joined Boost game";
-    private static final String boostNoJoinRunningMessage = ChatColor.RED + "You cannot join that game because it is already running.";
-    private static final String boostNoJoinStoppedMessage = ChatColor.RED + "You cannot join that game because it is stopped.";
-    private static final String boostNoJoinGameFullMessage = ChatColor.RED + "You cannot join that game because it is already full.";
-    private static final String boostLeaveMessage = ChatColor.DARK_AQUA + "Left Boost game";
-    private static final String boostLostMessage = ChatColor.DARK_PURPLE + "Your out!";
-    private static final String boostGameStarted = ChatColor.LIGHT_PURPLE + "Boost game has started!";
-    private static final String boostGameEnded = ChatColor.LIGHT_PURPLE + "Boost game has ended!";
-    private static final String boostGameStartsIn = ChatColor.LIGHT_PURPLE + "Game starts in %time% seconds ...";
-    private static final String boostWinner = ChatColor.GREEN + "!!Player %player% is the the winner!!";
 
     public Game( Main plugin, GameConfig gameConfig )
     {
@@ -73,7 +62,7 @@ public class Game
                         Game.this.start();
                     } else {
                         if( remainingQueueTime % gameConfig.getCountdownAnnounceTime() == 0 || remainingQueueTime <= 5 ) {
-                            String message = ChatColor.translateAlternateColorCodes( '&', boostGameStartsIn.replaceAll( "%time%", String.valueOf( remainingQueueTime ) ) );
+                            String message = plugin.getLoadedConfig().getMessage( Messages.GAME_COUNTDOWN ).replaceAll( "%time%", String.valueOf( remainingQueueTime ) ).replaceAll( "%game%", gameConfig.getDisplayName() );
                             for( PlayerInfo playerInfo : players.values() ) {
                                 playerInfo.getPlayer().sendMessage( message );
                             }
@@ -93,22 +82,22 @@ public class Game
             switch( gameState )
             {
                 case RUNNING:
-                    player.sendMessage( boostNoJoinRunningMessage );
+                    player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NO_JOIN_GAME_RUNNING ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
                     break;
                 case STOPPED:
-                    player.sendMessage( boostNoJoinStoppedMessage );
+                    player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NO_JOIN_GAME_STOPPED ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
                     break;
             }
             return true;
         }
         if( gameConfig.getMaxPlayers() > 0 && this.getPlayerCount() >= gameConfig.getMaxPlayers() )
         {
-            player.sendMessage( boostNoJoinGameFullMessage );
+            player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NO_JOIN_GAME_FULL ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
         }
         players.put( player.getUniqueId(), new PlayerInfo( player ) );
         player.teleport( gameConfig.getLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
-        player.sendMessage( boostJoinMessage );
+        player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.JOIN_GAME ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
         return true;
     }
 
@@ -117,7 +106,7 @@ public class Game
         players.remove( player.getUniqueId() );
         player.teleport( gameConfig.getLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
-        player.sendMessage( boostLeaveMessage );
+        player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.LEAVE_GAME ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
         player.getInventory().clear();
 
         if( gameState == GameState.RUNNING )
@@ -128,9 +117,9 @@ public class Game
                 gameState = GameState.STOPPED;
                 if( activePlayers.size() == 1 )
                 {
-                    String message = boostWinner.replaceAll( "%player%", activePlayers.get( 0 ).getDisplayName() );
+                    String message = plugin.getLoadedConfig().getMessage( Messages.WINNER ).replaceAll( "%player%", activePlayers.get( 0 ).getDisplayName() ).replaceAll( "%game%", gameConfig.getDisplayName() );
                     for( PlayerInfo playerInfo : players.values() ) {
-                        playerInfo.getPlayer().sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
+                        playerInfo.getPlayer().sendMessage( message );
                     }
                 }
                 this.end( false );
@@ -169,7 +158,7 @@ public class Game
             if( payerInfoLost != null ) payerInfoLost.setLost();
             player.teleport( gameConfig.getLossSpawn() );
             player.setGameMode( GameMode.SPECTATOR );
-            player.sendMessage( boostLostMessage );
+            player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.LOST ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
             player.getInventory().clear();
 
             List<Player> activePlayers = getActivePlayerList();
@@ -178,9 +167,9 @@ public class Game
                 gameState = GameState.STOPPED;
                 if( activePlayers.size() == 1 )
                 {
-                    String message = boostWinner.replaceAll( "%player%", activePlayers.get( 0 ).getDisplayName() );
+                    String message = plugin.getLoadedConfig().getMessage( Messages.WINNER ).replaceAll( "%player%", activePlayers.get( 0 ).getDisplayName() ).replaceAll( "%game%", gameConfig.getDisplayName() );
                     for( PlayerInfo playerInfo : players.values() ) {
-                        playerInfo.getPlayer().sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
+                        playerInfo.getPlayer().sendMessage( message );
                     }
                 }
                 this.end( false );
@@ -229,7 +218,7 @@ public class Game
             location.add( spreadVector );
             playerInfo.getPlayer().teleport( location );
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
-            playerInfo.getPlayer().sendMessage( boostGameStarted );
+            playerInfo.getPlayer().sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_STARTED ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
             playerInfo.getPlayer().getInventory().setItemInMainHand( new ItemStack( Material.DIAMOND_HOE ) );
             playerInfo.setActive();
         }
@@ -245,7 +234,7 @@ public class Game
         {
             playerInfo.getPlayer().teleport( gameConfig.getLobbySpawn() );
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
-            playerInfo.getPlayer().sendMessage( boostGameEnded );
+            playerInfo.getPlayer().sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_ENDED ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
             playerInfo.getPlayer().getInventory().clear();
             plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
         }

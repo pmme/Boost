@@ -1,6 +1,7 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Boost.Config.GameConfig;
+import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -15,12 +16,6 @@ public class GameManager
     private Map< String, Game > games = new HashMap<>();
     private Map< UUID, Game > playersInGames = new HashMap<>();
 
-    private static final String boostAlreadyInGameMessage = ChatColor.RED + "You are already in a Boost game.";
-    private static final String boostNotInGameMessage = ChatColor.RED + "You are not in a Boost game.";
-    private static final String boostGameDoesNotExistMessage = ChatColor.RED + "No Boost game with that name.";
-    private static final String boostGameAlreadyQueuingMessage = ChatColor.RED + "That Boost game is already queuing.";
-    private static final String boostGameAlreadyRunningMessage = ChatColor.RED + "That Boost game is already running.";
-    private static final String boostGameNotRunningMessage = ChatColor.RED + "That Boost game is not running.";
 
     public GameManager( Main plugin )
     {
@@ -63,12 +58,12 @@ public class GameManager
     public void joinGame( Player player, String gameName )
     {
         if( this.isPlaying( player ) ) {
-            player.sendMessage( boostAlreadyInGameMessage );
+            player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.ALREADY_IN_GAME ).replaceAll( "%game%", gameName ) );
             return;
         }
         Game game = this.getGame( gameName );
         if( game == null ) {
-            player.sendMessage( boostGameDoesNotExistMessage );
+            player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_DOES_NOT_EXIST ).replaceAll( "%game%", gameName ) );
             return;
         }
         if( game.join( player ) ) {
@@ -99,7 +94,7 @@ public class GameManager
     {
         Game game = this.getPlayersGame( player );
         if( game == null ) {
-            player.sendMessage( boostNotInGameMessage );
+            player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NOT_IN_GAME ) );
             return;
         }
         this.removePlayer( player );
@@ -115,15 +110,15 @@ public class GameManager
     {
         Game game = this.getGame( gameName );
         if( game == null ) {
-            sender.sendMessage( boostGameDoesNotExistMessage );
+            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_DOES_NOT_EXIST ).replaceAll( "%game%", gameName ) );
             return;
         }
         if( game.isRunning() ) {
-            sender.sendMessage( boostGameAlreadyRunningMessage );
+            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_ALREADY_RUNNING ).replaceAll( "%game%", gameName ) );
             return;
         }
         if( game.isQueuing() ) {
-            sender.sendMessage( boostGameAlreadyQueuingMessage );
+            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_ALREADY_QUEUING ).replaceAll( "%game%", gameName ) );
             return;
         }
         game.startQueuing();
@@ -133,11 +128,11 @@ public class GameManager
     {
         Game game = this.getGame( gameName );
         if( game == null ) {
-            sender.sendMessage( boostGameDoesNotExistMessage );
+            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_DOES_NOT_EXIST ).replaceAll( "%game%", gameName ) );
             return;
         }
         if( game.isRunning() ) {
-            sender.sendMessage( boostGameAlreadyRunningMessage );
+            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_ALREADY_RUNNING ).replaceAll( "%game%", gameName ) );
             return;
         }
         game.start();
@@ -147,11 +142,11 @@ public class GameManager
     {
         Game game = this.getGame( gameName );
         if( game == null ) {
-            sender.sendMessage( boostGameDoesNotExistMessage );
+            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_DOES_NOT_EXIST ).replaceAll( "%game%", gameName ) );
             return;
         }
         if( !game.isRunning() && !game.isQueuing() ) {
-            sender.sendMessage( boostGameNotRunningMessage );
+            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_NOT_RUNNING ).replaceAll( "%game%", gameName ) );
             return;
         }
         game.end( false );
@@ -181,7 +176,7 @@ public class GameManager
                 String message = "You are " + game.getPlayerStateText( (Player)sender ) + " in game " + game.getGameConfig().getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players.";
                 sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
             } else {
-                sender.sendMessage( "Not currently in a game." );
+                sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NOT_IN_GAME ) );
             }
         }
     }
