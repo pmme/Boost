@@ -89,11 +89,12 @@ public class Game
                     plugin.messageSender( player, Messages.NO_JOIN_GAME_STOPPED, gameConfig.getDisplayName() );
                     break;
             }
-            return true;
+            return false;
         }
         if( gameConfig.getMaxPlayers() > 0 && this.getPlayerCount() >= gameConfig.getMaxPlayers() )
         {
             plugin.messageSender( player, Messages.NO_JOIN_GAME_FULL, gameConfig.getDisplayName() );
+            return false;
         }
         players.put( player.getUniqueId(), new PlayerInfo( player ) );
         player.teleport( gameConfig.getLobbySpawn() );
