@@ -74,7 +74,7 @@ public class EventsListener implements Listener
                             plugin.getGameManager().displayStatus( thisPlayer );
                             return;
                         }
-                        thisPlayer.sendMessage( plugin.getLoadedConfig().getMessage( Messages.ERROR_IN_SIGN ) );
+                        plugin.messageSender( thisPlayer, Messages.ERROR_IN_SIGN );
                         return;
                     }
                 }

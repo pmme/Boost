@@ -63,9 +63,9 @@ public class Game
                         Game.this.start();
                     } else {
                         if( remainingQueueTime % gameConfig.getCountdownAnnounceTime() == 0 || remainingQueueTime <= 5 ) {
-                            String message = plugin.getLoadedConfig().getMessage( Messages.GAME_COUNTDOWN ).replaceAll( "%time%", String.valueOf( remainingQueueTime ) ).replaceAll( "%game%", gameConfig.getDisplayName() );
+                            String message = plugin.formatMessage( Messages.GAME_COUNTDOWN, gameConfig.getDisplayName(), "%time%", String.valueOf( remainingQueueTime ) );
                             for( PlayerInfo playerInfo : players.values() ) {
-                                playerInfo.getPlayer().sendMessage( message );
+                                plugin.messageSender( playerInfo.getPlayer(), message );
                             }
                         }
                         --remainingQueueTime;
@@ -83,22 +83,22 @@ public class Game
             switch( gameState )
             {
                 case RUNNING:
-                    player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NO_JOIN_GAME_RUNNING ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
+                    plugin.messageSender( player, Messages.NO_JOIN_GAME_RUNNING, gameConfig.getDisplayName() );
                     break;
                 case STOPPED:
-                    player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NO_JOIN_GAME_STOPPED ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
+                    plugin.messageSender( player, Messages.NO_JOIN_GAME_STOPPED, gameConfig.getDisplayName() );
                     break;
             }
             return true;
         }
         if( gameConfig.getMaxPlayers() > 0 && this.getPlayerCount() >= gameConfig.getMaxPlayers() )
         {
-            player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NO_JOIN_GAME_FULL ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
+            plugin.messageSender( player, Messages.NO_JOIN_GAME_FULL, gameConfig.getDisplayName() );
         }
         players.put( player.getUniqueId(), new PlayerInfo( player ) );
         player.teleport( gameConfig.getLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
-        player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.JOIN_GAME ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
+        plugin.messageSender( player, Messages.JOIN_GAME, gameConfig.getDisplayName() );
         return true;
     }
 
@@ -107,7 +107,7 @@ public class Game
         players.remove( player.getUniqueId() );
         player.teleport( gameConfig.getLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
-        player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.LEAVE_GAME ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
+        plugin.messageSender( player, Messages.LEAVE_GAME, gameConfig.getDisplayName() );
         player.getInventory().clear();
 
         if( gameState == GameState.RUNNING )
@@ -118,9 +118,9 @@ public class Game
                 gameState = GameState.STOPPED;
                 if( activePlayers.size() == 1 )
                 {
-                    String message = plugin.getLoadedConfig().getMessage( Messages.WINNER ).replaceAll( "%player%", activePlayers.get( 0 ).getDisplayName() ).replaceAll( "%game%", gameConfig.getDisplayName() );
+                    String message = plugin.formatMessage( Messages.WINNER, gameConfig.getDisplayName(), "%player%", activePlayers.get( 0 ).getDisplayName() );
                     for( PlayerInfo playerInfo : players.values() ) {
-                        playerInfo.getPlayer().sendMessage( message );
+                        plugin.messageSender( playerInfo.getPlayer(), message );
                     }
                 }
                 this.end( false );
@@ -159,7 +159,7 @@ public class Game
             if( payerInfoLost != null ) payerInfoLost.setLost();
             player.teleport( gameConfig.getLossSpawn() );
             player.setGameMode( GameMode.SPECTATOR );
-            player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.LOST ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
+            plugin.messageSender( player, Messages.LOST, gameConfig.getDisplayName() );
             player.getInventory().clear();
 
             List<Player> activePlayers = getActivePlayerList();
@@ -168,9 +168,9 @@ public class Game
                 gameState = GameState.STOPPED;
                 if( activePlayers.size() == 1 )
                 {
-                    String message = plugin.getLoadedConfig().getMessage( Messages.WINNER ).replaceAll( "%player%", activePlayers.get( 0 ).getDisplayName() ).replaceAll( "%game%", gameConfig.getDisplayName() );
+                    String message = plugin.formatMessage( Messages.WINNER, gameConfig.getDisplayName(), "%player%", activePlayers.get( 0 ).getDisplayName() );
                     for( PlayerInfo playerInfo : players.values() ) {
-                        playerInfo.getPlayer().sendMessage( message );
+                        plugin.messageSender( playerInfo.getPlayer(), message );
                     }
                 }
                 this.end( false );
@@ -219,7 +219,7 @@ public class Game
             location.add( spreadVector );
             playerInfo.getPlayer().teleport( location );
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
-            playerInfo.getPlayer().sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_STARTED ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
+            plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
             playerInfo.getPlayer().getInventory().setItemInMainHand( new ItemStack( Material.DIAMOND_HOE ) );
             playerInfo.setActive();
         }
@@ -235,7 +235,7 @@ public class Game
         {
             playerInfo.getPlayer().teleport( gameConfig.getLobbySpawn() );
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
-            playerInfo.getPlayer().sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_ENDED ).replaceAll( "%game%", gameConfig.getDisplayName() ) );
+            plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_ENDED, gameConfig.getDisplayName() );
             playerInfo.getPlayer().getInventory().clear();
             plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
         }

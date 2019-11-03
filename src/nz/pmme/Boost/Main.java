@@ -1,7 +1,10 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Boost.Config.Config;
+import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Game.GameManager;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -45,5 +48,30 @@ public class Main extends JavaPlugin
 
     public Config getLoadedConfig() {
         return config;
+    }
+
+    public void messageSender( CommandSender sender, String message ) {
+        sender.sendMessage( message );
+    }
+
+    public void messageSender( CommandSender sender, Messages message ) {
+        sender.sendMessage( this.getLoadedConfig().getMessage( message ) );
+    }
+
+    public void messageSender( CommandSender sender, Messages message, String gameName ) {
+        String gameNameColoured = ChatColor.translateAlternateColorCodes( '&', gameName );
+        sender.sendMessage( this.getLoadedConfig().getMessage( message ).replaceAll( "%game%", gameNameColoured ) );
+    }
+
+    public void messageSender( CommandSender sender, Messages message, String gameName, String placeHolder, String replacementValue ) {
+        String gameNameColoured = ChatColor.translateAlternateColorCodes( '&', gameName );
+        String replacementValueColoured = ChatColor.translateAlternateColorCodes( '&', replacementValue );
+        sender.sendMessage( this.getLoadedConfig().getMessage( message ).replaceAll( "%game%", gameNameColoured ).replaceAll( placeHolder, replacementValueColoured ) );
+    }
+
+    public String formatMessage( Messages message, String gameName, String placeHolder, String replacementValue ) {
+        String gameNameColoured = ChatColor.translateAlternateColorCodes( '&', gameName );
+        String replacementValueColoured = ChatColor.translateAlternateColorCodes( '&', replacementValue );
+        return this.getLoadedConfig().getMessage( message ).replaceAll( "%game%", gameNameColoured ).replaceAll( placeHolder, replacementValueColoured );
     }
 }

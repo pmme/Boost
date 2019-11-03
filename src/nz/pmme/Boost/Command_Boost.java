@@ -26,7 +26,7 @@ public class Command_Boost implements CommandExecutor
     {
         if( args.length == 0 )
         {
-            sender.sendMessage( plugin.isBoostEnabled() ? plugin.getLoadedConfig().getMessage( Messages.BOOST_ENABLED ) : plugin.getLoadedConfig().getMessage( Messages.BOOST_DISABLED ) );
+            plugin.messageSender( sender, plugin.isBoostEnabled() ? Messages.BOOST_ENABLED : Messages.BOOST_DISABLED );
             sender.sendMessage( plugin.getLoadedConfig().getCommandUsage() );
             return true;
         }
@@ -36,12 +36,12 @@ public class Command_Boost implements CommandExecutor
             switch( boostCommand )
             {
                 case "on":
-                    sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.BOOST_ENABLED ) );
+                    plugin.messageSender( sender, Messages.BOOST_ENABLED );
                     plugin.enableBoost();
                     return true;
 
                 case "off":
-                    sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.BOOST_DISABLED ) );
+                    plugin.messageSender( sender, Messages.BOOST_DISABLED );
                     plugin.disableBoost();
                     return true;
 
@@ -49,12 +49,12 @@ public class Command_Boost implements CommandExecutor
                     plugin.getGameManager().clearAllGames();
                     plugin.getLoadedConfig().reload();
                     plugin.getGameManager().createConfiguredGames();
-                    sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.CONFIG_RELOADED ) );
+                    plugin.messageSender( sender, Messages.CONFIG_RELOADED );
                     return true;
 
                 case "cleargames":
                     plugin.getGameManager().clearAllGames();
-                    sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAMES_CLEARED ) );
+                    plugin.messageSender( sender, Messages.GAMES_CLEARED );
                     return true;
 
                 case "creategame":
@@ -62,7 +62,7 @@ public class Command_Boost implements CommandExecutor
                         try {
                             plugin.getGameManager().createNewGame( args[1] );
                         } catch( GameAlreadyExistsException e ) {
-                            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_ALREADY_EXISTS ).replaceAll( "%game%", args[1] ) );
+                            plugin.messageSender( sender, Messages.GAME_ALREADY_EXISTS, args[1] );
                         }
                         return true;
                     }
@@ -72,7 +72,7 @@ public class Command_Boost implements CommandExecutor
                     if( args.length > 1 ) {
                         Game game = plugin.getGameManager().getGame( args[1] );
                         if( game == null ) {
-                            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_DOES_NOT_EXIST ).replaceAll( "%game%", args[1] ) );
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
                             return true;
                         }
                         if( args.length == 3 ) {
@@ -82,7 +82,7 @@ public class Command_Boost implements CommandExecutor
                             if( sender instanceof Player ) {
                                 game.getGameConfig().setGroundLevel( ((Player)sender).getLocation().getBlockY() );
                             } else {
-                                sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NO_CONSOLE ) );
+                                plugin.messageSender( sender, Messages.NO_CONSOLE );
                             }
                             return true;
                         }
@@ -95,7 +95,7 @@ public class Command_Boost implements CommandExecutor
                     if( args.length > 1 ) {
                         Game game = plugin.getGameManager().getGame( args[1] );
                         if( game == null ) {
-                            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_DOES_NOT_EXIST ).replaceAll( "%game%", args[1] ) );
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
                             return true;
                         }
                         if( args.length == 6 )
@@ -109,7 +109,7 @@ public class Command_Boost implements CommandExecutor
                                     case "setloss": game.getGameConfig().setLossSpawn( spawn ); break;
                                 }
                             } else {
-                                sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.FAILED_TO_FIND_WORLD ).replaceAll( "%world%", args[2] ) );
+                                plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, args[1],"%world%", args[2] );
                             }
                             return true;
                         }
@@ -131,7 +131,7 @@ public class Command_Boost implements CommandExecutor
                     if( args.length == 3 ) {
                         Game game = plugin.getGameManager().getGame( args[1] );
                         if( game == null ) {
-                            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_DOES_NOT_EXIST ).replaceAll( "%game%", args[1] ) );
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
                             return true;
                         }
                         game.getGameConfig().setSpawnSpread( Integer.valueOf( args[2] ) );
@@ -141,7 +141,7 @@ public class Command_Boost implements CommandExecutor
 
                 case "join":
                     if( !plugin.isBoostEnabled() ) {
-                        sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.BOOST_DISABLED ) );
+                        plugin.messageSender( sender, Messages.BOOST_DISABLED );
                         return true;
                     }
                     if( sender instanceof Player ) {
@@ -150,7 +150,7 @@ public class Command_Boost implements CommandExecutor
                             return true;
                         }
                     } else {
-                        sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NO_CONSOLE ) );
+                        plugin.messageSender( sender, Messages.NO_CONSOLE );
                         return true;
                     }
                     break;
@@ -162,14 +162,14 @@ public class Command_Boost implements CommandExecutor
                             return true;
                         }
                     } else {
-                        sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NO_CONSOLE ) );
+                        plugin.messageSender( sender, Messages.NO_CONSOLE );
                         return true;
                     }
                     break;
 
                 case "queue":
                     if( !plugin.isBoostEnabled() ) {
-                        sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.BOOST_DISABLED ) );
+                        plugin.messageSender( sender, Messages.BOOST_DISABLED );
                         return true;
                     }
                     if( args.length == 2 ) {
@@ -180,7 +180,7 @@ public class Command_Boost implements CommandExecutor
 
                 case "start":
                     if( !plugin.isBoostEnabled() ) {
-                        sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.BOOST_DISABLED ) );
+                        plugin.messageSender( sender, Messages.BOOST_DISABLED );
                         return true;
                     }
                     if( args.length == 2 ) {

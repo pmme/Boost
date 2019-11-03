@@ -59,12 +59,12 @@ public class GameManager
     public void joinGame( Player player, String gameName )
     {
         if( this.isPlaying( player ) ) {
-            player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.ALREADY_IN_GAME ).replaceAll( "%game%", gameName ) );
+            plugin.messageSender( player, Messages.ALREADY_IN_GAME, gameName );
             return;
         }
         Game game = this.getGame( gameName );
         if( game == null ) {
-            player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_DOES_NOT_EXIST ).replaceAll( "%game%", gameName ) );
+            plugin.messageSender( player, Messages.GAME_DOES_NOT_EXIST, gameName );
             return;
         }
         if( game.join( player ) ) {
@@ -95,7 +95,7 @@ public class GameManager
     {
         Game game = this.getPlayersGame( player );
         if( game == null ) {
-            player.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NOT_IN_GAME ) );
+            plugin.messageSender( player, Messages.NOT_IN_GAME );
             return;
         }
         this.removePlayer( player );
@@ -111,15 +111,15 @@ public class GameManager
     {
         Game game = this.getGame( gameName );
         if( game == null ) {
-            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_DOES_NOT_EXIST ).replaceAll( "%game%", gameName ) );
+            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, gameName );
             return;
         }
         if( game.isRunning() ) {
-            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_ALREADY_RUNNING ).replaceAll( "%game%", gameName ) );
+            plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, gameName );
             return;
         }
         if( game.isQueuing() ) {
-            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_ALREADY_QUEUING ).replaceAll( "%game%", gameName ) );
+            plugin.messageSender( sender, Messages.GAME_ALREADY_QUEUING, gameName );
             return;
         }
         game.startQueuing();
@@ -129,11 +129,11 @@ public class GameManager
     {
         Game game = this.getGame( gameName );
         if( game == null ) {
-            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_DOES_NOT_EXIST ).replaceAll( "%game%", gameName ) );
+            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, gameName );
             return;
         }
         if( game.isRunning() ) {
-            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_ALREADY_RUNNING ).replaceAll( "%game%", gameName ) );
+            plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, gameName );
             return;
         }
         game.start();
@@ -143,11 +143,11 @@ public class GameManager
     {
         Game game = this.getGame( gameName );
         if( game == null ) {
-            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_DOES_NOT_EXIST ).replaceAll( "%game%", gameName ) );
+            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, gameName );
             return;
         }
         if( !game.isRunning() && !game.isQueuing() ) {
-            sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.GAME_NOT_RUNNING ).replaceAll( "%game%", gameName ) );
+            plugin.messageSender( sender, Messages.GAME_NOT_RUNNING, gameName );
             return;
         }
         game.end( false );
@@ -177,7 +177,7 @@ public class GameManager
                 String message = "You are " + game.getPlayerStateText( (Player)sender ) + " in game " + game.getGameConfig().getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players.";
                 sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
             } else {
-                sender.sendMessage( plugin.getLoadedConfig().getMessage( Messages.NOT_IN_GAME ) );
+                plugin.messageSender( sender, Messages.NOT_IN_GAME );
             }
         }
     }
