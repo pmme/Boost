@@ -14,10 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -185,5 +182,13 @@ public class EventsListener implements Listener
     public void onPlayerQuit( PlayerQuitEvent event )
     {
         plugin.getGameManager().leaveGame( event.getPlayer() );
+    }
+
+    @EventHandler
+    public void onPlayerJoin( PlayerJoinEvent event )
+    {
+        if( plugin.isBoostEnabled() ) {
+            event.getPlayer().teleport( event.getPlayer().getWorld().getSpawnLocation() );
+        }
     }
 }

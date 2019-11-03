@@ -20,7 +20,7 @@ public class SpawnLocation
             int spawnY = plugin.getConfig().getInt( configPath + "y", 64 );
             int spawnZ = plugin.getConfig().getInt( configPath + "z", 0 );
             int spawnYaw = plugin.getConfig().getInt( configPath + "yaw", 0 );
-            spawn = new Location( spawnWorld, spawnX, spawnY, spawnZ, (float)spawnYaw, 0.0F );
+            spawn = new Location( spawnWorld, spawnX + 0.5D, spawnY, spawnZ + 0.5D, (float)spawnYaw, 0.0F );
         }
     }
 
