@@ -1,8 +1,9 @@
-package nz.pmme.Boost;
+package nz.pmme.Boost.Game;
 
 import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
+import nz.pmme.Boost.Main;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;

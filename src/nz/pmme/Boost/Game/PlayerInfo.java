@@ -1,4 +1,4 @@
-package nz.pmme.Boost;
+package nz.pmme.Boost.Game;
 
 import nz.pmme.Boost.Enums.PlayerGameState;
 import org.bukkit.GameMode;

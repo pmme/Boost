@@ -2,6 +2,7 @@ package nz.pmme.Boost;
 
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
+import nz.pmme.Boost.Game.Game;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;

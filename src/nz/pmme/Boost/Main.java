@@ -1,6 +1,7 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Boost.Config.Config;
+import nz.pmme.Boost.Game.GameManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**

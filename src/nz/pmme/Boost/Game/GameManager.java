@@ -1,8 +1,9 @@
-package nz.pmme.Boost;
+package nz.pmme.Boost.Game;
 
 import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
+import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

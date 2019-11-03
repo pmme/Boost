@@ -1,6 +1,7 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Boost.Config.Messages;
+import nz.pmme.Boost.Game.Game;
 import nz.pmme.Utils.VectorToOtherPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
