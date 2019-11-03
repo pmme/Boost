@@ -74,4 +74,12 @@ public class Main extends JavaPlugin
         String replacementValueColoured = ChatColor.translateAlternateColorCodes( '&', replacementValue );
         return this.getLoadedConfig().getMessage( message ).replaceAll( "%game%", gameNameColoured ).replaceAll( placeHolder, replacementValueColoured );
     }
+
+    public boolean hasPermission( CommandSender sender, String permission, Messages message ) {
+        if( !sender.hasPermission( permission ) ) {
+            messageSender( sender, message );
+            return false;
+        }
+        return true;
+    }
 }

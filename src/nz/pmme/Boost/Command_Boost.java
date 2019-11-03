@@ -36,16 +36,19 @@ public class Command_Boost implements CommandExecutor
             switch( boostCommand )
             {
                 case "on":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     plugin.messageSender( sender, Messages.BOOST_ENABLED );
                     plugin.enableBoost();
                     return true;
 
                 case "off":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     plugin.messageSender( sender, Messages.BOOST_DISABLED );
                     plugin.disableBoost();
                     return true;
 
                 case "reload":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     plugin.getGameManager().clearAllGames();
                     plugin.getLoadedConfig().reload();
                     plugin.getGameManager().createConfiguredGames();
@@ -53,11 +56,13 @@ public class Command_Boost implements CommandExecutor
                     return true;
 
                 case "cleargames":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     plugin.getGameManager().clearAllGames();
                     plugin.messageSender( sender, Messages.GAMES_CLEARED );
                     return true;
 
                 case "creategame":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length == 2 ) {
                         try {
                             plugin.getGameManager().createNewGame( args[1] );
@@ -69,6 +74,7 @@ public class Command_Boost implements CommandExecutor
                     break;
 
                 case "setground":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length > 1 ) {
                         Game game = plugin.getGameManager().getGame( args[1] );
                         if( game == null ) {
@@ -92,6 +98,7 @@ public class Command_Boost implements CommandExecutor
                 case "setstart":
                 case "setlobby":
                 case "setloss":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length > 1 ) {
                         Game game = plugin.getGameManager().getGame( args[1] );
                         if( game == null ) {
@@ -128,6 +135,7 @@ public class Command_Boost implements CommandExecutor
                     break;
 
                 case "setspread":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length == 3 ) {
                         Game game = plugin.getGameManager().getGame( args[1] );
                         if( game == null ) {
@@ -140,6 +148,7 @@ public class Command_Boost implements CommandExecutor
                     break;
 
                 case "join":
+                    if( !plugin.hasPermission( sender, "boost.join", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( !plugin.isBoostEnabled() ) {
                         plugin.messageSender( sender, Messages.BOOST_DISABLED );
                         return true;
@@ -168,6 +177,7 @@ public class Command_Boost implements CommandExecutor
                     break;
 
                 case "queue":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( !plugin.isBoostEnabled() ) {
                         plugin.messageSender( sender, Messages.BOOST_DISABLED );
                         return true;
@@ -179,6 +189,7 @@ public class Command_Boost implements CommandExecutor
                     break;
 
                 case "start":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( !plugin.isBoostEnabled() ) {
                         plugin.messageSender( sender, Messages.BOOST_DISABLED );
                         return true;
@@ -190,6 +201,7 @@ public class Command_Boost implements CommandExecutor
                     break;
 
                 case "end":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length == 2 ) {
                         plugin.getGameManager().endGame( args[1], sender );
                         return true;
@@ -197,6 +209,8 @@ public class Command_Boost implements CommandExecutor
                     break;
 
                 case "status":
+                    if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( !plugin.hasPermission( sender, "boost.status", Messages.NO_PERMISSION_CMD ) ) return true;
                     plugin.getGameManager().displayStatus( sender );
                     return true;
             }

@@ -27,6 +27,8 @@ public enum Messages
     GAME_ALREADY_RUNNING("game_already_running"),
     GAME_NOT_RUNNING("game_not_running"),
     FAILED_TO_FIND_WORLD("failed_to_find_world"),
+    NO_PERMISSION_CMD("no_permission_cmd"),
+    NO_PERMISSION_USE("no_permission_use"),
 
     END("end");
 

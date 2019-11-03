@@ -23,6 +23,8 @@ game_already_queuing: "&4Boost game %game%&r&4 is already queuing."
 game_already_running: "&4Boost game %game%&r&4 is already running."
 game_not_running: "&4Boost game %game%&r&4 is not running."
 failed_to_find_world: "&4Failed to find world named %world%&r&4."
+no_permission_cmd: "&4You do not have permission to use that command."
+no_permission_use: "&4You do not have permission to use that."
 
 command_usage:
   - "&3Boost command usage:"

@@ -50,7 +50,6 @@ public class EventsListener implements Listener
         if( plugin.isBoostEnabled() )
         {
             final Player thisPlayer = event.getPlayer();
-            final Game playersGame = plugin.getGameManager().getPlayersGame( thisPlayer );
 
             if( event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK )
             {
@@ -62,12 +61,14 @@ public class EventsListener implements Listener
                     {
                         String strippedLine1 = ChatColor.stripColor( lines[1] );
                         if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignJoin() ) && lines.length >= 3 ) {
+                            if( !plugin.hasPermission( thisPlayer, "boost.join", Messages.NO_PERMISSION_USE ) ) return;
                             plugin.getGameManager().joinGame( thisPlayer, ChatColor.stripColor( lines[2] ) );
                             return;
                         } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignLeave() ) ) {
                             plugin.getGameManager().leaveGame( thisPlayer );
                             return;
                         } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatus() ) ) {
+                            if( !plugin.hasPermission( thisPlayer, "boost.status", Messages.NO_PERMISSION_USE ) ) return;
                             plugin.getGameManager().displayStatus( thisPlayer );
                             return;
                         }
@@ -77,6 +78,7 @@ public class EventsListener implements Listener
                 }
             }
 
+            final Game playersGame = plugin.getGameManager().getPlayersGame( thisPlayer );
             if( playersGame == null ) return;
             if( !playersGame.isActiveInGame( thisPlayer ) ) return;
 

@@ -5,11 +5,30 @@ api-version: 1.13
 main: nz.pmme.Boost.Main
 commands:
   boost:
-    description: 'Boost commands'
-    usage: 'Enter "/boost" with no options for help'
-    aliases: bb
+    description: 'Enter "/boost" with no options for help.'
+    usage: /<command>
+    aliases: bst
+    permission: boost.cmd
+    permission-message: '&4You do not have permission to use that command.'
 
 permissions:
   boost.join:
     description: 'Permission to join a Boost game'
     default: true
+  boost.cmd:
+    description: 'Permission to use Boost player commands'
+    default: true
+  boost.admin:
+    description: 'Permission to use Boost admin commands'
+    default: op
+  boost.status:
+    description: 'Permission to fetch Boost game status'
+    default: true
+  boost.*:
+    description: 'Grant all Boost permissions'
+    default: op
+    children:
+      boost.join: true
+      boost.cmd: true
+      boost.admin: true
+      boost.status: true
