@@ -51,22 +51,22 @@ public class Main extends JavaPlugin
     }
 
     public void messageSender( CommandSender sender, String message ) {
-        sender.sendMessage( message );
+        sender.sendMessage( this.getLoadedConfig().getPrefix() + message );
     }
 
     public void messageSender( CommandSender sender, Messages message ) {
-        sender.sendMessage( this.getLoadedConfig().getMessage( message ) );
+        sender.sendMessage( this.getLoadedConfig().getPrefix() + this.getLoadedConfig().getMessage( message ) );
     }
 
     public void messageSender( CommandSender sender, Messages message, String gameName ) {
         String gameNameColoured = ChatColor.translateAlternateColorCodes( '&', gameName );
-        sender.sendMessage( this.getLoadedConfig().getMessage( message ).replaceAll( "%game%", gameNameColoured ) );
+        sender.sendMessage( this.getLoadedConfig().getPrefix() + this.getLoadedConfig().getMessage( message ).replaceAll( "%game%", gameNameColoured ) );
     }
 
     public void messageSender( CommandSender sender, Messages message, String gameName, String placeHolder, String replacementValue ) {
         String gameNameColoured = ChatColor.translateAlternateColorCodes( '&', gameName );
         String replacementValueColoured = ChatColor.translateAlternateColorCodes( '&', replacementValue );
-        sender.sendMessage( this.getLoadedConfig().getMessage( message ).replaceAll( "%game%", gameNameColoured ).replaceAll( placeHolder, replacementValueColoured ) );
+        sender.sendMessage( this.getLoadedConfig().getPrefix() + this.getLoadedConfig().getMessage( message ).replaceAll( "%game%", gameNameColoured ).replaceAll( placeHolder, replacementValueColoured ) );
     }
 
     public String formatMessage( Messages message, String gameName, String placeHolder, String replacementValue ) {

@@ -2,6 +2,7 @@ package nz.pmme.Boost.Config;
 
 public enum Messages
 {
+    TITLE("title"),
     BOOST_ENABLED("enabled"),
     BOOST_DISABLED("disabled"),
     CONFIG_RELOADED("reloaded"),

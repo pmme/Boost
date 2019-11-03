@@ -20,6 +20,7 @@ public class Config
 
     private File messagesConfigFile = null;
     private FileConfiguration messagesConfig = null;
+    private String messagePrefix;
     private EnumMap< Messages, String > messages = new EnumMap<>( Messages.class );
     private List<String> commandUsage = new ArrayList<>();
 
@@ -103,6 +104,7 @@ public class Config
             String messageText = messagesConfig.getString( message.getPath() );
             messages.put( message, messageText != null ? ChatColor.translateAlternateColorCodes( '&', messageText ) : "Missing message: " + message.getPath() );
         }
+        messagePrefix = this.getMessage( Messages.TITLE ) + " " + ChatColor.RESET;
         for( String string : messagesConfig.getStringList( "command_usage" ) ) {
             commandUsage.add( ChatColor.translateAlternateColorCodes( '&', string ) );
         }
@@ -132,5 +134,6 @@ public class Config
     }
 
     public String getMessage( Messages message ) { return messages.get( message ); }
+    public String getPrefix() { return messagePrefix; }
     public String[] getCommandUsage() { return commandUsage.toArray(new String[0]); }
 }
