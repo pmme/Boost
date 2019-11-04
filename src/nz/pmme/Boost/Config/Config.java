@@ -2,6 +2,7 @@ package nz.pmme.Boost.Config;
 
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -35,6 +36,8 @@ public class Config
     private String signJoin;
     private String signLeave;
     private String signStatus;
+
+    private SpawnLocation mainLobbySpawn;
 
     private List<GameConfig> gameConfigList = new ArrayList<>();
 
@@ -93,6 +96,8 @@ public class Config
         signLeave = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.leave", "Click to leave" ) );
         signStatus = ChatColor.translateAlternateColorCodes(  '&', plugin.getConfig().getString( "signs.status", "Click for status" ) );
 
+        mainLobbySpawn = new SpawnLocation( plugin, "main_lobby" );
+
         ConfigurationSection gamesSection = plugin.getConfig().getConfigurationSection( "games" );
         if( gamesSection != null ) {
             for( String gameName : gamesSection.getKeys( false ) ) {
@@ -121,6 +126,10 @@ public class Config
     public String getSignJoin() { return signJoin; }
     public String getSignLeave() { return signLeave; }
     public String getSignStatus() { return signStatus; }
+
+    public Location getMainLobbySpawn() {
+        return mainLobbySpawn.getSpawn();
+    }
 
     public List<GameConfig> getGameList() { return gameConfigList; }
 

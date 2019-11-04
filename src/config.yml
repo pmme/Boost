@@ -12,6 +12,13 @@ signs:
   leave: 'Click to leave'
   status: 'Click for status'
 
+main_lobby:
+  world: world
+  x: 0
+  y: 64
+  z: 0
+  yaw: 0
+
 games:
   #Sample game configuration
   Arena1:

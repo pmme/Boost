@@ -106,7 +106,7 @@ public class Game
     public void leave( Player player )
     {
         players.remove( player.getUniqueId() );
-        player.teleport( player.getWorld().getSpawnLocation() );
+        player.teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
         plugin.messageSender( player, Messages.LEAVE_GAME, gameConfig.getDisplayName() );
         player.getInventory().clear();
@@ -234,7 +234,7 @@ public class Game
         gameState = GameState.STOPPED;
         for( PlayerInfo playerInfo : players.values() )
         {
-            playerInfo.getPlayer().teleport( playerInfo.getPlayer().getWorld().getSpawnLocation() );
+            playerInfo.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_ENDED, gameConfig.getDisplayName() );
             playerInfo.getPlayer().getInventory().clear();
