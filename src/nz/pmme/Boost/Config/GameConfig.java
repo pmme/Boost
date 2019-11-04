@@ -21,7 +21,6 @@ public class GameConfig
     private SpawnLocation lobbySpawn;
     private SpawnLocation startSpawn;
     private SpawnLocation lossSpawn;
-    private int spawnSpread;
 
     private int countdownAnnounceTime;
 
@@ -44,7 +43,6 @@ public class GameConfig
         this.lobbySpawn = new SpawnLocation( plugin, configPath + "game_lobby" );
         this.startSpawn = new SpawnLocation( plugin, configPath + "game_start" );
         this.lossSpawn = new SpawnLocation( plugin, configPath + "game_loss" );
-        this.spawnSpread = plugin.getConfig().getInt( configPath + "game_start.spread", 4 );
 
         this.countdownAnnounceTime = plugin.getConfig().getInt( configPath + "countdown_announce_time", 10 );
     }
@@ -63,7 +61,6 @@ public class GameConfig
         this.lobbySpawn.setConfig();
         this.startSpawn.setConfig();
         this.lossSpawn.setConfig();
-        plugin.getConfig().set( configPath + "game_start.spread", this.spawnSpread );
 
         plugin.getConfig().set( configPath + "countdown_announce_time", this.countdownAnnounceTime );
 
@@ -139,13 +136,7 @@ public class GameConfig
 
     public void setSpawnSpread( int spread )
     {
-        this.spawnSpread = spread;
-        plugin.getConfig().set( configPath + "game_start.spread", this.spawnSpread );
-        plugin.saveConfig();
-    }
-
-    public int getSpawnSpread() {
-        return spawnSpread;
+        startSpawn.setSpread( spread );
     }
 
     public int getCountdownAnnounceTime() {

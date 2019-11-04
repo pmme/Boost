@@ -5,13 +5,11 @@ import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
 import nz.pmme.Boost.Main;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -214,11 +212,7 @@ public class Game
         gameState = GameState.RUNNING;
         for( PlayerInfo playerInfo : players.values() )
         {
-            // TODO: Probably worth making PlayerInfo a PlayerControl class, then adding startGame() to it. Needs spawn point and spread.
-            Location location = new Location( gameConfig.getStartSpawn().getWorld(), gameConfig.getStartSpawn().getX(), gameConfig.getStartSpawn().getY(), gameConfig.getStartSpawn().getZ(), (float)( Math.random() * 360.0 ), 0 );
-            Vector spreadVector = new Vector( Math.random()*gameConfig.getSpawnSpread(), 0, 0 ).rotateAroundY( Math.random() * 360.0 );
-            location.add( spreadVector );
-            playerInfo.getPlayer().teleport( location );
+            playerInfo.getPlayer().teleport( gameConfig.getStartSpawn() );
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
             playerInfo.getPlayer().getInventory().setItemInMainHand( new ItemStack( Material.DIAMOND_HOE ) );

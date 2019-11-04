@@ -3,11 +3,13 @@ package nz.pmme.Boost.Config;
 import nz.pmme.Boost.Main;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.util.Vector;
 
 public class SpawnLocation
 {
     private Main plugin;
     private Location spawn;
+    private int spread;
     private String configPath;
 
     public SpawnLocation( Main plugin, String spawnConfigPath )
@@ -21,6 +23,7 @@ public class SpawnLocation
             int spawnZ = plugin.getConfig().getInt( configPath + "z", 0 );
             int spawnYaw = plugin.getConfig().getInt( configPath + "yaw", 0 );
             spawn = new Location( spawnWorld, spawnX + 0.5D, spawnY, spawnZ + 0.5D, (float)spawnYaw, 0.0F );
+            spread = plugin.getConfig().getInt( configPath + "spread", 0 );
         }
     }
 
@@ -31,15 +34,30 @@ public class SpawnLocation
         plugin.getConfig().set( configPath + "y", spawn.getBlockY() );
         plugin.getConfig().set( configPath + "z", spawn.getBlockZ() );
         plugin.getConfig().set( configPath + "yaw", (int)spawn.getYaw() );
+        plugin.getConfig().set( configPath + "spread", spread );
     }
 
     public Location getSpawn() {
-        return spawn;
+        if( spread > 0 ) {
+            Location location = new Location( spawn.getWorld(), spawn.getX(), spawn.getY(), spawn.getZ(), (float)( Math.random() * 360.0 ), 0 );
+            Vector spreadVector = new Vector( Math.random() * spread, 0, 0 ).rotateAroundY( Math.random() * 360.0 );
+            location.add( spreadVector );
+            return location;
+        } else {
+            return spawn;
+        }
     }
 
     public void setSpawn( Location spawn )
     {
         this.spawn = spawn;
+        this.setConfig();
+        plugin.saveConfig();
+    }
+
+    public void setSpread( int spread )
+    {
+        this.spread = spread;
         this.setConfig();
         plugin.saveConfig();
     }
