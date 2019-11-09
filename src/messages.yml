@@ -58,5 +58,7 @@ command_usage:
   - "&f/boost delstats <player> &3- Delete game stats for player, or all."
   - "&f/boost status &3- Get a debug list of games and current player."
   - "&f/boost reload &3- End all games, reload config, and re-initialise."
+  - "&f/boost build <player> &3- Enable building for player."
+  - "&f/boost nobuild <player> &3- Turn off building for player."
   - "&f/boost on &3- Turn the Boost game and controls on."
   - "&f/boost off &3- Turn the Boost game and controls off."

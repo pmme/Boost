@@ -47,7 +47,7 @@ public class EventsListener implements Listener
     @EventHandler
     public void onPlayerInteract( PlayerInteractEvent event )
     {
-        if( plugin.isBoostEnabled() )
+        if( plugin.isBoostEnabled() && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) )
         {
             final Player thisPlayer = event.getPlayer();
 
@@ -125,7 +125,7 @@ public class EventsListener implements Listener
     @EventHandler
     public void onPlayerInteractEntity( PlayerInteractEntityEvent event )
     {
-        if( plugin.isBoostEnabled() ) {
+        if( plugin.isBoostEnabled() && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) {
             if( event.getRightClicked() instanceof Player )
             {
                 final Player thisPlayer = event.getPlayer();
@@ -151,13 +151,13 @@ public class EventsListener implements Listener
     @EventHandler
     public void onBlockBreak( BlockBreakEvent event )
     {
-        if( plugin.isBoostEnabled() ) event.setCancelled( true );
+        if( plugin.isBoostEnabled() && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) event.setCancelled( true );
     }
 
     @EventHandler
     public void onBlockPlace( BlockPlaceEvent event )
     {
-        if( plugin.isBoostEnabled() ) event.setCancelled( true );
+        if( plugin.isBoostEnabled() && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) event.setCancelled( true );
     }
 
     @EventHandler
@@ -175,7 +175,7 @@ public class EventsListener implements Listener
     @EventHandler
     public void onPlayerMove( PlayerMoveEvent event )
     {
-        if( plugin.isBoostEnabled() ) {
+        if( plugin.isBoostEnabled() && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) {
             Game game = plugin.getGameManager().getPlayersGame( event.getPlayer() );
             if( game == null ) return;
             if( game.isActiveInGame( event.getPlayer() ) ) {
@@ -190,6 +190,7 @@ public class EventsListener implements Listener
     public void onPlayerQuit( PlayerQuitEvent event )
     {
         plugin.getGameManager().leaveGame( event.getPlayer() );
+        plugin.removeBuilder( event.getPlayer().getUniqueId() );
     }
 
     @EventHandler

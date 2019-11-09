@@ -9,6 +9,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * Created by paul on 16-Apr-16.
  */
@@ -19,6 +23,7 @@ public class Main extends JavaPlugin
     private Config config = new Config( this );
     private Database database = new Database( this );
     private DataHandler dataHandler = new DataHandler( this, this.database );
+    private Map< UUID, Boolean > builders = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -90,5 +95,21 @@ public class Main extends JavaPlugin
             return false;
         }
         return true;
+    }
+
+    public boolean isInBuildMode( UUID playerId ) {
+        return this.builders.getOrDefault( playerId, false );
+    }
+
+    public void setBuilder( UUID playerId ) {
+        this.builders.put( playerId, true );
+    }
+
+    public void setNotBuilder( UUID playerId ) {
+        this.builders.put( playerId, false );
+    }
+
+    public void removeBuilder( UUID playerId ) {
+        this.builders.remove( playerId );
     }
 }

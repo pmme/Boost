@@ -255,6 +255,44 @@ public class Command_Boost implements CommandExecutor
                     if( !plugin.hasPermission( sender, "boost.status", Messages.NO_PERMISSION_CMD ) ) return true;
                     plugin.getGameManager().displayStatus( sender );
                     return true;
+
+                case "build":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 2 ) {
+                        for( Player player : plugin.getServer().getOnlinePlayers() ) {
+                            if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
+                                plugin.setBuilder( player.getUniqueId() );
+                                return true;
+                            }
+                        }
+                        plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
+                        return true;
+                    } else if( sender instanceof Player ) {
+                        plugin.setBuilder( ((Player)sender).getUniqueId() );
+                        return true;
+                    } else {
+                        plugin.messageSender( sender, Messages.NO_CONSOLE );
+                        return true;
+                    }
+
+                case "nobuild":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 2 ) {
+                        for( Player player : plugin.getServer().getOnlinePlayers() ) {
+                            if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
+                                plugin.setNotBuilder( player.getUniqueId() );
+                                return true;
+                            }
+                        }
+                        plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
+                        return true;
+                    } else if( sender instanceof Player ) {
+                        plugin.setNotBuilder( ((Player)sender).getUniqueId() );
+                        return true;
+                    } else {
+                        plugin.messageSender( sender, Messages.NO_CONSOLE );
+                        return true;
+                    }
             }
         }
         sender.sendMessage( plugin.getLoadedConfig().getCommandUsage() );
