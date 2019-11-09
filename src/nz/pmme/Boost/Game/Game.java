@@ -94,6 +94,12 @@ public class Game
             plugin.messageSender( player, Messages.NO_JOIN_GAME_FULL, gameConfig.getDisplayName() );
             return false;
         }
+
+        String message = plugin.formatMessage( Messages.PLAYER_JOINED_GAME, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
+        for( PlayerInfo playerInfo : players.values() ) {
+            plugin.messageSender( playerInfo.getPlayer(), message );
+        }
+
         players.put( player.getUniqueId(), new PlayerInfo( player ) );
         player.teleport( gameConfig.getLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
@@ -160,6 +166,11 @@ public class Game
             player.setGameMode( GameMode.SPECTATOR );
             plugin.messageSender( player, Messages.LOST, gameConfig.getDisplayName() );
             player.getInventory().clear();
+
+            String message = plugin.formatMessage( Messages.PLAYER_LOST, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
+            for( PlayerInfo playerInfo : players.values() ) {
+                plugin.messageSender( playerInfo.getPlayer(), message );
+            }
 
             List<Player> activePlayers = getActivePlayerList();
             if( activePlayers.size() <= 1 )
