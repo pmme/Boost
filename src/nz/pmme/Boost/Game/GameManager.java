@@ -60,6 +60,16 @@ public class GameManager
         return gameList;
     }
 
+    public List<String> getGameNames()
+    {
+        List<String> gameNames = new ArrayList<>();
+        List<Game> gamesList = this.getGames();
+        for( Game game : gamesList ) {
+            gameNames.add( ChatColor.translateAlternateColorCodes( '&', game.getGameConfig().getDisplayName() ) );
+        }
+        return gameNames;
+    }
+
     public void joinGame( Player player, String gameName )
     {
         if( this.isPlaying( player ) ) {

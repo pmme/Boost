@@ -1,6 +1,7 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Boost.Commands.Commands;
+import nz.pmme.Boost.Commands.TabComplete;
 import nz.pmme.Boost.Config.Config;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Game.GameManager;
@@ -33,6 +34,7 @@ public class Main extends JavaPlugin
         this.dataHandler.checkVersion();
         this.getGameManager().createConfiguredGames();
         this.getCommand( "boost" ).setExecutor( new Commands(this) );
+        this.getCommand( "boost" ).setTabCompleter( new TabComplete(this) );
         this.getServer().getPluginManager().registerEvents( new EventsListener(this), this );
     }
 

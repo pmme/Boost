@@ -171,6 +171,28 @@ public class DataHandler
         return null;
     }
 
+    public ArrayList<String> queryListOfPlayers()
+    {
+        Connection connection = this.database.getConnection();
+        try {
+            ArrayList<String> results = new ArrayList<>();
+            String queryPlayersSql = "SELECT player_name FROM player_stats ORDER BY player_name";
+            PreparedStatement queryPlayersStatement = connection.prepareStatement(queryPlayersSql);
+            ResultSet resultSet = queryPlayersStatement.executeQuery();
+            while( resultSet.next() ) {
+                results.add( resultSet.getString("player_name") );
+            }
+            resultSet.close();
+            queryPlayersStatement.close();
+            return results;
+        }
+        catch (SQLException sQLException) {
+            plugin.getLogger().severe( "Failed to query list of players" );
+            sQLException.printStackTrace();
+        }
+        return null;
+    }
+
     public List<PlayerStats> queryLeaderBoard()
     {
         List<PlayerStats> leaderBoard = new ArrayList<>();
