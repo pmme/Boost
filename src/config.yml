@@ -11,6 +11,16 @@ signs:
   join: 'Click to join'
   leave: 'Click to leave'
   status: 'Click for status'
+  stats: 'Your stats'
+  top: 'Leader board'
+
+SQLite: true
+sql:
+  host: 127.0.0.1
+  port: '3306'
+  database: boost
+  user: user
+  pass: password
 
 main_lobby:
   world: world

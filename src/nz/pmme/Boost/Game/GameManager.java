@@ -4,6 +4,7 @@ import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import nz.pmme.Boost.Main;
+import nz.pmme.Data.PlayerStats;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -180,5 +181,48 @@ public class GameManager
                 plugin.messageSender( sender, Messages.NOT_IN_GAME );
             }
         }
+    }
+
+    public void displayPlayerStats( CommandSender sender, Player player )
+    {
+        List<String> playerStatsMessage = new ArrayList<>();
+        PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( player.getUniqueId() );
+        if( playerStats == null ) {
+            plugin.messageSender( sender, Messages.PLAYER_NO_STATS, "", "%player%", player.getDisplayName() );
+        } else {
+            for( String string : plugin.getLoadedConfig().getPlayerStatsTemplate() ) {
+                playerStatsMessage.add( ChatColor.translateAlternateColorCodes( '&', string
+                        .replaceAll( "%player%", player.getDisplayName() )
+                        .replaceAll( "%games%", String.valueOf( playerStats.getGames() ) )
+                        .replaceAll( "%wins%", String.valueOf( playerStats.getWins() ) )
+                        .replaceAll( "%losses%", String.valueOf( playerStats.getLosses() ) )
+                ) );
+            }
+            sender.sendMessage( playerStatsMessage.toArray( new String[0] ) );
+        }
+    }
+
+    public void displayLeaderBoard( CommandSender sender )
+    {
+        List<String> leaderBoardMessage = new ArrayList<>();
+        leaderBoardMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_TITLE ) ) );
+        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard();
+        if( playerStatsList != null ) {
+            for( PlayerStats playerStats : playerStatsList ) {
+                leaderBoardMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_ENTRY )
+                        .replaceAll( "%player%", playerStats.getName() )
+                        .replaceAll( "%games%", String.valueOf( playerStats.getGames() ) )
+                        .replaceAll( "%wins%", String.valueOf( playerStats.getWins() ) )
+                        .replaceAll( "%losses%", String.valueOf( playerStats.getLosses() ) )
+                ) );
+            }
+        }
+        sender.sendMessage( leaderBoardMessage.toArray( new String[0] ) );
+    }
+
+    public void deletePlayerStats( CommandSender sender, Player player )
+    {
+        plugin.getDataHandler().deleteStats( player != null ? player.getUniqueId() : null );
+        plugin.messageSender( sender, Messages.DELETED_STATS );
     }
 }

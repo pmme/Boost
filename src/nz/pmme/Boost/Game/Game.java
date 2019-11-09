@@ -104,6 +104,7 @@ public class Game
         player.teleport( gameConfig.getLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
         plugin.messageSender( player, Messages.JOIN_GAME, gameConfig.getDisplayName() );
+        plugin.getDataHandler().addPlayer( player.getUniqueId(), player.getDisplayName() );
         return true;
     }
 
@@ -123,10 +124,7 @@ public class Game
                 gameState = GameState.STOPPED;
                 if( activePlayers.size() == 1 )
                 {
-                    String message = plugin.formatMessage( Messages.WINNER, gameConfig.getDisplayName(), "%player%", activePlayers.get( 0 ).getDisplayName() );
-                    for( PlayerInfo playerInfo : players.values() ) {
-                        plugin.messageSender( playerInfo.getPlayer(), message );
-                    }
+                    this.playerWon( activePlayers.get(0) );
                 }
                 this.end( false );
             }
@@ -166,6 +164,7 @@ public class Game
             player.setGameMode( GameMode.SPECTATOR );
             plugin.messageSender( player, Messages.LOST, gameConfig.getDisplayName() );
             player.getInventory().clear();
+            plugin.getDataHandler().logLoss( player.getUniqueId() );
 
             String message = plugin.formatMessage( Messages.PLAYER_LOST, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
             for( PlayerInfo playerInfo : players.values() ) {
@@ -178,14 +177,20 @@ public class Game
                 gameState = GameState.STOPPED;
                 if( activePlayers.size() == 1 )
                 {
-                    String message = plugin.formatMessage( Messages.WINNER, gameConfig.getDisplayName(), "%player%", activePlayers.get( 0 ).getDisplayName() );
-                    for( PlayerInfo playerInfo : players.values() ) {
-                        plugin.messageSender( playerInfo.getPlayer(), message );
-                    }
+                    this.playerWon( activePlayers.get(0) );
                 }
                 this.end( false );
             }
         }
+    }
+
+    private void playerWon( Player player )
+    {
+        String message = plugin.formatMessage( Messages.WINNER, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
+        for( PlayerInfo playerInfo : players.values() ) {
+            plugin.messageSender( playerInfo.getPlayer(), message );
+        }
+        plugin.getDataHandler().logWin( player.getUniqueId() );
     }
 
     public boolean isActiveInGame( Player player )
@@ -228,6 +233,7 @@ public class Game
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
             playerInfo.getPlayer().getInventory().setItemInMainHand( new ItemStack( Material.DIAMOND_HOE ) );
             playerInfo.setActive();
+            plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId() );
         }
         return true;
     }

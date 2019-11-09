@@ -31,6 +31,11 @@ public enum Messages
     FAILED_TO_FIND_WORLD("failed_to_find_world"),
     NO_PERMISSION_CMD("no_permission_cmd"),
     NO_PERMISSION_USE("no_permission_use"),
+    PLAYER_NOT_FOUND("player_not_found"),
+    PLAYER_NO_STATS("player_no_stats"),
+    DELETED_STATS("deleted_stats"),
+    LEADER_BOARD_TITLE("leader_board_title"),
+    LEADER_BOARD_ENTRY("leader_board_entry"),
 
     END("end");
 

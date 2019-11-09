@@ -71,6 +71,12 @@ public class EventsListener implements Listener
                             if( !plugin.hasPermission( thisPlayer, "boost.status", Messages.NO_PERMISSION_USE ) ) return;
                             plugin.getGameManager().displayStatus( thisPlayer );
                             return;
+                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStats() ) ) {
+                            plugin.getGameManager().displayPlayerStats( thisPlayer, thisPlayer );
+                            return;
+                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignTop() ) ) {
+                            plugin.getGameManager().displayLeaderBoard( thisPlayer );
+                            return;
                         }
                         plugin.messageSender( thisPlayer, Messages.ERROR_IN_SIGN );
                         return;

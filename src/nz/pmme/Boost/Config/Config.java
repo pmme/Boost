@@ -23,6 +23,7 @@ public class Config
     private FileConfiguration messagesConfig = null;
     private String messagePrefix;
     private EnumMap< Messages, String > messages = new EnumMap<>( Messages.class );
+    private List<String> playerStatsTemplate = new ArrayList<>();
     private List<String> commandUsage = new ArrayList<>();
 
     private int targetBoxH;
@@ -36,6 +37,8 @@ public class Config
     private String signJoin;
     private String signLeave;
     private String signStatus;
+    private String signStats;
+    private String signTop;
 
     private SpawnLocation mainLobbySpawn;
 
@@ -66,6 +69,7 @@ public class Config
         plugin.reloadConfig();
         this.createMessagesConfig();
         this.messages.clear();
+        this.playerStatsTemplate.clear();
         this.commandUsage.clear();
         this.gameConfigList.clear();
         this.load();
@@ -94,7 +98,9 @@ public class Config
         signTitle = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.title", "[Boost]" ) );
         signJoin = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.join", "Click to join" ) );
         signLeave = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.leave", "Click to leave" ) );
-        signStatus = ChatColor.translateAlternateColorCodes(  '&', plugin.getConfig().getString( "signs.status", "Click for status" ) );
+        signStatus = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.status", "Click for status" ) );
+        signStats = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.stats", "Your stats" ) );
+        signTop = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.top", "Leader board" ) );
 
         mainLobbySpawn = new SpawnLocation( plugin, "main_lobby" );
 
@@ -110,6 +116,9 @@ public class Config
             messages.put( message, messageText != null ? ChatColor.translateAlternateColorCodes( '&', messageText ) : "Missing message: " + message.getPath() );
         }
         messagePrefix = this.getMessage( Messages.TITLE ) + " " + ChatColor.RESET;
+        for( String string : messagesConfig.getStringList( "player_stats" ) ) {
+            playerStatsTemplate.add( string );
+        }
         for( String string : messagesConfig.getStringList( "command_usage" ) ) {
             commandUsage.add( ChatColor.translateAlternateColorCodes( '&', string ) );
         }
@@ -126,6 +135,8 @@ public class Config
     public String getSignJoin() { return signJoin; }
     public String getSignLeave() { return signLeave; }
     public String getSignStatus() { return signStatus; }
+    public String getSignStats() { return signStats; }
+    public String getSignTop() { return signTop; }
 
     public Location getMainLobbySpawn() {
         return mainLobbySpawn.getSpawn();
@@ -144,5 +155,6 @@ public class Config
 
     public String getMessage( Messages message ) { return messages.get( message ); }
     public String getPrefix() { return messagePrefix; }
+    public List<String> getPlayerStatsTemplate() { return playerStatsTemplate; }
     public String[] getCommandUsage() { return commandUsage.toArray(new String[0]); }
 }

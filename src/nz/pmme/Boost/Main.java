@@ -3,6 +3,8 @@ package nz.pmme.Boost;
 import nz.pmme.Boost.Config.Config;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Game.GameManager;
+import nz.pmme.Data.Database;
+import nz.pmme.Data.DataHandler;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,10 +17,14 @@ public class Main extends JavaPlugin
     private GameManager gameManager = new GameManager( this );
     private boolean boostEnabled = true;
     private Config config = new Config( this );
+    private Database database = new Database( this );
+    private DataHandler dataHandler = new DataHandler( this, this.database );
 
     @Override
     public void onEnable() {
-        config.init();
+        this.config.init();
+        this.dataHandler.generateTables();
+        this.dataHandler.checkVersion();
         this.getGameManager().createConfiguredGames();
         this.getCommand( "boost" ).setExecutor( new Command_Boost(this) );
         this.getServer().getPluginManager().registerEvents( new EventsListener(this), this );
@@ -28,6 +34,7 @@ public class Main extends JavaPlugin
     public void onDisable() {
         this.getGameManager().clearAllGames();
         this.disableBoost();
+        this.database.closeConnection();
     }
 
     public boolean isBoostEnabled() {
@@ -49,6 +56,8 @@ public class Main extends JavaPlugin
     public Config getLoadedConfig() {
         return config;
     }
+
+    public DataHandler getDataHandler() { return dataHandler; }
 
     public void messageSender( CommandSender sender, String message ) {
         sender.sendMessage( this.getLoadedConfig().getPrefix() + message );

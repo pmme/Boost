@@ -3,6 +3,7 @@ package nz.pmme.Boost;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import nz.pmme.Boost.Game.Game;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -207,6 +208,47 @@ public class Command_Boost implements CommandExecutor
                         return true;
                     }
                     break;
+
+                case "top":
+                    plugin.getGameManager().displayLeaderBoard( sender );
+                    return true;
+
+                case "stats":
+                    if( args.length == 2 ) {
+                        for( Player player : plugin.getServer().getOnlinePlayers() ) {
+                            if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
+                                plugin.getGameManager().displayPlayerStats( sender, player );
+                                return true;
+                            }
+                        }
+                        plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
+                        return true;
+                    } else if( sender instanceof Player ) {
+                        plugin.getGameManager().displayPlayerStats( sender, (Player)sender );
+                        return true;
+                    } else {
+                        plugin.messageSender( sender, Messages.NO_CONSOLE );
+                        return true;
+                    }
+
+                case "delstats":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 2 ) {
+                        for( Player player : plugin.getServer().getOnlinePlayers() ) {
+                            if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
+                                plugin.getGameManager().deletePlayerStats( sender, player );
+                                return true;
+                            }
+                        }
+                        plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
+                        return true;
+                    } else if( sender instanceof Player ) {
+                        plugin.getGameManager().deletePlayerStats( sender, (Player)sender );
+                        return true;
+                    } else {
+                        plugin.messageSender( sender, Messages.NO_CONSOLE );
+                        return true;
+                    }
 
                 case "status":
                     if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
