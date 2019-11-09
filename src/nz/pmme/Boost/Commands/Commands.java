@@ -150,6 +150,7 @@ public class Commands implements CommandExecutor
                     break;
 
                 case "join":
+                    if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( !plugin.hasPermission( sender, "boost.join", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( !plugin.isBoostEnabled() ) {
                         plugin.messageSender( sender, Messages.BOOST_DISABLED );
@@ -167,6 +168,7 @@ public class Commands implements CommandExecutor
                     break;
 
                 case "leave":
+                    if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( sender instanceof Player ) {
                         if( args.length == 1 ) {
                             plugin.getGameManager().leaveGame( (Player)sender );
@@ -211,10 +213,12 @@ public class Commands implements CommandExecutor
                     break;
 
                 case "top":
+                    if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
                     plugin.getGameManager().displayLeaderBoard( sender );
                     return true;
 
                 case "stats":
+                    if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length == 2 ) {
                         for( Player player : plugin.getServer().getOnlinePlayers() ) {
                             if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
