@@ -1,8 +1,9 @@
-package nz.pmme.Boost;
+package nz.pmme.Boost.Commands;
 
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import nz.pmme.Boost.Game.Game;
+import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -14,11 +15,11 @@ import org.bukkit.entity.Player;
 /**
  * Created by paul on 24-Apr-16.
  */
-public class Command_Boost implements CommandExecutor
+public class Commands implements CommandExecutor
 {
     private Main plugin;
 
-    public Command_Boost( Main plugin ) {
+    public Commands( Main plugin ) {
         this.plugin = plugin;
     }
 
