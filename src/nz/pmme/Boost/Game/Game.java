@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
-public class Game
+public class Game implements Comparable<Game>
 {
     private Main plugin;
     private GameConfig gameConfig;
@@ -30,6 +30,11 @@ public class Game
         this.gameState = GameState.STOPPED;
 
         if( this.gameConfig.isAutoQueue() ) this.startQueuing();
+    }
+
+    @Override
+    public int compareTo( Game other ) {
+        return this.gameConfig.getName().compareTo( other.gameConfig.getName() );
     }
 
     public GameConfig getGameConfig() {

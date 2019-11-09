@@ -53,8 +53,11 @@ public class GameManager
         return games.get( gameName.toLowerCase() );
     }
 
-    public List<Game> getGames() {
-        return new ArrayList<>( games.values() );
+    public List<Game> getGames()
+    {
+        List<Game> gameList = new ArrayList<>( games.values() );
+        gameList.sort(null);
+        return gameList;
     }
 
     public void joinGame( Player player, String gameName )
@@ -166,7 +169,7 @@ public class GameManager
     public void displayStatus( CommandSender sender )
     {
         sender.sendMessage( "Boost games:" );
-        for( Game game : plugin.getGameManager().getGames() )
+        for( Game game : this.getGames() )
         {
             String message = "- " + game.getGameConfig().getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players.";
             if( game.isQueuing() ) message += " " + game.getRemainingQueueTime() + "s before start.";
