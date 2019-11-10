@@ -121,6 +121,19 @@ public class GameManager
         playersInGames.remove( player.getUniqueId() );
     }
 
+    public void queueGame( Game game, CommandSender sender )
+    {
+        if( game.isRunning() ) {
+            plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, game.getGameConfig().getName() );
+            return;
+        }
+        if( game.isQueuing() ) {
+            plugin.messageSender( sender, Messages.GAME_ALREADY_QUEUING, game.getGameConfig().getName() );
+            return;
+        }
+        game.startQueuing();
+    }
+
     public void queueGame( String gameName, CommandSender sender )
     {
         Game game = this.getGame( gameName );
@@ -128,15 +141,16 @@ public class GameManager
             plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, gameName );
             return;
         }
+        this.queueGame( game, sender );
+    }
+
+    public void startGame( Game game, CommandSender sender )
+    {
         if( game.isRunning() ) {
-            plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, gameName );
+            plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, game.getGameConfig().getName() );
             return;
         }
-        if( game.isQueuing() ) {
-            plugin.messageSender( sender, Messages.GAME_ALREADY_QUEUING, gameName );
-            return;
-        }
-        game.startQueuing();
+        game.start();
     }
 
     public void startGame( String gameName, CommandSender sender )
@@ -146,11 +160,16 @@ public class GameManager
             plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, gameName );
             return;
         }
-        if( game.isRunning() ) {
-            plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, gameName );
+        this.startGame( game, sender );
+    }
+
+    public void endGame( Game game, CommandSender sender )
+    {
+        if( !game.isRunning() && !game.isQueuing() ) {
+            plugin.messageSender( sender, Messages.GAME_NOT_RUNNING, game.getGameConfig().getName() );
             return;
         }
-        game.start();
+        game.end( false );
     }
 
     public void endGame( String gameName, CommandSender sender )
@@ -160,11 +179,7 @@ public class GameManager
             plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, gameName );
             return;
         }
-        if( !game.isRunning() && !game.isQueuing() ) {
-            plugin.messageSender( sender, Messages.GAME_NOT_RUNNING, gameName );
-            return;
-        }
-        game.end( false );
+        this.endGame( game, sender );
     }
 
     public void clearAllGames()

@@ -186,6 +186,14 @@ public class Commands implements CommandExecutor
                         plugin.messageSender( sender, Messages.BOOST_DISABLED );
                         return true;
                     }
+                    if( args.length == 1 ) {
+                        if( sender instanceof Player ) {
+                            Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
+                            if( game == null ) break;
+                            plugin.getGameManager().queueGame( game, sender );
+                            return true;
+                        }
+                    }
                     if( args.length == 2 ) {
                         plugin.getGameManager().queueGame( args[1], sender );
                         return true;
@@ -198,6 +206,14 @@ public class Commands implements CommandExecutor
                         plugin.messageSender( sender, Messages.BOOST_DISABLED );
                         return true;
                     }
+                    if( args.length == 1 ) {
+                        if( sender instanceof Player ) {
+                            Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
+                            if( game == null ) break;
+                            plugin.getGameManager().startGame( game, sender );
+                            return true;
+                        }
+                    }
                     if( args.length == 2 ) {
                         plugin.getGameManager().startGame( args[1], sender );
                         return true;
@@ -206,6 +222,14 @@ public class Commands implements CommandExecutor
 
                 case "end":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 1 ) {
+                        if( sender instanceof Player ) {
+                            Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
+                            if( game == null ) break;
+                            plugin.getGameManager().endGame( game, sender );
+                            return true;
+                        }
+                    }
                     if( args.length == 2 ) {
                         plugin.getGameManager().endGame( args[1], sender );
                         return true;
