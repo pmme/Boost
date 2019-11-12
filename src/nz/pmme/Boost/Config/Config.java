@@ -24,7 +24,8 @@ public class Config
     private String messagePrefix;
     private EnumMap< Messages, String > messages = new EnumMap<>( Messages.class );
     private List<String> playerStatsTemplate = new ArrayList<>();
-    private List<String> commandUsage = new ArrayList<>();
+    private List<String> commandUsageUser = new ArrayList<>();
+    private List<String> commandUsageAdmin = new ArrayList<>();
 
     private int targetBoxH;
     private int targetBoxV;
@@ -70,7 +71,8 @@ public class Config
         this.createMessagesConfig();
         this.messages.clear();
         this.playerStatsTemplate.clear();
-        this.commandUsage.clear();
+        this.commandUsageUser.clear();
+        this.commandUsageAdmin.clear();
         this.gameConfigList.clear();
         this.load();
     }
@@ -119,8 +121,11 @@ public class Config
         for( String string : messagesConfig.getStringList( "player_stats" ) ) {
             playerStatsTemplate.add( string );
         }
-        for( String string : messagesConfig.getStringList( "command_usage" ) ) {
-            commandUsage.add( ChatColor.translateAlternateColorCodes( '&', string ) );
+        for( String string : messagesConfig.getStringList( "command_usage_user" ) ) {
+            commandUsageUser.add( ChatColor.translateAlternateColorCodes( '&', string ) );
+        }
+        for( String string : messagesConfig.getStringList( "command_usage_admin" ) ) {
+            commandUsageAdmin.add( ChatColor.translateAlternateColorCodes( '&', string ) );
         }
     }
 
@@ -156,5 +161,11 @@ public class Config
     public String getMessage( Messages message ) { return messages.get( message ); }
     public String getPrefix() { return messagePrefix; }
     public List<String> getPlayerStatsTemplate() { return playerStatsTemplate; }
-    public String[] getCommandUsage() { return commandUsage.toArray(new String[0]); }
+
+    public String[] getCommandUsage( boolean isAdmin )
+    {
+        List<String> commandUsage = new ArrayList<>( commandUsageUser );
+        if( isAdmin ) commandUsage.addAll( commandUsageAdmin );
+        return commandUsage.toArray(new String[0]);
+    }
 }

@@ -29,7 +29,7 @@ public class Commands implements CommandExecutor
         if( args.length == 0 )
         {
             plugin.messageSender( sender, plugin.isBoostEnabled() ? Messages.BOOST_ENABLED : Messages.BOOST_DISABLED );
-            sender.sendMessage( plugin.getLoadedConfig().getCommandUsage() );
+            sender.sendMessage( plugin.getLoadedConfig().getCommandUsage( sender.hasPermission( "boost.admin" ) ) );
             return true;
         }
         else
@@ -324,7 +324,7 @@ public class Commands implements CommandExecutor
                     }
             }
         }
-        sender.sendMessage( plugin.getLoadedConfig().getCommandUsage() );
+        sender.sendMessage( plugin.getLoadedConfig().getCommandUsage( sender.hasPermission( "boost.admin" ) ) );
         return true;
     }
 }
