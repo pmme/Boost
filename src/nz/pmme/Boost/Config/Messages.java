@@ -38,6 +38,7 @@ public enum Messages
     LEADER_BOARD_ENTRY("leader_board_entry"),
     BUILD_ENABLED("build_enabled"),
     BUILD_DISABLED("build_disabled"),
+    GAME_NOT_CONFIGURED("game_not_configured"),
 
     END("end");
 

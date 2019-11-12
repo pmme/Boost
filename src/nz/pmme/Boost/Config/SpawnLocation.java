@@ -29,6 +29,7 @@ public class SpawnLocation
 
     public void setConfig()
     {
+        if( spawn == null ) return;     // New config will have null spawn initially.
         if( spawn.getWorld() != null ) plugin.getConfig().set( configPath + "world", spawn.getWorld().getName() );
         plugin.getConfig().set( configPath + "x", spawn.getBlockX() );
         plugin.getConfig().set( configPath + "y", spawn.getBlockY() );
@@ -38,7 +39,7 @@ public class SpawnLocation
     }
 
     public Location getSpawn() {
-        if( spread > 0 ) {
+        if( spread > 0 && spawn != null ) {
             Location location = new Location( spawn.getWorld(), spawn.getX(), spawn.getY(), spawn.getZ(), (float)( Math.random() * 360.0 ), 0 );
             Vector spreadVector = new Vector( Math.random() * spread, 0, 0 ).rotateAroundY( Math.random() * 360.0 );
             location.add( spreadVector );

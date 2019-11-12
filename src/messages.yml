@@ -34,6 +34,7 @@ leader_board_title: "&5[Boost] Leader board:"
 leader_board_entry: "%player% &a%wins% wins &c%losses% losses &3%games% games"
 build_enabled: "Build mode enabled for %player%."
 build_disabled: "Build mode disabled for %player%."
+game_not_configured: "%game%&r&4 is not properly configured."
 
 player_stats:
   - "&5[Boost] &fPlayer stats: %player%"

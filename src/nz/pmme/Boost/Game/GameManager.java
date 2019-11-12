@@ -131,6 +131,10 @@ public class GameManager
             plugin.messageSender( sender, Messages.GAME_ALREADY_QUEUING, game.getGameConfig().getName() );
             return;
         }
+        if( !game.getGameConfig().isProperlyConfigured() ) {
+            plugin.messageSender( sender, Messages.GAME_NOT_CONFIGURED, game.getGameConfig().getName() );
+            return;
+        }
         game.startQueuing();
     }
 
@@ -148,6 +152,10 @@ public class GameManager
     {
         if( game.isRunning() ) {
             plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, game.getGameConfig().getName() );
+            return;
+        }
+        if( !game.getGameConfig().isProperlyConfigured() ) {
+            plugin.messageSender( sender, Messages.GAME_NOT_CONFIGURED, game.getGameConfig().getName() );
             return;
         }
         game.start();

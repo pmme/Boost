@@ -38,7 +38,7 @@ public class GameConfig
         this.countdown = plugin.getConfig().getInt( configPath + "countdown", 30 );
         this.minPlayers = plugin.getConfig().getInt( configPath + "min_players", 2 );
         this.maxPlayers = plugin.getConfig().getInt( configPath + "max_players", 0 );
-        this.autoQueue = plugin.getConfig().getBoolean( configPath + "auto_queue", true );
+        this.autoQueue = plugin.getConfig().getBoolean( configPath + "auto_queue", false );
 
         this.lobbySpawn = new SpawnLocation( plugin, configPath + "game_lobby" );
         this.startSpawn = new SpawnLocation( plugin, configPath + "game_start" );
@@ -141,5 +141,12 @@ public class GameConfig
 
     public int getCountdownAnnounceTime() {
         return countdownAnnounceTime;
+    }
+
+    public boolean isProperlyConfigured(){
+        if( this.getLobbySpawn() == null ) return false;
+        if( this.getLossSpawn() == null ) return false;
+        if( this.getStartSpawn() == null ) return false;
+        return true;
     }
 }
