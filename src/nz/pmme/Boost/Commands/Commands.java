@@ -291,6 +291,8 @@ public class Commands implements CommandExecutor
                         for( Player player : plugin.getServer().getOnlinePlayers() ) {
                             if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
                                 plugin.setBuilder( player.getUniqueId() );
+                                plugin.messageSender( player, Messages.BUILD_ENABLED, "", "%player%", player.getName() );
+                                plugin.messageSender( sender, Messages.BUILD_ENABLED, "", "%player%", player.getName() );
                                 return true;
                             }
                         }
@@ -298,6 +300,7 @@ public class Commands implements CommandExecutor
                         return true;
                     } else if( sender instanceof Player ) {
                         plugin.setBuilder( ((Player)sender).getUniqueId() );
+                        plugin.messageSender( sender, Messages.BUILD_ENABLED, "", "%player%", sender.getName() );
                         return true;
                     } else {
                         plugin.messageSender( sender, Messages.NO_CONSOLE );
@@ -310,6 +313,8 @@ public class Commands implements CommandExecutor
                         for( Player player : plugin.getServer().getOnlinePlayers() ) {
                             if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
                                 plugin.setNotBuilder( player.getUniqueId() );
+                                plugin.messageSender( player, Messages.BUILD_DISABLED, "", "%player%", player.getName() );
+                                plugin.messageSender( sender, Messages.BUILD_DISABLED, "", "%player%", player.getName() );
                                 return true;
                             }
                         }
@@ -317,6 +322,7 @@ public class Commands implements CommandExecutor
                         return true;
                     } else if( sender instanceof Player ) {
                         plugin.setNotBuilder( ((Player)sender).getUniqueId() );
+                        plugin.messageSender( sender, Messages.BUILD_DISABLED, "", "%player%", sender.getName() );
                         return true;
                     } else {
                         plugin.messageSender( sender, Messages.NO_CONSOLE );

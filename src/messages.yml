@@ -32,6 +32,8 @@ player_no_stats: "&4No stats for player %player%&r&4."
 deleted_stats: "&3Player stats deleted."
 leader_board_title: "&5[Boost] Leader board:"
 leader_board_entry: "%player% &a%wins% wins &c%losses% losses &3%games% games"
+build_enabled: "Build mode enabled for %player%."
+build_disabled: "Build mode disabled for %player%."
 
 player_stats:
   - "&5[Boost] &fPlayer stats: %player%"
