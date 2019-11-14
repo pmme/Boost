@@ -44,6 +44,22 @@ public class EventsListener implements Listener
         return false;
     }
 
+    private boolean hasBlockUnder( Location playerPosition )
+    {
+        for( int y = 0; y < plugin.getLoadedConfig().getTargetBoxV(); ++y ) {
+            for( int x = -1; x <= 1; ++x ) {
+                for( int z = -1; z <= 1; ++z ) {
+                    Block block = playerPosition.getWorld().getBlockAt( playerPosition.getBlockX() + x, playerPosition.getBlockY() - y, playerPosition.getBlockZ() + z );
+                    Block blockUnder = playerPosition.getWorld().getBlockAt( playerPosition.getBlockX() + x, playerPosition.getBlockY() - 1 - y, playerPosition.getBlockZ() + z );
+                    if( block.isEmpty() && !blockUnder.isEmpty() ) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     @EventHandler
     public void onPlayerInteract( PlayerInteractEvent event )
     {
@@ -107,7 +123,8 @@ public class EventsListener implements Listener
 
                 List< Player > otherPlayers = playersGame.getActivePlayerList();
                 for( Player otherPlayer : otherPlayers ) {
-                    if( inTargetBox( targetPotentialPlayerPosition, otherPlayer.getLocation() ) ) {
+                    if( this.inTargetBox( targetPotentialPlayerPosition, otherPlayer.getLocation() ) && this.hasBlockUnder( otherPlayer.getLocation() ) )
+                    {
                         VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
 
                         // Set a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
