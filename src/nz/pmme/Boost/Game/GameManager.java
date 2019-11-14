@@ -232,6 +232,7 @@ public class GameManager
                         .replaceAll( "%games%", String.valueOf( playerStats.getGames() ) )
                         .replaceAll( "%wins%", String.valueOf( playerStats.getWins() ) )
                         .replaceAll( "%losses%", String.valueOf( playerStats.getLosses() ) )
+                        .replaceAll( "%rank%", String.valueOf( playerStats.getRank() ) )
                 ) );
             }
             sender.sendMessage( playerStatsMessage.toArray( new String[0] ) );

@@ -156,11 +156,20 @@ public class DataHandler
             String queryStatsSql = "SELECT * FROM player_stats WHERE player_id=?";
             PreparedStatement queryStatsStatement = connection.prepareStatement( queryStatsSql );
             queryStatsStatement.setString( 1, playerId.toString() );
-            ResultSet resultSet = queryStatsStatement.executeQuery();
-            if( resultSet.next() ) {
-                playerStats = new PlayerStats( resultSet.getString( "player_name" ), resultSet.getInt( "games" ), resultSet.getInt( "wins" ), resultSet.getInt( "losses" ) );
+            ResultSet resultSetStats = queryStatsStatement.executeQuery();
+            if( resultSetStats.next() )
+            {
+                String queryRankSql = "SELECT COUNT(*) FROM player_stats WHERE wins>?";
+                PreparedStatement queryRankStatement = connection.prepareStatement( queryRankSql );
+                queryRankStatement.setInt( 1, resultSetStats.getInt( "wins" ) );
+                ResultSet resultSetRank = queryRankStatement.executeQuery();
+                int rank = resultSetRank.next() ? resultSetRank.getInt(1)+1 : 0;
+                resultSetRank.close();
+                queryRankStatement.close();
+
+                playerStats = new PlayerStats( resultSetStats.getString( "player_name" ), resultSetStats.getInt( "games" ), resultSetStats.getInt( "wins" ), resultSetStats.getInt( "losses" ), rank );
             }
-            resultSet.close();
+            resultSetStats.close();
             queryStatsStatement.close();
             return playerStats;
         }
@@ -202,7 +211,7 @@ public class DataHandler
             PreparedStatement queryLeaderBoardStatement = connection.prepareStatement( queryLeaderBoardSql );
             ResultSet resultSet = queryLeaderBoardStatement.executeQuery();
             while( resultSet.next() ) {
-                leaderBoard.add( new PlayerStats( resultSet.getString( "player_name" ), resultSet.getInt( "games" ), resultSet.getInt( "wins" ), resultSet.getInt( "losses" ) ) );
+                leaderBoard.add( new PlayerStats( resultSet.getString( "player_name" ), resultSet.getInt( "games" ), resultSet.getInt( "wins" ), resultSet.getInt( "losses" ), 0 ) );
             }
         }
         catch (SQLException sQLException) {

@@ -41,6 +41,7 @@ player_stats:
   - "  &3%games% games played"
   - "  &a%wins% wins"
   - "  &c%losses% losses"
+  - "  &dRank: %rank%"
 
 command_usage_user:
   - "&5Boost commands:"
