@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -22,6 +23,8 @@ public class Game implements Comparable<Game>
 
     private int remainingQueueTime;
     private BukkitTask queueTask;
+
+    private static Vector VECTOR0 = new Vector();
 
     public Game( Main plugin, GameConfig gameConfig )
     {
@@ -106,6 +109,8 @@ public class Game implements Comparable<Game>
         }
 
         players.put( player.getUniqueId(), new PlayerInfo( player ) );
+        player.setVelocity( Game.VECTOR0 );
+        player.setFlying( false );
         player.teleport( gameConfig.getLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
         plugin.messageSender( player, Messages.JOIN_GAME, gameConfig.getDisplayName() );
@@ -116,6 +121,8 @@ public class Game implements Comparable<Game>
     public void leave( Player player )
     {
         players.remove( player.getUniqueId() );
+        player.setVelocity( Game.VECTOR0 );
+        player.setFlying( false );
         player.teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
         plugin.messageSender( player, Messages.LEAVE_GAME, gameConfig.getDisplayName() );
@@ -165,6 +172,8 @@ public class Game implements Comparable<Game>
         {
             PlayerInfo payerInfoLost = players.get( player.getUniqueId() );
             if( payerInfoLost != null ) payerInfoLost.setLost();
+            player.setVelocity( Game.VECTOR0 );
+            player.setFlying( false );
             player.teleport( gameConfig.getLossSpawn() );
             player.setGameMode( GameMode.SPECTATOR );
             plugin.messageSender( player, Messages.LOST, gameConfig.getDisplayName() );
@@ -233,6 +242,8 @@ public class Game implements Comparable<Game>
         gameState = GameState.RUNNING;
         for( PlayerInfo playerInfo : players.values() )
         {
+            playerInfo.getPlayer().setVelocity( Game.VECTOR0 );
+            playerInfo.getPlayer().setFlying( false );
             playerInfo.getPlayer().teleport( gameConfig.getStartSpawn() );
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
@@ -250,6 +261,8 @@ public class Game implements Comparable<Game>
         gameState = GameState.STOPPED;
         for( PlayerInfo playerInfo : players.values() )
         {
+            playerInfo.getPlayer().setVelocity( Game.VECTOR0 );
+            playerInfo.getPlayer().setFlying( false );
             playerInfo.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_ENDED, gameConfig.getDisplayName() );
