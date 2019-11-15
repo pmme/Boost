@@ -63,7 +63,7 @@ command_usage_admin:
   - "&f/boost start Arena1 &3- Force-start the named game."
   - "&f/boost end Arena1 &3- Force-end the named game."
   - "&f/boost cleargames &3- End all games with no re-queuing."
-  - "&f/boost delstats &3- Delete all game stats for all players."
+  - "&f/boost delstats * &3- Delete all game stats for all players."
   - "&f/boost delstats <player> &3- Delete game stats for player."
   - "&f/boost reload &3- End all games, reload config, and re-initialise."
   - "&f/boost build <player> &3- Enable building for player."

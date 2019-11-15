@@ -263,21 +263,20 @@ public class Commands implements CommandExecutor
                 case "delstats":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length == 2 ) {
-                        for( Player player : plugin.getServer().getOnlinePlayers() ) {
-                            if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
-                                plugin.getGameManager().deletePlayerStats( sender, player );
-                                return true;
+                        if( args[1].equals( "*" ) ) {
+                            plugin.getGameManager().deletePlayerStats( sender, null );
+                        } else {
+                            for( Player player : plugin.getServer().getOnlinePlayers() ) {
+                                if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
+                                    plugin.getGameManager().deletePlayerStats( sender, player );
+                                    return true;
+                                }
                             }
+                            plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
                         }
-                        plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
-                        return true;
-                    } else if( sender instanceof Player ) {
-                        plugin.getGameManager().deletePlayerStats( sender, (Player)sender );
-                        return true;
-                    } else {
-                        plugin.messageSender( sender, Messages.NO_CONSOLE );
                         return true;
                     }
+                    break;
 
                 case "status":
                     if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
