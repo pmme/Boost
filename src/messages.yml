@@ -70,3 +70,23 @@ command_usage_admin:
   - "&f/boost nobuild <player> &3- Turn off building for player."
   - "&f/boost on &3- Turn the Boost game and controls on."
   - "&f/boost off &3- Turn the Boost game and controls off."
+
+instructions:
+  title: "Boost Instructions"
+  author: "Boost"
+  page1:
+  - ""
+  - " &5&n Welcome to &lBoost&r&5&n! "
+  - ""
+  - "&2The aim of the game is to boost other players off their platforms until you are the only player who has not fallen."
+  page2:
+  - "&dRight-click &1with your boost stick to boost players up and away from you."
+  - ""
+  - "&1Boost yourself by right-clicking at your own feet."
+  - ""
+  - "&dYou can boost players from any distance."
+  page3:
+  - ""
+  - ""
+  - ""
+  - "&2Designed and written by: &0pmme"

@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.InputStream;
@@ -26,6 +27,8 @@ public class Config
     private List<String> playerStatsTemplate = new ArrayList<>();
     private List<String> commandUsageUser = new ArrayList<>();
     private List<String> commandUsageAdmin = new ArrayList<>();
+
+    private InstructionBook instructionBook;
 
     private int targetBoxH;
     private int targetBoxV;
@@ -127,6 +130,7 @@ public class Config
         for( String string : messagesConfig.getStringList( "command_usage_admin" ) ) {
             commandUsageAdmin.add( ChatColor.translateAlternateColorCodes( '&', string ) );
         }
+        instructionBook = new InstructionBook( plugin, messagesConfig );
     }
 
     public int getTargetBoxH() { return targetBoxH; }
@@ -161,6 +165,7 @@ public class Config
     public String getMessage( Messages message ) { return messages.get( message ); }
     public String getPrefix() { return messagePrefix; }
     public List<String> getPlayerStatsTemplate() { return playerStatsTemplate; }
+    public ItemStack createInstructionBook() { return instructionBook.create(); }
 
     public String[] getCommandUsage( boolean isAdmin )
     {

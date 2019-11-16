@@ -127,6 +127,8 @@ public class Game implements Comparable<Game>
         player.setGameMode( GameMode.ADVENTURE );
         plugin.messageSender( player, Messages.LEAVE_GAME, gameConfig.getDisplayName() );
         player.getInventory().clear();
+        ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
+        player.getInventory().setItem( 0, instructionBook );
 
         if( gameState == GameState.RUNNING )
         {
@@ -267,6 +269,9 @@ public class Game implements Comparable<Game>
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_ENDED, gameConfig.getDisplayName() );
             playerInfo.getPlayer().getInventory().clear();
+            ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
+            playerInfo.getPlayer().getInventory().setItem( 0, instructionBook );
+
             plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
         }
         players.clear();

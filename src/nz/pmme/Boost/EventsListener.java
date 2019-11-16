@@ -15,6 +15,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -215,6 +216,16 @@ public class EventsListener implements Listener
     {
         if( plugin.isBoostEnabled() ) {
             event.getPlayer().teleport( event.getPlayer().getWorld().getSpawnLocation() );
+            ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
+            event.getPlayer().getInventory().setItem( 0, instructionBook );
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDropItem( PlayerDropItemEvent event )
+    {
+        if( plugin.isBoostEnabled() ) {
+            event.setCancelled( true );
         }
     }
 }
