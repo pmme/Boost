@@ -238,6 +238,20 @@ public class Game implements Comparable<Game>
         return gameState.toString();
     }
 
+    private ItemStack createBoostStick()
+    {
+        try {
+            if( plugin.getLoadedConfig().isBoostStickRandom() ) {
+                return plugin.getLoadedConfig().getRandomBoostStick().create();
+            } else if( plugin.getLoadedConfig().getDefaultBoostStick() != null ) {
+                return plugin.getLoadedConfig().getBoostStick( plugin.getLoadedConfig().getDefaultBoostStick() ).create();
+            }
+        } catch( NullPointerException e ) {
+            // Empty catch to drop through to hard-coded default.
+        }
+        return new ItemStack( Material.DIAMOND_HOE );
+    }
+
     public boolean start()
     {
         if( queueTask != null && !queueTask.isCancelled() ) queueTask.cancel();
@@ -249,7 +263,9 @@ public class Game implements Comparable<Game>
             playerInfo.getPlayer().teleport( gameConfig.getStartSpawn() );
             playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
-            playerInfo.getPlayer().getInventory().setItemInMainHand( new ItemStack( Material.DIAMOND_HOE ) );
+
+            playerInfo.getPlayer().getInventory().setItemInMainHand( this.createBoostStick() );
+
             playerInfo.setActive();
             plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId() );
         }

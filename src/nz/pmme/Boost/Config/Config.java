@@ -12,9 +12,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
+import java.util.*;
 
 public class Config
 {
@@ -46,6 +44,10 @@ public class Config
 
     private SpawnLocation mainLobbySpawn;
 
+    private boolean boostStickRandom;
+    private String defaultBoostStick;
+    private List<BoostStick> boostSticks = new ArrayList<>();
+    private Map< String, BoostStick > boostSticksByName = new HashMap<>();
     private List<GameConfig> gameConfigList = new ArrayList<>();
 
     public Config( Main plugin )
@@ -76,6 +78,8 @@ public class Config
         this.playerStatsTemplate.clear();
         this.commandUsageUser.clear();
         this.commandUsageAdmin.clear();
+        this.boostSticks.clear();
+        this.boostSticksByName.clear();
         this.gameConfigList.clear();
         this.load();
     }
@@ -109,6 +113,16 @@ public class Config
 
         mainLobbySpawn = new SpawnLocation( plugin, "main_lobby" );
 
+        boostStickRandom = plugin.getConfig().getBoolean( "boost_sticks.random", true );
+        defaultBoostStick = plugin.getConfig().getString( "boost_sticks.default" );
+        ConfigurationSection boostSticksSection = plugin.getConfig().getConfigurationSection( "boost_sticks.stick_types" );
+        if( boostSticksSection != null ) {
+            for( String boostStickName : boostSticksSection.getKeys( false ) ) {
+                BoostStick boostStick = new BoostStick( plugin, boostStickName.toLowerCase() );
+                boostSticks.add( boostStick );
+                boostSticksByName.put( boostStick.getName(), boostStick );
+            }
+        }
         ConfigurationSection gamesSection = plugin.getConfig().getConfigurationSection( "games" );
         if( gamesSection != null ) {
             for( String gameName : gamesSection.getKeys( false ) ) {
@@ -147,9 +161,19 @@ public class Config
     public String getSignStats() { return signStats; }
     public String getSignTop() { return signTop; }
 
-    public Location getMainLobbySpawn() {
-        return mainLobbySpawn.getSpawn();
+    public Location getMainLobbySpawn() { return mainLobbySpawn.getSpawn(); }
+
+    public boolean isBoostStickRandom() { return boostStickRandom; }
+    public String getDefaultBoostStick() { return defaultBoostStick; }
+    public List<BoostStick> getBoostSticks() { return boostSticks; }
+    public BoostStick getRandomBoostStick() {
+        if( boostSticks.size() == 0 ) {
+            plugin.getLogger().severe( "boost_sticks.stick_types configuration missing." );
+            return null;
+        }
+        return boostSticks.get( (int)( Math.random() * ( 0.5D + boostSticks.size() ) ) );
     }
+    public BoostStick getBoostStick( String name ) { return boostSticksByName.get( name ); }
 
     public List<GameConfig> getGameList() { return gameConfigList; }
 
