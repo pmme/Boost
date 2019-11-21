@@ -47,11 +47,11 @@ public class EventsListener implements Listener
 
     private boolean hasBlockUnder( Location playerPosition )
     {
-        for( int y = 0; y < plugin.getLoadedConfig().getTargetBoxV(); ++y ) {
-            for( int x = -1; x <= 1; ++x ) {
-                for( int z = -1; z <= 1; ++z ) {
-                    Block block = playerPosition.getWorld().getBlockAt( playerPosition.getBlockX() + x, playerPosition.getBlockY() - y, playerPosition.getBlockZ() + z );
-                    Block blockUnder = playerPosition.getWorld().getBlockAt( playerPosition.getBlockX() + x, playerPosition.getBlockY() - 1 - y, playerPosition.getBlockZ() + z );
+        for( int y = playerPosition.getBlockY(); y >= playerPosition.getBlockY() - plugin.getLoadedConfig().getTargetBoxV(); --y ) {
+            for( int x = playerPosition.getBlockX() - 1; x <= playerPosition.getBlockX() + 1; ++x ) {
+                for( int z = playerPosition.getBlockZ() - 1; z <= playerPosition.getBlockZ() + 1; ++z ) {
+                    Block block = playerPosition.getWorld().getBlockAt( x, y, z );
+                    Block blockUnder = playerPosition.getWorld().getBlockAt( x, y - 1, z );
                     if( block.isEmpty() && !blockUnder.isEmpty() ) {
                         return true;
                     }
