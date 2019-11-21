@@ -204,14 +204,18 @@ public class GameManager
         sender.sendMessage( "Boost games:" );
         for( Game game : this.getGames() )
         {
-            String message = "- " + game.getGameConfig().getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + ", with " + game.getPlayerCount() + " players.";
-            if( game.isQueuing() ) message += " " + game.getRemainingQueueTime() + "s before start.";
+            String message = "- " + game.getGameConfig().getDisplayName() + ChatColor.RESET + " is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players";
+            if( game.getPlayerCount() < game.getGameConfig().getMinPlayers() ) {
+                message += " " + ( game.getGameConfig().getMinPlayers() - game.getPlayerCount() ) + " more required";
+            } else if( game.isQueuing() ) {
+                message += " " + game.getRemainingQueueTime() + "s before start";
+            }
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
         }
         if( sender instanceof Player ) {
             Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
             if( game != null ) {
-                String message = "You are " + game.getPlayerStateText( (Player)sender ) + " in game " + game.getGameConfig().getDisplayName() + ChatColor.RESET + ", which is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players.";
+                String message = "You are " + game.getPlayerStateText( (Player)sender ) + " in game " + game.getGameConfig().getDisplayName();
                 sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
             } else {
                 plugin.messageSender( sender, Messages.NOT_IN_GAME );

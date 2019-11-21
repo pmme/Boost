@@ -39,6 +39,7 @@ public enum Messages
     BUILD_ENABLED("build_enabled"),
     BUILD_DISABLED("build_disabled"),
     GAME_NOT_CONFIGURED("game_not_configured"),
+    PLAYERS_REQUIRED("players_required"),
 
     END("end");
 

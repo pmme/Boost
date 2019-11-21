@@ -104,8 +104,11 @@ public class Game implements Comparable<Game>
         }
 
         String message = plugin.formatMessage( Messages.PLAYER_JOINED_GAME, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
+        int playersRequired = gameConfig.getMinPlayers() - this.getPlayerCount() - 1;
+        String messagePlayerCount = plugin.formatMessage( Messages.PLAYERS_REQUIRED, gameConfig.getDisplayName(), "%count%", String.valueOf( playersRequired ) );
         for( PlayerInfo playerInfo : players.values() ) {
             plugin.messageSender( playerInfo.getPlayer(), message );
+            if( playersRequired > 0 ) plugin.messageSender( playerInfo.getPlayer(), messagePlayerCount );
         }
 
         players.put( player.getUniqueId(), new PlayerInfo( player ) );
@@ -114,6 +117,7 @@ public class Game implements Comparable<Game>
         player.teleport( gameConfig.getLobbySpawn() );
         player.setGameMode( GameMode.ADVENTURE );
         plugin.messageSender( player, Messages.JOIN_GAME, gameConfig.getDisplayName() );
+        if( playersRequired > 0 ) plugin.messageSender( player, messagePlayerCount );
         plugin.getDataHandler().addPlayer( player.getUniqueId(), player.getDisplayName() );
         return true;
     }
