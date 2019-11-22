@@ -190,6 +190,25 @@ public class GameManager
         this.endGame( game, sender );
     }
 
+    public void stopGame( Game game, CommandSender sender )
+    {
+        if( !game.isRunning() && !game.isQueuing() ) {
+            plugin.messageSender( sender, Messages.GAME_NOT_RUNNING, game.getGameConfig().getName() );
+            return;
+        }
+        game.end( true );
+    }
+
+    public void stopGame( String gameName, CommandSender sender )
+    {
+        Game game = this.getGame( gameName );
+        if( game == null ) {
+            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, gameName );
+            return;
+        }
+        this.stopGame( game, sender );
+    }
+
     public void clearAllGames()
     {
         for( Game game : games.values() ) {

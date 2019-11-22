@@ -231,7 +231,35 @@ public class Commands implements CommandExecutor
                         }
                     }
                     if( args.length == 2 ) {
-                        plugin.getGameManager().endGame( args[1], sender );
+                        if( args[1].equals( "*" ) ) {
+                            for( Game game : plugin.getGameManager().getGames() ) {
+                                plugin.getGameManager().endGame( game, sender );
+                            }
+                        } else {
+                            plugin.getGameManager().endGame( args[1], sender );
+                        }
+                        return true;
+                    }
+                    break;
+
+                case "stop":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 1 ) {
+                        if( sender instanceof Player ) {
+                            Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
+                            if( game == null ) break;
+                            plugin.getGameManager().stopGame( game, sender );
+                            return true;
+                        }
+                    }
+                    if( args.length == 2 ) {
+                        if( args[1].equals( "*" ) ) {
+                            for( Game game : plugin.getGameManager().getGames() ) {
+                                plugin.getGameManager().stopGame( game, sender );
+                            }
+                        } else {
+                            plugin.getGameManager().stopGame( args[1], sender );
+                        }
                         return true;
                     }
                     break;

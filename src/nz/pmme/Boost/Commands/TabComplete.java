@@ -31,6 +31,7 @@ public class TabComplete implements TabCompleter
             "queue",
             "start",
             "end",
+            "stop",
             "cleargames",
             "delstats",
             "reload",
@@ -98,6 +99,7 @@ public class TabComplete implements TabCompleter
                 case "queue":
                 case "start":
                 case "end":
+                case "stop":
                     if( !sender.hasPermission( "boost.admin" ) ) break;
                     for( String gameName : plugin.getGameManager().getGameNames() ) {
                         returnList.add( ChatColor.stripColor( gameName ) );
