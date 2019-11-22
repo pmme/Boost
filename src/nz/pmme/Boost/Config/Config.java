@@ -171,7 +171,7 @@ public class Config
             plugin.getLogger().severe( "boost_sticks.stick_types configuration missing." );
             return null;
         }
-        return boostSticks.get( (int)( Math.random() * ( 0.5D + boostSticks.size() ) ) );
+        return boostSticks.get( (int)( Math.random() * ( boostSticks.size() ) ) );
     }
     public BoostStick getBoostStick( String name ) { return boostSticksByName.get( name ); }
 
