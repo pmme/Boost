@@ -119,6 +119,8 @@ public class EventsListener implements Listener
                     break;
             }
             if( targetBlock != null ) {
+                thisPlayer.playSound( thisPlayer.getLocation(), plugin.getLoadedConfig().getBoostSound(), 1, 1 );
+
                 // Check if there is a player standing on the target block.
                 final Vector targetPotentialPlayerPosition = targetBlock.getLocation().toVector().add( VECTOR_UP );
 
@@ -134,6 +136,8 @@ public class EventsListener implements Listener
                         // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
                         Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
                         otherPlayer.setVelocity( vectorBoost );
+
+                        otherPlayer.getWorld().playSound( otherPlayer.getLocation(), plugin.getLoadedConfig().getBoostedSound(), 1, 1 );
                     }
                 }
             }
@@ -161,6 +165,8 @@ public class EventsListener implements Listener
                     // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
                     Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
                     otherPlayer.setVelocity( vectorBoost );
+
+                    otherPlayer.getWorld().playSound( otherPlayer.getLocation(), plugin.getLoadedConfig().getBoostedSound(), 1, 1 );
                 }
             }
         }

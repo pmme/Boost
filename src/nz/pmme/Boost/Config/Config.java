@@ -3,6 +3,7 @@ package nz.pmme.Boost.Config;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -43,6 +44,17 @@ public class Config
     private String signTop;
 
     private SpawnLocation mainLobbySpawn;
+
+    private Sound tickSound;
+    private Sound joinSound;
+    private Sound leaveSound;
+    private Sound startSound;
+    private Sound winSound;
+    private Sound loseSound;
+    private Sound boostSound;
+    private Sound boostedSound;
+    private Sound statsSound;
+    private Sound leaderSound;
 
     private boolean boostStickRandom;
     private String defaultBoostStick;
@@ -94,6 +106,16 @@ public class Config
         }
     }
 
+    private Sound tryGetSoundFromConfig( String path, String def )
+    {
+        try {
+            return Sound.valueOf( plugin.getConfig().getString( path, def ) );
+        } catch( IllegalArgumentException e ) {
+            plugin.getLogger().warning( "Sound " + plugin.getConfig().getString( path, def ) + " not recognised." );
+            return null;
+        }
+    }
+
     private void load()
     {
         // targetDistance is the radius from the centre block, so a box of 3 blocks is (3-1)/2 = 1 block bigger than the main block. 1 block is (1-1)/2 = 0 blocks bigger, or just the main block.
@@ -112,6 +134,17 @@ public class Config
         signTop = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.top", "Leader board" ) );
 
         mainLobbySpawn = new SpawnLocation( plugin, "main_lobby" );
+
+        tickSound = this.tryGetSoundFromConfig( "sounds.tick", "ITEM_FLINTANDSTEEL_USE" );
+        joinSound = this.tryGetSoundFromConfig( "sounds.join", "UI_LOOM_SELECT_PATTERN" );
+        leaveSound = this.tryGetSoundFromConfig( "sounds.leave", "UI_LOOM_TAKE_RESULT" );
+        startSound = this.tryGetSoundFromConfig( "sounds.start", "ENTITY_EVOKER_PREPARE_SUMMON" );
+        winSound = this.tryGetSoundFromConfig( "sounds.win", "UI_TOAST_CHALLENGE_COMPLETE" );
+        loseSound = this.tryGetSoundFromConfig( "sounds.lose", "ENTITY_GHAST_HURT" );
+        boostSound = this.tryGetSoundFromConfig( "sounds.boost", "ITEM_TRIDENT_THROW" );
+        boostedSound = this.tryGetSoundFromConfig( "sounds.boosted", "ITEM_TRIDENT_RIPTIDE_3" );
+        statsSound = this.tryGetSoundFromConfig( "sounds.stats", "ENTITY_ENDER_EYE_DEATH" );
+        leaderSound = this.tryGetSoundFromConfig( "sound.leader", "ENTITY_ENDER_EYE_DEATH" );
 
         boostStickRandom = plugin.getConfig().getBoolean( "boost_sticks.random", true );
         defaultBoostStick = plugin.getConfig().getString( "boost_sticks.default" );
@@ -162,6 +195,17 @@ public class Config
     public String getSignTop() { return signTop; }
 
     public Location getMainLobbySpawn() { return mainLobbySpawn.getSpawn(); }
+
+    public Sound getTickSound() { return  tickSound; }
+    public Sound getJoinSound() { return joinSound; }
+    public Sound getLeaveSound() { return leaveSound; }
+    public Sound getStartSound() { return startSound; }
+    public Sound getWinSound() { return winSound; }
+    public Sound getLoseSound() { return loseSound; }
+    public Sound getBoostSound() { return boostSound; }
+    public Sound getBoostedSound() { return boostedSound; }
+    public Sound getStatsSound() { return statsSound; }
+    public Sound getLeaderSound() { return leaderSound; }
 
     public boolean isBoostStickRandom() { return boostStickRandom; }
     public String getDefaultBoostStick() { return defaultBoostStick; }

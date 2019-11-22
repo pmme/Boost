@@ -29,6 +29,18 @@ main_lobby:
   z: 0
   yaw: 0
 
+sounds:
+  tick: 'ITEM_FLINTANDSTEEL_USE'
+  join: 'UI_LOOM_SELECT_PATTERN'
+  leave: 'UI_LOOM_TAKE_RESULT'
+  start: 'ENTITY_EVOKER_PREPARE_SUMMON'
+  win: 'UI_TOAST_CHALLENGE_COMPLETE'
+  lose: 'ENTITY_GHAST_HURT'
+  boost: 'ITEM_TRIDENT_THROW'
+  boosted: 'ITEM_TRIDENT_RIPTIDE_3'
+  stats: 'ENTITY_ENDER_EYE_DEATH'
+  leader: 'ENTITY_ENDER_EYE_DEATH'
+
 boost_sticks:
   random: true
   default: wood

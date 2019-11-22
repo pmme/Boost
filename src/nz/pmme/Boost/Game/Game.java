@@ -72,6 +72,9 @@ public class Game implements Comparable<Game>
                             String message = plugin.formatMessage( Messages.GAME_COUNTDOWN, gameConfig.getDisplayName(), "%time%", String.valueOf( remainingQueueTime ) );
                             for( PlayerInfo playerInfo : players.values() ) {
                                 plugin.messageSender( playerInfo.getPlayer(), message );
+                                if( remainingQueueTime <= 5 ) {
+                                    playerInfo.getPlayer().playSound( playerInfo.getPlayer().getLocation(), plugin.getLoadedConfig().getTickSound(), 1, 1 );
+                                }
                             }
                         }
                         --remainingQueueTime;
@@ -119,6 +122,7 @@ public class Game implements Comparable<Game>
         plugin.messageSender( player, Messages.JOIN_GAME, gameConfig.getDisplayName() );
         if( playersRequired > 0 ) plugin.messageSender( player, messagePlayerCount );
         plugin.getDataHandler().addPlayer( player.getUniqueId(), player.getDisplayName() );
+        player.playSound( player.getLocation(), plugin.getLoadedConfig().getJoinSound(), 1, 1 );
         return true;
     }
 
@@ -145,8 +149,11 @@ public class Game implements Comparable<Game>
                     this.playerWon( activePlayers.get(0) );
                 }
                 this.end( false );
+                return;
             }
         }
+
+        player.playSound( player.getLocation(), plugin.getLoadedConfig().getLeaveSound(), 1, 1 );
     }
 
     public List<Player> getPlayerList()
@@ -185,6 +192,7 @@ public class Game implements Comparable<Game>
             plugin.messageSender( player, Messages.LOST, gameConfig.getDisplayName() );
             player.getInventory().clear();
             plugin.getDataHandler().logLoss( player.getUniqueId() );
+            player.playSound( player.getLocation(), plugin.getLoadedConfig().getLoseSound(), 1, 1 );
 
             String message = plugin.formatMessage( Messages.PLAYER_LOST, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
             for( PlayerInfo playerInfo : players.values() ) {
@@ -207,6 +215,8 @@ public class Game implements Comparable<Game>
     private void playerWon( Player player )
     {
         String message = plugin.formatMessage( Messages.WINNER, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
+        player.playSound( player.getLocation(), plugin.getLoadedConfig().getWinSound(), 0.75f, 1 );
+        player.playSound( plugin.getLoadedConfig().getMainLobbySpawn(), plugin.getLoadedConfig().getWinSound(), 0.75f, 1 );     // The player is about to be teleported to the mainLobbySpawn.
         for( PlayerInfo playerInfo : players.values() ) {
             plugin.messageSender( playerInfo.getPlayer(), message );
         }
@@ -273,6 +283,7 @@ public class Game implements Comparable<Game>
             playerInfo.setActive();
             plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId() );
         }
+        gameConfig.getStartSpawn().getWorld().playSound( gameConfig.getStartSpawn(), plugin.getLoadedConfig().getStartSound(), 1, 1 );
         return true;
     }
 

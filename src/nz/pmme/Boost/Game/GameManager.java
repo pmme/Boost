@@ -259,6 +259,9 @@ public class GameManager
                 ) );
             }
             sender.sendMessage( playerStatsMessage.toArray( new String[0] ) );
+            if( sender instanceof Player ) {
+                ((Player)sender).playSound( ((Player)sender).getLocation(), plugin.getLoadedConfig().getStatsSound(), 1, 1 );
+            }
         }
     }
 
@@ -278,6 +281,9 @@ public class GameManager
             }
         }
         sender.sendMessage( leaderBoardMessage.toArray( new String[0] ) );
+        if( sender instanceof Player ) {
+            ((Player)sender).playSound( ((Player)sender).getLocation(), plugin.getLoadedConfig().getLeaderSound(), 1, 1 );
+        }
     }
 
     public void deletePlayerStats( CommandSender sender, Player player )
