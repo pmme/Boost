@@ -2,6 +2,7 @@ package nz.pmme.Boost.Config;
 
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -55,6 +56,10 @@ public class Config
     private Sound boostedSound;
     private Sound statsSound;
     private Sound leaderSound;
+
+    private GameMode playingGameMode;
+    private GameMode lostGameMode;
+    private GameMode lobbyGameMode;
 
     private boolean boostStickRandom;
     private String defaultBoostStick;
@@ -146,6 +151,10 @@ public class Config
         statsSound = this.tryGetSoundFromConfig( "sounds.stats", "ENTITY_ENDER_EYE_DEATH" );
         leaderSound = this.tryGetSoundFromConfig( "sound.leader", "ENTITY_ENDER_EYE_DEATH" );
 
+        playingGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.playing", "ADVENTURE" ) );
+        lostGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lost", "SPECTATOR" ) );
+        lobbyGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lobby", "ADVENTURE" ) );
+
         boostStickRandom = plugin.getConfig().getBoolean( "boost_sticks.random", true );
         defaultBoostStick = plugin.getConfig().getString( "boost_sticks.default" );
         ConfigurationSection boostSticksSection = plugin.getConfig().getConfigurationSection( "boost_sticks.stick_types" );
@@ -206,6 +215,10 @@ public class Config
     public Sound getBoostedSound() { return boostedSound; }
     public Sound getStatsSound() { return statsSound; }
     public Sound getLeaderSound() { return leaderSound; }
+
+    public GameMode getPlayingGameMode() { return playingGameMode; }
+    public GameMode getLostGameMode() { return lostGameMode; }
+    public GameMode getLobbyGameMode() { return lobbyGameMode; }
 
     public boolean isBoostStickRandom() { return boostStickRandom; }
     public String getDefaultBoostStick() { return defaultBoostStick; }

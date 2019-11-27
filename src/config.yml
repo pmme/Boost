@@ -41,6 +41,11 @@ sounds:
   stats: 'ENTITY_ENDER_EYE_DEATH'
   leader: 'ENTITY_ENDER_EYE_DEATH'
 
+gamemode:
+  playing: 'ADVENTURE'
+  lost: 'SPECTATOR'
+  lobby: 'ADVENTURE'
+
 boost_sticks:
   random: true
   default: wood

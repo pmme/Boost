@@ -4,7 +4,6 @@ import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
 import nz.pmme.Boost.Main;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -118,7 +117,7 @@ public class Game implements Comparable<Game>
         player.setVelocity( Game.VECTOR0 );
         player.setFlying( false );
         player.teleport( gameConfig.getLobbySpawn() );
-        player.setGameMode( GameMode.ADVENTURE );
+        player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
         plugin.messageSender( player, Messages.JOIN_GAME, gameConfig.getDisplayName() );
         if( playersRequired > 0 ) plugin.messageSender( player, messagePlayerCount );
         plugin.getDataHandler().addPlayer( player.getUniqueId(), player.getDisplayName() );
@@ -132,7 +131,7 @@ public class Game implements Comparable<Game>
         player.setVelocity( Game.VECTOR0 );
         player.setFlying( false );
         player.teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
-        player.setGameMode( GameMode.ADVENTURE );
+        player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
         plugin.messageSender( player, Messages.LEAVE_GAME, gameConfig.getDisplayName() );
         player.getInventory().clear();
         ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
@@ -188,7 +187,7 @@ public class Game implements Comparable<Game>
             player.setVelocity( Game.VECTOR0 );
             player.setFlying( false );
             player.teleport( gameConfig.getLossSpawn() );
-            player.setGameMode( GameMode.SPECTATOR );
+            player.setGameMode( plugin.getLoadedConfig().getLostGameMode() );
             plugin.messageSender( player, Messages.LOST, gameConfig.getDisplayName() );
             player.getInventory().clear();
             plugin.getDataHandler().logLoss( player.getUniqueId() );
@@ -275,7 +274,7 @@ public class Game implements Comparable<Game>
             playerInfo.getPlayer().setVelocity( Game.VECTOR0 );
             playerInfo.getPlayer().setFlying( false );
             playerInfo.getPlayer().teleport( gameConfig.getStartSpawn() );
-            playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
+            playerInfo.getPlayer().setGameMode( plugin.getLoadedConfig().getPlayingGameMode() );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
 
             playerInfo.getPlayer().getInventory().setItemInMainHand( this.createBoostStick() );
@@ -297,7 +296,7 @@ public class Game implements Comparable<Game>
             playerInfo.getPlayer().setVelocity( Game.VECTOR0 );
             playerInfo.getPlayer().setFlying( false );
             playerInfo.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
-            playerInfo.getPlayer().setGameMode( GameMode.ADVENTURE );
+            playerInfo.getPlayer().setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_ENDED, gameConfig.getDisplayName() );
             playerInfo.getPlayer().getInventory().clear();
             ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();

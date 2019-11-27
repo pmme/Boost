@@ -1,7 +1,6 @@
 package nz.pmme.Boost.Game;
 
 import nz.pmme.Boost.Enums.PlayerGameState;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 public class PlayerInfo
