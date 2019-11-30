@@ -51,9 +51,7 @@ public class Commands implements CommandExecutor
 
                 case "reload":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    plugin.getGameManager().clearAllGames();
-                    plugin.getLoadedConfig().reload();
-                    plugin.getGameManager().createConfiguredGames();
+                    plugin.reload();
                     plugin.messageSender( sender, Messages.CONFIG_RELOADED );
                     return true;
 

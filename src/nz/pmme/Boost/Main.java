@@ -29,9 +29,9 @@ public class Main extends JavaPlugin
 
     @Override
     public void onEnable() {
-        this.config.init();
-        this.dataHandler.generateTables();
-        this.dataHandler.checkVersion();
+        this.getLoadedConfig().init();
+        this.getDataHandler().generateTables();
+        this.getDataHandler().checkVersion();
         this.getGameManager().createConfiguredGames();
         this.getCommand( "boost" ).setExecutor( new Commands(this) );
         this.getCommand( "boost" ).setTabCompleter( new TabComplete(this) );
@@ -42,7 +42,17 @@ public class Main extends JavaPlugin
     public void onDisable() {
         this.getGameManager().clearAllGames();
         this.disableBoost();
-        this.database.closeConnection();
+        this.getDatabase().closeConnection();
+    }
+
+    public void reload() {
+        this.getGameManager().clearAllGames();
+        this.getDatabase().closeConnection();
+        this.getLoadedConfig().reload();
+        this.getDataHandler().generateTables();
+        this.getDataHandler().checkVersion();
+        this.getGameManager().createConfiguredGames();
+        this.getLogger().info( "Boost reloaded." );
     }
 
     public boolean isBoostEnabled() {
@@ -65,7 +75,13 @@ public class Main extends JavaPlugin
         return config;
     }
 
-    public DataHandler getDataHandler() { return dataHandler; }
+    public Database getDatabase() {
+        return database;
+    }
+
+    public DataHandler getDataHandler() {
+        return dataHandler;
+    }
 
     public void messageSender( CommandSender sender, String message ) {
         sender.sendMessage( this.getLoadedConfig().getPrefix() + message );
