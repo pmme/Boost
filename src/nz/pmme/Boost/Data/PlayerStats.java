@@ -1,6 +1,4 @@
-package nz.pmme.Data;
-
-import java.util.UUID;
+package nz.pmme.Boost.Data;
 
 public class PlayerStats
 {

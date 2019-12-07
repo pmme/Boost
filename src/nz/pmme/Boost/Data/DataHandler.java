@@ -1,4 +1,4 @@
-package nz.pmme.Data;
+package nz.pmme.Boost.Data;
 
 
 import java.sql.*;

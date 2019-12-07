@@ -4,7 +4,7 @@ import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import nz.pmme.Boost.Main;
-import nz.pmme.Data.PlayerStats;
+import nz.pmme.Boost.Data.PlayerStats;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
