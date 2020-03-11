@@ -5,6 +5,7 @@ import nz.pmme.Boost.Commands.TabComplete;
 import nz.pmme.Boost.Config.Config;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Game.GameManager;
+import nz.pmme.Boost.Tasks.StatsResetTask;
 import nz.pmme.Boost.Data.Database;
 import nz.pmme.Boost.Data.DataHandler;
 import org.bukkit.ChatColor;
@@ -26,6 +27,7 @@ public class Main extends JavaPlugin
     private Database database = new Database( this );
     private DataHandler dataHandler = new DataHandler( this, this.database );
     private Map< UUID, Boolean > builders = new HashMap<>();
+    private StatsResetTask statsResetTask = new StatsResetTask( this );
 
     @Override
     public void onEnable() {
@@ -36,10 +38,12 @@ public class Main extends JavaPlugin
         this.getCommand( "boost" ).setExecutor( new Commands(this) );
         this.getCommand( "boost" ).setTabCompleter( new TabComplete(this) );
         this.getServer().getPluginManager().registerEvents( new EventsListener(this), this );
+        this.statsResetTask.startTask();
     }
 
     @Override
     public void onDisable() {
+        this.statsResetTask.cancel();
         this.getGameManager().clearAllGames();
         this.disableBoost();
         this.getDatabase().closeConnection();

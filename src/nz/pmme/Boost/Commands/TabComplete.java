@@ -1,5 +1,6 @@
 package nz.pmme.Boost.Commands;
 
+import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -83,7 +84,7 @@ public class TabComplete implements TabCompleter
                 case "delstats":
                     if( !sender.hasPermission( "boost.admin" ) ) break;
                 case "stats":
-                    for( String playerName : plugin.getDataHandler().queryListOfPlayers() ) {
+                    for( String playerName : plugin.getDataHandler().queryListOfPlayers( StatsPeriod.TOTAL ) ) {
                         String playerNameNoColour = ChatColor.stripColor(playerName);
                         if( arg1lower.isEmpty() || playerNameNoColour.toLowerCase().startsWith(arg1lower) ) {
                             returnList.add( playerNameNoColour );

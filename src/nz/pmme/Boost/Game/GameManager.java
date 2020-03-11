@@ -2,6 +2,7 @@ package nz.pmme.Boost.Game;
 
 import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
+import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import nz.pmme.Boost.Main;
 import nz.pmme.Boost.Data.PlayerStats;
@@ -245,7 +246,7 @@ public class GameManager
     public void displayPlayerStats( CommandSender sender, Player player )
     {
         List<String> playerStatsMessage = new ArrayList<>();
-        PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( player.getUniqueId() );
+        PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( StatsPeriod.TOTAL, player.getUniqueId() );
         if( playerStats == null ) {
             plugin.messageSender( sender, Messages.PLAYER_NO_STATS, "", "%player%", player.getDisplayName() );
         } else {
@@ -265,11 +266,11 @@ public class GameManager
         }
     }
 
-    public void displayLeaderBoard( CommandSender sender )
+    public void displayLeaderBoard( CommandSender sender, StatsPeriod statsPeriod )
     {
         List<String> leaderBoardMessage = new ArrayList<>();
         leaderBoardMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_TITLE ) ) );
-        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard();
+        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard( statsPeriod );
         if( playerStatsList != null ) {
             for( PlayerStats playerStats : playerStatsList ) {
                 leaderBoardMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_ENTRY )
@@ -288,7 +289,7 @@ public class GameManager
 
     public void deletePlayerStats( CommandSender sender, Player player )
     {
-        plugin.getDataHandler().deleteStats( player != null ? player.getUniqueId() : null );
+        plugin.getDataHandler().deleteStats( StatsPeriod.TOTAL, player != null ? player.getUniqueId() : null );
         plugin.messageSender( sender, Messages.DELETED_STATS );
     }
 }

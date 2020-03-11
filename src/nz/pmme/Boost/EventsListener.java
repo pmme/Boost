@@ -1,6 +1,7 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Boost.Config.Messages;
+import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Utils.VectorToOtherPlayer;
 import org.bukkit.ChatColor;
@@ -89,10 +90,26 @@ public class EventsListener implements Listener
                             plugin.getGameManager().displayStatus( thisPlayer );
                             return;
                         } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStats() ) ) {
+                            if( lines.length > 2 ) {
+
+                            }
                             plugin.getGameManager().displayPlayerStats( thisPlayer, thisPlayer );
                             return;
                         } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignTop() ) ) {
-                            plugin.getGameManager().displayLeaderBoard( thisPlayer );
+                            if( lines.length > 2 ) {
+                                String strippedLine2 = ChatColor.stripColor( lines[2] );
+                                if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignDaily() ) ) {
+                                    plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.DAILY );
+                                } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignWeekly() ) ) {
+                                    plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.WEEKLY );
+                                } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignMonthly() ) ) {
+                                    plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.MONTHLY );
+                                } else {
+                                    plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.TOTAL );
+                                }
+                            } else {
+                                plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.TOTAL );
+                            }
                             return;
                         }
                         plugin.messageSender( thisPlayer, Messages.ERROR_IN_SIGN );

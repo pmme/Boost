@@ -1,6 +1,7 @@
 package nz.pmme.Boost.Commands;
 
 import nz.pmme.Boost.Config.Messages;
+import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
@@ -264,7 +265,7 @@ public class Commands implements CommandExecutor
 
                 case "top":
                     if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
-                    plugin.getGameManager().displayLeaderBoard( sender );
+                    plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.TOTAL );
                     return true;
 
                 case "stats":
