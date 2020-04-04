@@ -72,6 +72,7 @@ public class Config
     private List<BoostStick> boostSticks = new ArrayList<>();
     private Map< String, BoostStick > boostSticksByName = new HashMap<>();
     private List<GameConfig> gameConfigList = new ArrayList<>();
+    private Map< String, Boolean > gameWorlds = new HashMap<>();
 
     private File statsResetConfigFile = null;
     private FileConfiguration statsResetConfig = null;
@@ -124,6 +125,7 @@ public class Config
         this.boostSticks.clear();
         this.boostSticksByName.clear();
         this.gameConfigList.clear();
+        this.gameWorlds.clear();
         this.load();
     }
 
@@ -202,6 +204,9 @@ public class Config
                 gameConfigList.add( gameConfig );
             }
         }
+        for( String world : plugin.getConfig().getStringList( "boost_worlds" ) ) {
+            gameWorlds.put( world, true );
+        }
         for( Messages message : Messages.values() ) {
             String messageText = messagesConfig.getString( message.getPath() );
             messages.put( message, messageText != null ? ChatColor.translateAlternateColorCodes( '&', messageText ) : "Missing message: " + message.getPath() );
@@ -279,6 +284,10 @@ public class Config
         plugin.saveConfig();
         gameConfigList.add( gameConfig );
         return gameConfig;
+    }
+
+    public boolean isGameWorld( String world ) {
+        return gameWorlds.isEmpty() || gameWorlds.containsKey( world );
     }
 
     public String getMessage( Messages message ) { return messages.get( message ); }

@@ -6,6 +6,7 @@ import nz.pmme.Boost.Game.Game;
 import nz.pmme.Utils.VectorToOtherPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -34,8 +35,9 @@ public class EventsListener implements Listener
         this.plugin = plugin;
     }
 
-    private boolean inTargetBox( Vector targetPosition, Location playerPosition )
+    private boolean inTargetBox( World targetWorld, Vector targetPosition, Location playerPosition )
     {
+        if( !targetWorld.equals( playerPosition.getWorld() ) ) return false;
         int yDelta = playerPosition.getBlockY() - targetPosition.getBlockY();
         if(     Math.abs( playerPosition.getBlockX() - targetPosition.getBlockX() ) <= plugin.getLoadedConfig().getTargetBoxH()
             &&  yDelta >= 0 && yDelta <= plugin.getLoadedConfig().getTargetBoxV()
@@ -143,7 +145,7 @@ public class EventsListener implements Listener
 
                 List< Player > otherPlayers = playersGame.getActivePlayerList();
                 for( Player otherPlayer : otherPlayers ) {
-                    if( this.inTargetBox( targetPotentialPlayerPosition, otherPlayer.getLocation() ) && this.hasBlockUnder( otherPlayer.getLocation() ) )
+                    if( this.inTargetBox( thisPlayer.getWorld(), targetPotentialPlayerPosition, otherPlayer.getLocation() ) && this.hasBlockUnder( otherPlayer.getLocation() ) )
                     {
                         VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
 
@@ -192,24 +194,24 @@ public class EventsListener implements Listener
     @EventHandler
     public void onBlockBreak( BlockBreakEvent event )
     {
-        if( plugin.isBoostEnabled() && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) event.setCancelled( true );
+        if( plugin.isBoostEnabled() && plugin.isInGameWorld( event.getPlayer() ) && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) event.setCancelled( true );
     }
 
     @EventHandler
     public void onBlockPlace( BlockPlaceEvent event )
     {
-        if( plugin.isBoostEnabled() && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) event.setCancelled( true );
+        if( plugin.isBoostEnabled() && plugin.isInGameWorld( event.getPlayer() ) && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) event.setCancelled( true );
     }
 
     @EventHandler
     public void onEntityDamage( EntityDamageEvent event )
     {
         if( plugin.isBoostEnabled() ) {
-//            if( event.getEntity() instanceof Player ) {
-//                if( plugin.getGameManager().isPlaying( (Player)event.getEntity() ) ) {
+            if( event.getEntity() instanceof Player ) {
+                if( plugin.isInGameWorld( event.getEntity() ) ) {
                     event.setCancelled( true );
-//                }
-//            }
+                }
+            }
         }
     }
 
@@ -238,9 +240,31 @@ public class EventsListener implements Listener
     public void onPlayerJoin( PlayerJoinEvent event )
     {
         if( plugin.isBoostEnabled() ) {
-            event.getPlayer().teleport( event.getPlayer().getWorld().getSpawnLocation() );
-            ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
-            event.getPlayer().getInventory().setItem( 0, instructionBook );
+            if( plugin.isInGameWorld( event.getPlayer() ) ) {
+                event.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
+                ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
+                event.getPlayer().getInventory().setItem( 0, instructionBook );
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerChangeWorld( PlayerChangedWorldEvent event )
+    {
+        if( plugin.isBoostEnabled() ) {
+            if( !plugin.isInGameWorld( event.getPlayer() ) )
+            {
+                // Player left to some world that's not a boost world.
+                plugin.getGameManager().leaveGame( event.getPlayer() );
+                plugin.removeBuilder( event.getPlayer().getUniqueId() );
+            }
+            else if( event.getPlayer().getWorld().equals( plugin.getLoadedConfig().getMainLobbySpawn().getWorld() ) && !plugin.isGameWorld( event.getFrom().getName() ) )
+            {
+                // Player arrived in the boost spawn world AND not from a boost arena world or other.
+                event.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
+                ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
+                event.getPlayer().getInventory().setItem( 0, instructionBook );
+            }
         }
     }
 
@@ -248,7 +272,9 @@ public class EventsListener implements Listener
     public void onPlayerDropItem( PlayerDropItemEvent event )
     {
         if( plugin.isBoostEnabled() ) {
-            event.setCancelled( true );
+            if( plugin.isInGameWorld( event.getPlayer() ) ) {
+                event.setCancelled( true );
+            }
         }
     }
 }

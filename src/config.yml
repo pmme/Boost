@@ -26,6 +26,8 @@ sql:
   user: user
   pass: password
 
+boost_worlds: [world]
+
 main_lobby:
   world: world
   x: 0

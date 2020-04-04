@@ -10,6 +10,7 @@ import nz.pmme.Boost.Data.Database;
 import nz.pmme.Boost.Data.DataHandler;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -122,6 +123,14 @@ public class Main extends JavaPlugin
 
     public boolean isInBuildMode( UUID playerId ) {
         return this.builders.getOrDefault( playerId, false );
+    }
+
+    public boolean isInGameWorld( Entity entity ) {
+        return this.getLoadedConfig().isGameWorld( entity.getWorld().getName() );
+    }
+
+    public boolean isGameWorld( String world ) {
+        return this.getLoadedConfig().isGameWorld( world );
     }
 
     public void setBuilder( UUID playerId ) {
