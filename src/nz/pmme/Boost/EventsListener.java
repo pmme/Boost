@@ -232,7 +232,9 @@ public class EventsListener implements Listener
     @EventHandler
     public void onPlayerQuit( PlayerQuitEvent event )
     {
-        plugin.getGameManager().leaveGame( event.getPlayer() );
+        if( plugin.getGameManager().isPlaying( event.getPlayer() ) ) {
+            plugin.getGameManager().leaveGame( event.getPlayer() );
+        }
         plugin.removeBuilder( event.getPlayer().getUniqueId() );
     }
 
@@ -252,10 +254,12 @@ public class EventsListener implements Listener
     public void onPlayerChangeWorld( PlayerChangedWorldEvent event )
     {
         if( plugin.isBoostEnabled() ) {
-            if( !plugin.isInGameWorld( event.getPlayer() ) )
+            if( !plugin.isInGameWorld( event.getPlayer() ) && plugin.isGameWorld( event.getFrom().getName() ) )
             {
                 // Player left to some world that's not a boost world.
-                plugin.getGameManager().leaveGame( event.getPlayer() );
+                if( plugin.getGameManager().isPlaying( event.getPlayer() ) ) {
+                    plugin.getGameManager().leaveGame( event.getPlayer() );
+                }
                 plugin.removeBuilder( event.getPlayer().getUniqueId() );
             }
             else if( event.getPlayer().getWorld().equals( plugin.getLoadedConfig().getMainLobbySpawn().getWorld() ) && !plugin.isGameWorld( event.getFrom().getName() ) )
