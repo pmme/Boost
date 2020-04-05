@@ -67,7 +67,7 @@ public class EventsListener implements Listener
     @EventHandler
     public void onPlayerInteract( PlayerInteractEvent event )
     {
-        if( plugin.isBoostEnabled() && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) )
+        if( plugin.isBoostEnabled() && plugin.isInGameWorld( event.getPlayer() ) && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) )
         {
             final Player thisPlayer = event.getPlayer();
 
@@ -166,7 +166,7 @@ public class EventsListener implements Listener
     @EventHandler
     public void onPlayerInteractEntity( PlayerInteractEntityEvent event )
     {
-        if( plugin.isBoostEnabled() && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) {
+        if( plugin.isBoostEnabled() && plugin.isInGameWorld( event.getPlayer() ) && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) {
             if( event.getRightClicked() instanceof Player )
             {
                 final Player thisPlayer = event.getPlayer();
@@ -206,11 +206,9 @@ public class EventsListener implements Listener
     @EventHandler
     public void onEntityDamage( EntityDamageEvent event )
     {
-        if( plugin.isBoostEnabled() ) {
+        if( plugin.isBoostEnabled() && plugin.isInGameWorld( event.getEntity() ) ) {
             if( event.getEntity() instanceof Player ) {
-                if( plugin.isInGameWorld( event.getEntity() ) ) {
-                    event.setCancelled( true );
-                }
+                event.setCancelled( true );
             }
         }
     }
@@ -218,7 +216,7 @@ public class EventsListener implements Listener
     @EventHandler
     public void onPlayerMove( PlayerMoveEvent event )
     {
-        if( plugin.isBoostEnabled() && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) {
+        if( plugin.isBoostEnabled() && plugin.isInGameWorld( event.getPlayer() ) && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) ) {
             Game game = plugin.getGameManager().getPlayersGame( event.getPlayer() );
             if( game == null ) return;
             if( game.isActiveInGame( event.getPlayer() ) ) {
@@ -241,12 +239,10 @@ public class EventsListener implements Listener
     @EventHandler
     public void onPlayerJoin( PlayerJoinEvent event )
     {
-        if( plugin.isBoostEnabled() ) {
-            if( plugin.isInGameWorld( event.getPlayer() ) ) {
-                event.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
-                ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
-                event.getPlayer().getInventory().setItem( 0, instructionBook );
-            }
+        if( plugin.isBoostEnabled() && plugin.isInGameWorld( event.getPlayer() ) ) {
+            event.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
+            ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
+            event.getPlayer().getInventory().setItem( 0, instructionBook );
         }
     }
 
@@ -275,10 +271,8 @@ public class EventsListener implements Listener
     @EventHandler
     public void onPlayerDropItem( PlayerDropItemEvent event )
     {
-        if( plugin.isBoostEnabled() ) {
-            if( plugin.isInGameWorld( event.getPlayer() ) ) {
-                event.setCancelled( true );
-            }
+        if( plugin.isBoostEnabled() && plugin.isInGameWorld( event.getPlayer() ) ) {
+            event.setCancelled( true );
         }
     }
 }

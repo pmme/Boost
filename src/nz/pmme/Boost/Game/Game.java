@@ -131,13 +131,14 @@ public class Game implements Comparable<Game>
         players.remove( player.getUniqueId() );
         player.setVelocity( Game.VECTOR0 );
         player.setFlying( false );
-        player.teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
-        player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
         plugin.messageSender( player, Messages.LEAVE_GAME, gameConfig.getDisplayName() );
-        player.getInventory().clear();
-        ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
-        player.getInventory().setItem( 0, instructionBook );
-
+        if( plugin.isInGameWorld( player ) ) {
+            player.teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
+            player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
+            player.getInventory().clear();
+            ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
+            player.getInventory().setItem( 0, instructionBook );
+        }
         if( gameState == GameState.RUNNING )
         {
             List<Player> activePlayers = getActivePlayerList();
