@@ -250,6 +250,7 @@ public class EventsListener implements Listener
     public void onPlayerChangeWorld( PlayerChangedWorldEvent event )
     {
         if( plugin.isBoostEnabled() ) {
+            Location mainLobbySpawn = plugin.getLoadedConfig().getMainLobbySpawn();
             if( !plugin.isInGameWorld( event.getPlayer() ) && plugin.isGameWorld( event.getFrom().getName() ) )
             {
                 // Player left to some world that's not a boost world.
@@ -258,10 +259,10 @@ public class EventsListener implements Listener
                 }
                 plugin.removeBuilder( event.getPlayer().getUniqueId() );
             }
-            else if( event.getPlayer().getWorld().equals( plugin.getLoadedConfig().getMainLobbySpawn().getWorld() ) && !plugin.isGameWorld( event.getFrom().getName() ) )
+            else if( mainLobbySpawn != null && event.getPlayer().getWorld().equals( mainLobbySpawn.getWorld() ) && !plugin.isGameWorld( event.getFrom().getName() ) )
             {
                 // Player arrived in the boost spawn world AND not from a boost arena world or other.
-                event.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
+                event.getPlayer().teleport( mainLobbySpawn );
                 ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
                 event.getPlayer().getInventory().setItem( 0, instructionBook );
             }

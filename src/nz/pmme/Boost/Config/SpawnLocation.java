@@ -16,7 +16,8 @@ public class SpawnLocation
     {
         this.plugin = plugin;
         this.configPath = spawnConfigPath + ".";
-        World spawnWorld = plugin.getServer().getWorld( plugin.getConfig().getString( configPath + "world", "world" ) );
+        String spawnWorldName = plugin.getConfig().getString( configPath + "world", "world" );
+        World spawnWorld = plugin.getServer().getWorld( spawnWorldName );
         if( spawnWorld != null ) {
             int spawnX = plugin.getConfig().getInt( configPath + "x", 0 );
             int spawnY = plugin.getConfig().getInt( configPath + "y", 64 );
@@ -24,6 +25,14 @@ public class SpawnLocation
             int spawnYaw = plugin.getConfig().getInt( configPath + "yaw", 0 );
             spawn = new Location( spawnWorld, spawnX + 0.5D, spawnY, spawnZ + 0.5D, (float)spawnYaw, 0.0F );
             spread = plugin.getConfig().getInt( configPath + "spread", 0 );
+        } else {
+            plugin.getLogger().severe( "World " + spawnWorldName + " not found for configuration item '" + configPath + "world'." );
+            StringBuilder availableWorlds = new StringBuilder();
+            for( World world : plugin.getServer().getWorlds() ) {
+                availableWorlds.append( world.getName() ).append( ", " );
+            }
+            availableWorlds.delete( availableWorlds.length()-2, availableWorlds.length()-1 );
+            plugin.getLogger().severe( "Available worlds are: " + availableWorlds.toString() );
         }
     }
 

@@ -3,6 +3,11 @@ version: 1.6.1
 author: pmme
 api-version: 1.14
 main: nz.pmme.Boost.Main
+
+load: POSTWORLD
+softdepend:
+  - Multiverse-Core
+
 commands:
   boost:
     description: 'Enter "/boost" with no options for help.'
