@@ -67,6 +67,7 @@ public class Commands implements CommandExecutor
                     if( args.length == 2 ) {
                         try {
                             plugin.getGameManager().createNewGame( args[1] );
+                            plugin.messageSender( sender, Messages.GAME_CREATED, args[1] );
                         } catch( GameAlreadyExistsException e ) {
                             plugin.messageSender( sender, Messages.GAME_ALREADY_EXISTS, args[1] );
                         }
@@ -83,11 +84,16 @@ public class Commands implements CommandExecutor
                             return true;
                         }
                         if( args.length == 3 ) {
-                            game.getGameConfig().setGroundLevel( Integer.valueOf( args[2] ) );
+                            int y = Integer.parseInt( args[2] );
+                            game.getGameConfig().setGroundLevel(y);
+                            plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
                             return true;
-                        } else {
+                        }
+                        if ( args.length == 2 ) {
                             if( sender instanceof Player ) {
-                                game.getGameConfig().setGroundLevel( ((Player)sender).getLocation().getBlockY() );
+                                int y = ((Player)sender).getLocation().getBlockY();
+                                game.getGameConfig().setGroundLevel(y);
+                                plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
                             } else {
                                 plugin.messageSender( sender, Messages.NO_CONSOLE );
                             }
@@ -106,29 +112,38 @@ public class Commands implements CommandExecutor
                             plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
                             return true;
                         }
-                        if( args.length == 6 )
-                        {
+                        Location spawn = null;
+                        if( args.length == 6 ) {
                             World world = plugin.getServer().getWorld( args[2] );
                             if( world != null ) {
-                                Location spawn = new Location( world, Double.valueOf( args[3] ), Double.valueOf( args[4] ), Double.valueOf( args[5] ) );
-                                switch( boostCommand ) {
-                                    case "setstart": game.getGameConfig().setStartSpawn( spawn ); break;
-                                    case "setlobby": game.getGameConfig().setLobbySpawn( spawn ); break;
-                                    case "setloss": game.getGameConfig().setLossSpawn( spawn ); break;
-                                }
+                                spawn = new Location( world, Double.parseDouble( args[3] ), Double.parseDouble( args[4] ), Double.parseDouble( args[5] ) );
                             } else {
                                 plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, args[1],"%world%", args[2] );
+                                return true;
                             }
-                            return true;
                         }
-                        else if( args.length == 2 )
-                        {
+                        if( args.length == 2 ) {
                             if( sender instanceof Player ) {
-                                switch( boostCommand ) {
-                                    case "setstart": game.getGameConfig().setStartSpawn( ((Player)sender).getLocation() ); break;
-                                    case "setlobby": game.getGameConfig().setLobbySpawn( ((Player)sender).getLocation() ); break;
-                                    case "setloss": game.getGameConfig().setLossSpawn( ((Player)sender).getLocation() ); break;
-                                }
+                                spawn = ((Player)sender).getLocation();
+                            } else {
+                                plugin.messageSender( sender, Messages.NO_CONSOLE );
+                                return true;
+                            }
+                        }
+                        if( spawn != null ) {
+                            switch( boostCommand ) {
+                                case "setstart":
+                                    game.getGameConfig().setStartSpawn( spawn );
+                                    plugin.messageSender( sender, Messages.START_SPAWN_SET, game.getGameConfig().getDisplayName() );
+                                    break;
+                                case "setlobby":
+                                    game.getGameConfig().setLobbySpawn( spawn );
+                                    plugin.messageSender( sender, Messages.LOBBY_SPAWN_SET, game.getGameConfig().getDisplayName() );
+                                    break;
+                                case "setloss":
+                                    game.getGameConfig().setLossSpawn( spawn );
+                                    plugin.messageSender( sender, Messages.LOSS_SPAWN_SET, game.getGameConfig().getDisplayName() );
+                                    break;
                             }
                             return true;
                         }
@@ -143,7 +158,9 @@ public class Commands implements CommandExecutor
                             plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
                             return true;
                         }
-                        game.getGameConfig().setSpawnSpread( Integer.valueOf( args[2] ) );
+                        int spread = Integer.parseInt( args[2] );
+                        game.getGameConfig().setSpawnSpread( spread );
+                        plugin.messageSender( sender, Messages.SPREAD_SET, game.getGameConfig().getDisplayName(), "%spread%", String.valueOf( spread ) );
                         return true;
                     }
                     break;

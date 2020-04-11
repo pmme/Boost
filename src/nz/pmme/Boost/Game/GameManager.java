@@ -125,17 +125,18 @@ public class GameManager
     public void queueGame( Game game, CommandSender sender )
     {
         if( game.isRunning() ) {
-            plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, game.getGameConfig().getName() );
+            plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, game.getGameConfig().getDisplayName() );
             return;
         }
         if( game.isQueuing() ) {
-            plugin.messageSender( sender, Messages.GAME_ALREADY_QUEUING, game.getGameConfig().getName() );
+            plugin.messageSender( sender, Messages.GAME_ALREADY_QUEUING, game.getGameConfig().getDisplayName() );
             return;
         }
         if( !game.getGameConfig().isProperlyConfigured() ) {
-            plugin.messageSender( sender, Messages.GAME_NOT_CONFIGURED, game.getGameConfig().getName() );
+            plugin.messageSender( sender, Messages.GAME_NOT_CONFIGURED, game.getGameConfig().getDisplayName() );
             return;
         }
+        plugin.messageSender( sender, Messages.STARTED_QUEUING, game.getGameConfig().getDisplayName() );
         game.startQueuing();
     }
 
@@ -152,14 +153,15 @@ public class GameManager
     public void startGame( Game game, CommandSender sender )
     {
         if( game.isRunning() ) {
-            plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, game.getGameConfig().getName() );
+            plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, game.getGameConfig().getDisplayName() );
             return;
         }
         if( !game.getGameConfig().isProperlyConfigured() ) {
-            plugin.messageSender( sender, Messages.GAME_NOT_CONFIGURED, game.getGameConfig().getName() );
+            plugin.messageSender( sender, Messages.GAME_NOT_CONFIGURED, game.getGameConfig().getDisplayName() );
             return;
         }
         game.start();
+        plugin.messageSender( sender, Messages.GAME_STARTED, game.getGameConfig().getDisplayName() );
     }
 
     public void startGame( String gameName, CommandSender sender )
@@ -175,10 +177,11 @@ public class GameManager
     public void endGame( Game game, CommandSender sender )
     {
         if( !game.isRunning() && !game.isQueuing() ) {
-            plugin.messageSender( sender, Messages.GAME_NOT_RUNNING, game.getGameConfig().getName() );
+            plugin.messageSender( sender, Messages.GAME_NOT_RUNNING, game.getGameConfig().getDisplayName() );
             return;
         }
         game.end( false );
+        plugin.messageSender( sender, Messages.GAME_ENDED, game.getGameConfig().getDisplayName() );
     }
 
     public void endGame( String gameName, CommandSender sender )
@@ -194,10 +197,11 @@ public class GameManager
     public void stopGame( Game game, CommandSender sender )
     {
         if( !game.isRunning() && !game.isQueuing() ) {
-            plugin.messageSender( sender, Messages.GAME_NOT_RUNNING, game.getGameConfig().getName() );
+            plugin.messageSender( sender, Messages.GAME_NOT_RUNNING, game.getGameConfig().getDisplayName() );
             return;
         }
         game.end( true );
+        plugin.messageSender( sender, Messages.GAME_ENDED, game.getGameConfig().getDisplayName() );
     }
 
     public void stopGame( String gameName, CommandSender sender )

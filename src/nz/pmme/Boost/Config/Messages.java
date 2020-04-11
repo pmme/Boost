@@ -40,6 +40,13 @@ public enum Messages
     BUILD_DISABLED("build_disabled"),
     GAME_NOT_CONFIGURED("game_not_configured"),
     PLAYERS_REQUIRED("players_required"),
+    GAME_CREATED("game_created"),
+    GROUND_SET("ground_set"),
+    START_SPAWN_SET("start_spawn_set"),
+    LOBBY_SPAWN_SET("lobby_spawn_set"),
+    LOSS_SPAWN_SET("loss_spawn_set"),
+    SPREAD_SET("spread_set"),
+    STARTED_QUEUING("started_queuing"),
 
     END("end");
 
