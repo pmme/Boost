@@ -48,6 +48,10 @@ public enum Messages
     SPREAD_SET("spread_set"),
     MAIN_SPAWN_SET("main_spawn_set"),
     STARTED_QUEUING("started_queuing"),
+    NOT_IN_GAME_WORLD("not_in_game_world"),
+    ADDED_GAME_WORLD("added_game_world"),
+    REMOVED_GAME_WORLD("removed_game_world"),
+    NOT_A_GAME_WORLD("not_a_game_world"),
 
     END("end");
 

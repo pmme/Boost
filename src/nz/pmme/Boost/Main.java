@@ -11,6 +11,7 @@ import nz.pmme.Boost.Data.DataHandler;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -132,6 +133,13 @@ public class Main extends JavaPlugin
 
     public boolean isInGameWorld( Entity entity ) {
         return this.getLoadedConfig().isGameWorld( entity.getWorld().getName() );
+    }
+
+    public boolean isInGameWorld( CommandSender sender ) {
+        if( sender instanceof Player ) {
+            return this.getLoadedConfig().isGameWorld( ((Player)sender).getWorld().getName() );
+        }
+        return false;
     }
 
     public boolean isGameWorld( String world ) {

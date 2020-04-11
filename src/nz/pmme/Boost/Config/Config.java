@@ -294,6 +294,22 @@ public class Config
         return gameWorlds.isEmpty() || gameWorlds.containsKey( world );
     }
 
+    public void addGameWorld( String world ) {
+        gameWorlds.put( world, true );
+        plugin.getConfig().set( "boost_worlds", this.getGameWorlds() );
+        plugin.saveConfig();
+    }
+
+    public void delGameWorld( String world ) {
+        gameWorlds.remove( world );
+        plugin.getConfig().set( "boost_worlds", this.getGameWorlds() );
+        plugin.saveConfig();
+    }
+
+    public String[] getGameWorlds() {
+        return gameWorlds.keySet().toArray(new String[0]);
+    }
+
     public String getMessage( Messages message ) { return messages.get( message ); }
     public String getPrefix() { return messagePrefix; }
     public List<String> getPlayerStatsTemplate() { return playerStatsTemplate; }

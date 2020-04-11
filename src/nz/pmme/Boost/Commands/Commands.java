@@ -3,6 +3,7 @@ package nz.pmme.Boost.Commands;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
+import nz.pmme.Boost.Exceptions.GameDoesNotExistException;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
@@ -56,6 +57,62 @@ public class Commands implements CommandExecutor
                     plugin.messageSender( sender, Messages.CONFIG_RELOADED );
                     return true;
 
+                case "addgameworld":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 2 ) {
+                        World world = plugin.getServer().getWorld( args[1] );
+                        if( world != null ) {
+                            plugin.getLoadedConfig().addGameWorld( world.getName() );
+                            plugin.messageSender( sender, Messages.ADDED_GAME_WORLD, "%world%", world.getName() );
+                        } else {
+                            plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, "%world%", args[1] );
+                        }
+                        return true;
+                    }
+                    if ( args.length == 1 ) {
+                        if( sender instanceof Player ) {
+                            World world = ((Player)sender).getLocation().getWorld();
+                            plugin.getLoadedConfig().addGameWorld( world.getName() );
+                            plugin.messageSender( sender, Messages.ADDED_GAME_WORLD, "%world%", world.getName() );
+                        } else {
+                            plugin.messageSender( sender, Messages.NO_CONSOLE );
+                        }
+                        return true;
+                    }
+                    break;
+
+                case "removegameworld":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 2 ) {
+                        World world = plugin.getServer().getWorld( args[1] );
+                        if( world != null ) {
+                            if( plugin.getLoadedConfig().isGameWorld( world.getName() ) ) {
+                                plugin.getLoadedConfig().delGameWorld( world.getName() );
+                                plugin.messageSender( sender, Messages.REMOVED_GAME_WORLD, "%world%", world.getName() );
+                            } else {
+                                plugin.messageSender( sender, Messages.NOT_A_GAME_WORLD, "%world%", world.getName() );
+                            }
+                        } else {
+                            plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, "%world%", args[1] );
+                        }
+                        return true;
+                    }
+                    if ( args.length == 1 ) {
+                        if( sender instanceof Player ) {
+                            World world = ((Player)sender).getLocation().getWorld();
+                            if( plugin.getLoadedConfig().isGameWorld( world.getName() ) ) {
+                                plugin.getLoadedConfig().delGameWorld( world.getName() );
+                                plugin.messageSender( sender, Messages.REMOVED_GAME_WORLD, "%world%", world.getName() );
+                            } else {
+                                plugin.messageSender( sender, Messages.NOT_A_GAME_WORLD, "%world%", world.getName() );
+                            }
+                        } else {
+                            plugin.messageSender( sender, Messages.NO_CONSOLE );
+                        }
+                        return true;
+                    }
+                    break;
+
                 case "setmainlobby":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length == 5 ) {
@@ -71,6 +128,10 @@ public class Commands implements CommandExecutor
                     }
                     if( args.length == 1 ) {
                         if( sender instanceof Player ) {
+                            if( !plugin.isInGameWorld(sender) ) {
+                                plugin.messageSender( sender, Messages.NOT_IN_GAME_WORLD );
+                                return true;
+                            }
                             plugin.getLoadedConfig().setMainLobbySpawn( ( (Player)sender ).getLocation() );
                             plugin.messageSender( sender, Messages.MAIN_SPAWN_SET );
                         } else {
@@ -115,6 +176,10 @@ public class Commands implements CommandExecutor
                         }
                         if ( args.length == 2 ) {
                             if( sender instanceof Player ) {
+                                if( !plugin.isInGameWorld(sender) ) {
+                                    plugin.messageSender( sender, Messages.NOT_IN_GAME_WORLD );
+                                    return true;
+                                }
                                 int y = ((Player)sender).getLocation().getBlockY();
                                 game.getGameConfig().setGroundLevel(y);
                                 plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
@@ -148,6 +213,10 @@ public class Commands implements CommandExecutor
                         }
                         if( args.length == 2 ) {
                             if( sender instanceof Player ) {
+                                if( !plugin.isInGameWorld(sender) ) {
+                                    plugin.messageSender( sender, Messages.NOT_IN_GAME_WORLD );
+                                    return true;
+                                }
                                 spawn = ((Player)sender).getLocation();
                             } else {
                                 plugin.messageSender( sender, Messages.NO_CONSOLE );
@@ -197,6 +266,10 @@ public class Commands implements CommandExecutor
                         return true;
                     }
                     if( sender instanceof Player ) {
+                        if( !plugin.isInGameWorld(sender) ) {
+                            plugin.messageSender( sender, Messages.NOT_IN_GAME_WORLD );
+                            return true;
+                        }
                         if( args.length == 2 ) {
                             plugin.getGameManager().joinGame( (Player)sender, args[1] );
                             return true;

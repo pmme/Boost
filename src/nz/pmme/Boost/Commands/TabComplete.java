@@ -3,6 +3,7 @@ package nz.pmme.Boost.Commands;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -36,6 +37,8 @@ public class TabComplete implements TabCompleter
             "cleargames",
             "delstats",
             "reload",
+            "addgameworld",
+            "removegameworld",
             "setmainlobby",
             "build",
             "nobuild",
@@ -115,6 +118,20 @@ public class TabComplete implements TabCompleter
                         if( arg1lower.isEmpty() || player.getName().toLowerCase().startsWith(arg1lower) || ChatColor.stripColor(player.getDisplayName()).toLowerCase().startsWith(arg1lower) ) {
                             returnList.add( player.getName() );
                         }
+                    }
+                    return returnList;
+
+                case "addgameworld":
+                    if( !sender.hasPermission( "boost.admin" ) ) break;
+                    for( World world : plugin.getServer().getWorlds() ) {
+                        returnList.add( world.getName() );
+                    }
+                    return returnList;
+
+                case "removegameworld":
+                    if( !sender.hasPermission( "boost.admin" ) ) break;
+                    for( String world : plugin.getLoadedConfig().getGameWorlds() ) {
+                        returnList.add( world );
                     }
                     return returnList;
             }
