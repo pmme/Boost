@@ -36,6 +36,7 @@ public class TabComplete implements TabCompleter
             "cleargames",
             "delstats",
             "reload",
+            "setmainlobby",
             "build",
             "nobuild",
             "on",

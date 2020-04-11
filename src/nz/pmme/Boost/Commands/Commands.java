@@ -56,6 +56,30 @@ public class Commands implements CommandExecutor
                     plugin.messageSender( sender, Messages.CONFIG_RELOADED );
                     return true;
 
+                case "setmainlobby":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 5 ) {
+                        World world = plugin.getServer().getWorld( args[1] );
+                        if( world != null ) {
+                            Location spawn = new Location( world, Double.parseDouble( args[2] ), Double.parseDouble( args[3] ), Double.parseDouble( args[4] ) );
+                            plugin.getLoadedConfig().setMainLobbySpawn( spawn );
+                            plugin.messageSender( sender, Messages.MAIN_SPAWN_SET );
+                        } else {
+                            plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, "%world%", args[1] );
+                        }
+                        return true;
+                    }
+                    if( args.length == 1 ) {
+                        if( sender instanceof Player ) {
+                            plugin.getLoadedConfig().setMainLobbySpawn( ( (Player)sender ).getLocation() );
+                            plugin.messageSender( sender, Messages.MAIN_SPAWN_SET );
+                        } else {
+                            plugin.messageSender( sender, Messages.NO_CONSOLE );
+                        }
+                        return true;
+                    }
+                    break;
+
                 case "cleargames":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     plugin.getGameManager().clearAllGames();
@@ -118,7 +142,7 @@ public class Commands implements CommandExecutor
                             if( world != null ) {
                                 spawn = new Location( world, Double.parseDouble( args[3] ), Double.parseDouble( args[4] ), Double.parseDouble( args[5] ) );
                             } else {
-                                plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, args[1],"%world%", args[2] );
+                                plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, "%world%", args[2] );
                                 return true;
                             }
                         }

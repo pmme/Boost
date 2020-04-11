@@ -247,6 +247,10 @@ public class Config
     public String getSignTotal() { return signTotal; }
 
     public Location getMainLobbySpawn() { return mainLobbySpawn.getSpawn(); }
+    public void setMainLobbySpawn( Location spawn ) {
+        mainLobbySpawn.setSpawn( spawn );
+        plugin.saveConfig();
+    }
 
     public Sound getTickSound() { return  tickSound; }
     public Sound getJoinSound() { return joinSound; }

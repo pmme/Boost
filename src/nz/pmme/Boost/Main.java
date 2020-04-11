@@ -101,6 +101,11 @@ public class Main extends JavaPlugin
         sender.sendMessage( this.getLoadedConfig().getPrefix() + this.getLoadedConfig().getMessage( message ).replaceAll( "%game%", gameNameColoured ) );
     }
 
+    public void messageSender( CommandSender sender, Messages message, String placeHolder, String replacementValue ) {
+        String replacementValueColoured = ChatColor.translateAlternateColorCodes( '&', replacementValue );
+        sender.sendMessage( this.getLoadedConfig().getPrefix() + this.getLoadedConfig().getMessage( message ).replaceAll( placeHolder, replacementValueColoured ) );
+    }
+
     public void messageSender( CommandSender sender, Messages message, String gameName, String placeHolder, String replacementValue ) {
         String gameNameColoured = ChatColor.translateAlternateColorCodes( '&', gameName );
         String replacementValueColoured = ChatColor.translateAlternateColorCodes( '&', replacementValue );

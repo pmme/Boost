@@ -42,6 +42,7 @@ start_spawn_set: "Game start spawn set for game %game%&r."
 lobby_spawn_set: "Game queuing lobby spawn set for game %game%&r."
 loss_spawn_set: "Loss in game spawn set for game %game%&r."
 spread_set: "Game start player spread set to %spread% for game %game%&r."
+main_spawn_set: "Main lobby spawn set."
 started_queuing: "%game%&r&3 now queueing."
 
 player_stats:
@@ -77,6 +78,7 @@ command_usage_admin:
   - "&f/boost delstats * &3- Delete all game stats for all players."
   - "&f/boost delstats <player> &3- Delete game stats for player."
   - "&f/boost reload &3- End all games, reload config, and re-initialise."
+  - "&f/boost setmainlobby <world x y z> &3- Set the spawn for the main lobby."
   - "&f/boost build <player> &3- Enable building for player."
   - "&f/boost nobuild <player> &3- Turn off building for player."
   - "&f/boost on &3- Turn the Boost game and controls on."

@@ -46,6 +46,7 @@ public enum Messages
     LOBBY_SPAWN_SET("lobby_spawn_set"),
     LOSS_SPAWN_SET("loss_spawn_set"),
     SPREAD_SET("spread_set"),
+    MAIN_SPAWN_SET("main_spawn_set"),
     STARTED_QUEUING("started_queuing"),
 
     END("end");
