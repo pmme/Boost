@@ -205,7 +205,7 @@ public class Config
             }
         }
         for( String world : plugin.getConfig().getStringList( "boost_worlds" ) ) {
-            gameWorlds.put( world, true );
+            gameWorlds.put( world.toLowerCase(), true );
         }
         for( Messages message : Messages.values() ) {
             String messageText = messagesConfig.getString( message.getPath() );
@@ -298,17 +298,17 @@ public class Config
     }
 
     public boolean isGameWorld( String world ) {
-        return gameWorlds.isEmpty() || gameWorlds.containsKey( world );
+        return gameWorlds.isEmpty() || gameWorlds.containsKey( world.toLowerCase() );
     }
 
     public void addGameWorld( String world ) {
-        gameWorlds.put( world, true );
+        gameWorlds.put( world.toLowerCase(), true );
         plugin.getConfig().set( "boost_worlds", this.getGameWorlds() );
         plugin.saveConfig();
     }
 
     public void delGameWorld( String world ) {
-        gameWorlds.remove( world );
+        gameWorlds.remove( world.toLowerCase() );
         plugin.getConfig().set( "boost_worlds", this.getGameWorlds() );
         plugin.saveConfig();
     }
