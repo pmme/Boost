@@ -52,6 +52,8 @@ public enum Messages
     ADDED_GAME_WORLD("added_game_world"),
     REMOVED_GAME_WORLD("removed_game_world"),
     NOT_A_GAME_WORLD("not_a_game_world"),
+    MUST_TYPE_CONFIRM("must_type_confirm"),
+    GAME_DELETED("game_deleted"),
 
     END("end");
 

@@ -4,6 +4,7 @@ import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
+import nz.pmme.Boost.Exceptions.GameDoesNotExistException;
 import nz.pmme.Boost.Main;
 import nz.pmme.Boost.Data.PlayerStats;
 import org.bukkit.ChatColor;
@@ -47,6 +48,18 @@ public class GameManager
         Game game = new Game( plugin, gameConfig );
         games.put( gameConfig.getName().toLowerCase(), game );
         return game;
+    }
+
+    public void deleteGame( String gameName ) throws GameDoesNotExistException
+    {
+        String gameNameLower = gameName.toLowerCase();
+        Game game = games.get( gameNameLower );
+        if( game == null ) {
+            throw new GameDoesNotExistException();
+        }
+        game.end( true );
+        games.remove( gameNameLower );
+        plugin.getLoadedConfig().deleteGameConfig( game.getGameConfig() );
     }
 
     public Game getGame( String gameName )

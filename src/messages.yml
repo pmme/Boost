@@ -48,6 +48,8 @@ not_in_game_world: "&4You are not in a Boost game world."
 added_game_world: "World %world%&r added as Boost game world."
 removed_game_world: "World %world%&r removed from Boost game worlds."
 not_a_game_world: "&4World %world%&r&4 is not a Boost game world."
+must_type_confirm: "&4You must include the word 'confirm' after the game name."
+game_deleted: "Boost game %game%&r deleted."
 
 player_stats:
   - "&5[Boost] &fPlayer stats: %player%"
@@ -67,6 +69,7 @@ command_usage_user:
 command_usage_admin:
   - "&5Boost admin commands:"
   - "&f/boost creategame Arena1 &3- Create a game configuration."
+  - "&f/boost deletegame Arena1 confirm &3- &4Delete &3a game configuration."
   - "&f/boost setground Arena1 [yPos] &3- Set the losing ground level."
   - "&f/boost setstart Arena1 <world x y z> &3- Set the start spawn position."
   - "&f/boost setlobby Arena1 <world x y z> &3- Set the lobby spawn position."

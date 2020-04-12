@@ -25,6 +25,7 @@ public class TabComplete implements TabCompleter
     };
     private static final String[] adminCommands = {
             "creategame",
+            "deletegame",
             "setground",
             "setstart",
             "setlobby",
@@ -105,6 +106,7 @@ public class TabComplete implements TabCompleter
                 case "start":
                 case "end":
                 case "stop":
+                case "deletegame":
                     if( !sender.hasPermission( "boost.admin" ) ) break;
                     for( String gameName : plugin.getGameManager().getGameNames() ) {
                         returnList.add( ChatColor.stripColor( gameName ) );

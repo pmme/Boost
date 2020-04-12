@@ -290,6 +290,13 @@ public class Config
         return gameConfig;
     }
 
+    public void deleteGameConfig( GameConfig gameConfig )
+    {
+        gameConfigList.remove( gameConfig );
+        plugin.getConfig().set( "games." + gameConfig.getName(), null );
+        plugin.saveConfig();
+    }
+
     public boolean isGameWorld( String world ) {
         return gameWorlds.isEmpty() || gameWorlds.containsKey( world );
     }

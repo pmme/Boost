@@ -160,6 +160,23 @@ public class Commands implements CommandExecutor
                     }
                     break;
 
+                case "deletegame":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 2 || ( args.length == 3 && !args[2].equalsIgnoreCase( "confirm" ) ) ) {
+                        plugin.messageSender( sender, Messages.MUST_TYPE_CONFIRM, args[1] );
+                        return true;
+                    }
+                    if( args.length == 3 ) {
+                        try {
+                            plugin.getGameManager().deleteGame( args[1] );
+                            plugin.messageSender( sender, Messages.GAME_DELETED, args[1] );
+                        } catch( GameDoesNotExistException e ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                        }
+                        return true;
+                    }
+                    break;
+
                 case "setground":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length > 1 ) {
