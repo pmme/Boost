@@ -3,6 +3,7 @@ package nz.pmme.Boost.Commands;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
+import nz.pmme.Boost.Exceptions.GameDisplayNameMustMatchConfigurationException;
 import nz.pmme.Boost.Exceptions.GameDoesNotExistException;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
@@ -14,12 +15,15 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 /**
  * Created by paul on 24-Apr-16.
  */
 public class Commands implements CommandExecutor
 {
     private Main plugin;
+    static final List<String> trueValues = java.util.Arrays.asList( "on", "true", "t", "1", "yes", "y" );
 
     public Commands( Main plugin ) {
         this.plugin = plugin;
@@ -177,6 +181,24 @@ public class Commands implements CommandExecutor
                     }
                     break;
 
+                case "setdisplayname":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 3 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        try {
+                            game.getGameConfig().setDisplayName( args[2] );
+                            plugin.messageSender( sender, Messages.DISPLAY_NAME_SET, game.getGameConfig().getDisplayName(), "%gameconfig%", game.getGameConfig().getName() );
+                        } catch( GameDisplayNameMustMatchConfigurationException e ) {
+                            plugin.messageSender( sender, Messages.DISPLAY_NAME_MISMATCH, "%gameconfig%", game.getGameConfig().getName() );
+                        }
+                        return true;
+                    }
+                    break;
+
                 case "setground":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length > 1 ) {
@@ -271,6 +293,81 @@ public class Commands implements CommandExecutor
                         int spread = Integer.parseInt( args[2] );
                         game.getGameConfig().setSpawnSpread( spread );
                         plugin.messageSender( sender, Messages.SPREAD_SET, game.getGameConfig().getDisplayName(), "%spread%", String.valueOf( spread ) );
+                        return true;
+                    }
+                    break;
+
+                case "setminplayers":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 3 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        int minPlayers = Integer.parseInt( args[2] );
+                        game.getGameConfig().setMinPlayers( minPlayers );
+                        plugin.messageSender( sender, Messages.MIN_PLAYERS_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( minPlayers ) );
+                        return true;
+                    }
+                    break;
+
+                case "setmaxplayers":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 3 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        int maxPlayers = Integer.parseInt( args[2] );
+                        game.getGameConfig().setMaxPlayers( maxPlayers );
+                        plugin.messageSender( sender, Messages.MAX_PLAYERS_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( maxPlayers ) );
+                        return true;
+                    }
+                    break;
+
+                case "autoqueue":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 3 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        boolean autoQueue = trueValues.contains( args[2].toLowerCase() );
+                        game.getGameConfig().setAutoQueue( autoQueue );
+                        plugin.messageSender( sender, autoQueue ? Messages.AUTO_QUEUE_ENABLED : Messages.AUTO_QUEUE_DISABLED, game.getGameConfig().getDisplayName() );
+                        return true;
+                    }
+                    break;
+
+                case "setcountdown":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 3 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        int countdown = Integer.parseInt( args[2] );
+                        game.getGameConfig().setCountdown( countdown );
+                        plugin.messageSender( sender, Messages.COUNTDOWN_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( countdown ) );
+                        return true;
+                    }
+                    break;
+
+                case "setannouncement":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 3 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        int countdownAnnouncementTime = Integer.parseInt( args[2] );
+                        game.getGameConfig().setCountdownAnnounceTime( countdownAnnouncementTime );
+                        plugin.messageSender( sender, Messages.COUNTDOWN_ANNOUNCEMENT_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( countdownAnnouncementTime ) );
                         return true;
                     }
                     break;

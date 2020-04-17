@@ -26,11 +26,17 @@ public class TabComplete implements TabCompleter
     private static final String[] adminCommands = {
             "creategame",
             "deletegame",
+            "setdisplayname",
             "setground",
             "setstart",
             "setlobby",
             "setloss",
             "setspread",
+            "setminplayers",
+            "setmaxplayers",
+            "autoqueue",
+            "setcountdown",
+            "setannouncement",
             "queue",
             "start",
             "end",
@@ -97,11 +103,17 @@ public class TabComplete implements TabCompleter
                     }
                     return returnList;
 
+                case "setdisplayname":
                 case "setground":
                 case "setstart":
                 case "setlobby":
                 case "setloss":
                 case "setspread":
+                case "setminplayers":
+                case "setmaxplayers":
+                case "autoqueue":
+                case "setcountdown":
+                case "setannouncement":
                 case "queue":
                 case "start":
                 case "end":
@@ -136,6 +148,15 @@ public class TabComplete implements TabCompleter
                         returnList.add( world );
                     }
                     return returnList;
+            }
+        }
+        else if( args.length == 3 )
+        {
+            String arg2lower = args[2].toLowerCase();
+            switch( arg0lower ) {
+                case "autoqueue":
+                    if( !sender.hasPermission( "boost.admin" ) ) break;
+                    return new ArrayList<>( java.util.Arrays.asList( "on", "off" ) );
             }
         }
         return Collections.emptyList();

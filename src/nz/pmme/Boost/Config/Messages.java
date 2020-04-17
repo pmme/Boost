@@ -54,6 +54,14 @@ public enum Messages
     NOT_A_GAME_WORLD("not_a_game_world"),
     MUST_TYPE_CONFIRM("must_type_confirm"),
     GAME_DELETED("game_deleted"),
+    MIN_PLAYERS_SET("min_players_set"),
+    MAX_PLAYERS_SET("max_players_set"),
+    AUTO_QUEUE_ENABLED("auto_queue_enabled"),
+    AUTO_QUEUE_DISABLED("auto_queue_disabled"),
+    COUNTDOWN_SET("countdown_set"),
+    COUNTDOWN_ANNOUNCEMENT_SET("countdown_announcement_set"),
+    DISPLAY_NAME_SET("display_name_set"),
+    DISPLAY_NAME_MISMATCH("display_name_mismatch"),
 
     END("end");
 

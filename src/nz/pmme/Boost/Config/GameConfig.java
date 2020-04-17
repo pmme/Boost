@@ -1,6 +1,8 @@
 package nz.pmme.Boost.Config;
 
+import nz.pmme.Boost.Exceptions.GameDisplayNameMustMatchConfigurationException;
 import nz.pmme.Boost.Main;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
 public class GameConfig
@@ -49,7 +51,7 @@ public class GameConfig
 
     public void setConfig()
     {
-        plugin.getConfig().set( configPath + "name", this.name );
+        plugin.getConfig().set( configPath + "name", this.displayName );
         plugin.getConfig().set( configPath + "ground", this.groundLevel );
         plugin.getConfig().set( configPath + "target_dist", this.targetDist );
 
@@ -74,20 +76,59 @@ public class GameConfig
         return displayName;
     }
 
+    public void setDisplayName( String newDisplayName ) throws GameDisplayNameMustMatchConfigurationException
+    {
+        String newDisplayNamePlain = ChatColor.stripColor( ChatColor.translateAlternateColorCodes( '&', newDisplayName ) );
+        if( !newDisplayNamePlain.equalsIgnoreCase( this.name ) ) {
+            throw new GameDisplayNameMustMatchConfigurationException();
+        }
+        displayName = newDisplayName;
+        this.setConfig();
+        plugin.saveConfig();
+    }
+
     public int getCountdown() {
         return countdown;
+    }
+
+    public void setCountdown( int newCountdown )
+    {
+        countdown = newCountdown;
+        this.setConfig();
+        plugin.saveConfig();
     }
 
     public int getMinPlayers() {
         return minPlayers;
     }
 
+    public void setMinPlayers( int newMinPlayers )
+    {
+        minPlayers = newMinPlayers;
+        this.setConfig();
+        plugin.saveConfig();
+    }
+
     public int getMaxPlayers() {
         return maxPlayers;
     }
 
+    public void setMaxPlayers( int newMaxPlayers )
+    {
+        maxPlayers = newMaxPlayers;
+        this.setConfig();
+        plugin.saveConfig();
+    }
+
     public boolean isAutoQueue() {
         return autoQueue;
+    }
+
+    public void setAutoQueue( boolean newAutoQueue )
+    {
+        autoQueue = newAutoQueue;
+        this.setConfig();
+        plugin.saveConfig();
     }
 
     public int getGroundLevel()
@@ -98,7 +139,7 @@ public class GameConfig
     public void setGroundLevel( int newGround )
     {
         groundLevel = newGround;
-        plugin.getConfig().set( configPath + "ground", groundLevel );
+        this.setConfig();
         plugin.saveConfig();
     }
 
@@ -141,6 +182,13 @@ public class GameConfig
 
     public int getCountdownAnnounceTime() {
         return countdownAnnounceTime;
+    }
+
+    public void setCountdownAnnounceTime( int newCountdownAnnounceTime )
+    {
+        countdownAnnounceTime = newCountdownAnnounceTime;
+        this.setConfig();
+        plugin.saveConfig();
     }
 
     public boolean isProperlyConfigured(){
