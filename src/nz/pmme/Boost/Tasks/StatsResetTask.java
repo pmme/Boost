@@ -1,5 +1,6 @@
 package nz.pmme.Boost.Tasks;
 
+import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Main;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -26,21 +27,29 @@ public class StatsResetTask extends BukkitRunnable
         final Calendar cal = Calendar.getInstance();
         cal.setFirstDayOfWeek(Calendar.SUNDAY);
 
-        int day = cal.get(Calendar.DAY_OF_WEEK);
-        int week = cal.get(Calendar.WEEK_OF_YEAR);
-        int month = cal.get(Calendar.MONTH);
-
-        if( day != plugin.getLoadedConfig().getTrackedDay() )
+        for( StatsPeriod statsPeriod : StatsPeriod.values() )
         {
-            plugin.getLoadedConfig().setTrackedDay( day );
-        }
-        if( week != plugin.getLoadedConfig().getTrackedWeek() )
-        {
-            plugin.getLoadedConfig().setTrackedWeek( week );
-        }
-        if( month != plugin.getLoadedConfig().getTrackedMonth() )
-        {
-            plugin.getLoadedConfig().setTrackedMonth( month );
+            if( statsPeriod.isResettable() )
+            {
+                int periodCounter = 0;
+                switch( statsPeriod ) {
+                    case DAILY:
+                        periodCounter = cal.get( Calendar.DAY_OF_WEEK );
+                        break;
+                    case WEEKLY:
+                        periodCounter = cal.get( Calendar.WEEK_OF_YEAR );
+                        break;
+                    case MONTHLY:
+                        periodCounter = cal.get( Calendar.MONTH );
+                        break;
+                }
+                if( periodCounter != plugin.getLoadedConfig().getPeriodTracker( statsPeriod ) )
+                {
+                    plugin.getDataHandler().deleteStats( statsPeriod, null );
+                    plugin.getLoadedConfig().setPeriodTracker( statsPeriod, periodCounter );
+                    plugin.getLogger().info( statsPeriod.getName() + " player stats reset." );
+                }
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package nz.pmme.Boost.Config;
 
+import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -329,34 +330,24 @@ public class Config
         return commandUsage.toArray(new String[0]);
     }
 
-    public int getTrackedDay() { return trackedDay; }
-    public int getTrackedWeek() { return trackedWeek; }
-    public int getTrackedMonth() { return trackedMonth; }
+    public int getPeriodTracker( StatsPeriod statsPeriod )
+    {
+        switch( statsPeriod ) {
+            case DAILY: return trackedDay;
+            case WEEKLY: return trackedWeek;
+            case MONTHLY: return trackedMonth;
+        }
+        return 0;
+    }
 
-    public void setTrackedDay( int day )
+    public void setPeriodTracker( StatsPeriod statsPeriod, int periodCounter )
     {
-        trackedDay = day;
-        statsResetConfig.set( "day", trackedDay );
-        try {
-            statsResetConfig.save( statsResetConfigFile );
-        } catch( IOException e ) {
-            plugin.getLogger().log( Level.SEVERE, "Could not save config to \'" + statsResetConfigFile.getPath() + "\'", e );
+        switch( statsPeriod ) {
+            case DAILY:  trackedDay = periodCounter; break;
+            case WEEKLY: trackedWeek = periodCounter; break;
+            case MONTHLY: trackedMonth = periodCounter; break;
         }
-    }
-    public void setTrackedWeek( int week )
-    {
-        trackedWeek = week;
-        statsResetConfig.set( "day", trackedWeek );
-        try {
-            statsResetConfig.save( statsResetConfigFile );
-        } catch( IOException e ) {
-            plugin.getLogger().log( Level.SEVERE, "Could not save config to \'" + statsResetConfigFile.getPath() + "\'", e );
-        }
-    }
-    public void setTrackedMonth( int month )
-    {
-        trackedMonth = month;
-        statsResetConfig.set( "day", trackedMonth );
+        statsResetConfig.set( statsPeriod.getConfigNode(), periodCounter );
         try {
             statsResetConfig.save( statsResetConfigFile );
         } catch( IOException e ) {

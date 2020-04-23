@@ -306,7 +306,9 @@ public class GameManager
 
     public void deletePlayerStats( CommandSender sender, Player player )
     {
-        plugin.getDataHandler().deleteStats( StatsPeriod.TOTAL, player != null ? player.getUniqueId() : null );
+        for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
+            plugin.getDataHandler().deleteStats( statsPeriod, player != null ? player.getUniqueId() : null );
+        }
         plugin.messageSender( sender, Messages.DELETED_STATS );
     }
 }
