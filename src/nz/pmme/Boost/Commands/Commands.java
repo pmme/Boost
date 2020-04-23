@@ -493,8 +493,21 @@ public class Commands implements CommandExecutor
 
                 case "top":
                     if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
-                    plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.TOTAL );
-                    return true;
+                    if( args.length == 2 ) {
+                        String period = args[1].toLowerCase();
+                        if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignDaily() ) ) {
+                            plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.DAILY );
+                        } else if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignWeekly() ) ) {
+                            plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.WEEKLY );
+                        } else if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignMonthly() ) ) {
+                            plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.MONTHLY );
+                        } else break;
+                        return true;
+                    } else if( args.length == 1 ) {
+                        plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.TOTAL );
+                        return true;
+                    }
+                    break;
 
                 case "stats":
                     if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;

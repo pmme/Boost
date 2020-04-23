@@ -72,6 +72,7 @@ command_usage_user:
   - "&f/boost leave &3- Leave your current game."
   - "&f/boost stats <player> &3- Display game stats for player."
   - "&f/boost top &3- Display leader board."
+  - "&f/boost top <Daily/Weekly/Monthly> &3- Display period leader board."
   - "&f/boost status &3- Get a list of games and their status."
 
 command_usage_admin:

@@ -60,6 +60,8 @@ public class TabComplete implements TabCompleter
     @Override
     public List<String> onTabComplete( CommandSender sender, Command command, String alias, String[] args )
     {
+        if( !sender.hasPermission( "boost.cmd" ) ) return Collections.emptyList();
+
         String arg0lower = args.length > 0 ? args[0].toLowerCase() : null;
         if( args.length == 1 )
         {
@@ -147,6 +149,12 @@ public class TabComplete implements TabCompleter
                     for( String world : plugin.getLoadedConfig().getGameWorlds() ) {
                         returnList.add( world );
                     }
+                    return returnList;
+
+                case "top":
+                    returnList.add( plugin.getLoadedConfig().getSignDaily() );
+                    returnList.add( plugin.getLoadedConfig().getSignWeekly() );
+                    returnList.add( plugin.getLoadedConfig().getSignMonthly() );
                     return returnList;
             }
         }
