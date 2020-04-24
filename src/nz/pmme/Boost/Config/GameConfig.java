@@ -4,6 +4,7 @@ import nz.pmme.Boost.Exceptions.GameDisplayNameMustMatchConfigurationException;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 
 public class GameConfig
 {
@@ -196,5 +197,38 @@ public class GameConfig
         if( this.getLossSpawn() == null ) return false;
         if( this.getStartSpawn() == null ) return false;
         return true;
+    }
+
+    public void displayConfig( CommandSender sender )
+    {
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost game config:" ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Config name: &9" + this.name ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Display name: &9" + this.displayName ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: &9" + this.groundLevel ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Target distance: &9" + this.targetDist ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start countdown: &9" + this.countdown ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Countdown announcement period: &9" + this.countdownAnnounceTime ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Minimum players to start: &9" + this.minPlayers ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Maximum players: &9" + this.maxPlayers ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Auto queue: &9" + ( this.autoQueue ? "&aon" : "&coff" ) ) );
+        if( this.lobbySpawn.getConfiguredSpawn() == null ) {
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Lobby spawn: &cNot configured" ) );
+        } else {
+            Location spawn = this.lobbySpawn.getConfiguredSpawn();
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Lobby spawn: &9" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
+        }
+        if( this.startSpawn.getConfiguredSpawn() == null ) {
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn: &cNot configured" ) );
+        } else {
+            Location spawn = this.startSpawn.getConfiguredSpawn();
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn: &9" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn spread: &9" + this.startSpawn.getSpread() ) );
+        }
+        if( this.lossSpawn.getConfiguredSpawn() == null ) {
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &cNot configured" ) );
+        } else {
+            Location spawn = this.lossSpawn.getConfiguredSpawn();
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &9" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
+        }
     }
 }

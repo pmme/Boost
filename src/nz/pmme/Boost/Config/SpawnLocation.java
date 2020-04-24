@@ -60,6 +60,16 @@ public class SpawnLocation
         }
     }
 
+    public Location getConfiguredSpawn()
+    {
+        return spawn;
+    }
+
+    public int getSpread()
+    {
+        return spread;
+    }
+
     public void setSpawn( Location spawn )
     {
         this.spawn = spawn;

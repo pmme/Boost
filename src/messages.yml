@@ -79,6 +79,7 @@ command_usage_admin:
   - "&5Boost admin commands:"
   - "&f/boost creategame Arena1 &3- Create a game configuration."
   - "&f/boost deletegame Arena1 confirm &3- &4Delete &3a game configuration."
+  - "&f/boost showgameconfig Arena1 &3- Display the configuration for a game."
   - "&f/boost setdisplayname Arena1 <name> &3- Set the display name for the game."
   - "&f/boost setground Arena1 [yPos] &3- Set the losing ground level."
   - "&f/boost setstart Arena1 <world x y z> &3- Set the start spawn position."

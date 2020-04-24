@@ -26,6 +26,7 @@ public class TabComplete implements TabCompleter
     private static final String[] adminCommands = {
             "creategame",
             "deletegame",
+            "showgameconfig",
             "setdisplayname",
             "setground",
             "setstart",
@@ -105,6 +106,7 @@ public class TabComplete implements TabCompleter
                     }
                     return returnList;
 
+                case "showgameconfig":
                 case "setdisplayname":
                 case "setground":
                 case "setstart":
