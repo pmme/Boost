@@ -3,7 +3,6 @@ package nz.pmme.Boost.Game;
 import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
-import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Main;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -253,14 +252,10 @@ public class Game implements Comparable<Game>
         return gameState.toString();
     }
 
-    private ItemStack createBoostStick()
+    private ItemStack createBoostStick( Player player )
     {
         try {
-            if( plugin.getLoadedConfig().isBoostStickRandom() ) {
-                return plugin.getLoadedConfig().getRandomBoostStick().create();
-            } else if( plugin.getLoadedConfig().getDefaultBoostStick() != null ) {
-                return plugin.getLoadedConfig().getBoostStick( plugin.getLoadedConfig().getDefaultBoostStick() ).create();
-            }
+            return plugin.getLoadedConfig().getBoostStick( player ).create();
         } catch( NullPointerException e ) {
             // Empty catch to drop through to hard-coded default.
         }
@@ -279,7 +274,7 @@ public class Game implements Comparable<Game>
             playerInfo.getPlayer().setGameMode( plugin.getLoadedConfig().getPlayingGameMode() );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
 
-            playerInfo.getPlayer().getInventory().setItemInMainHand( this.createBoostStick() );
+            playerInfo.getPlayer().getInventory().setItemInMainHand( this.createBoostStick( playerInfo.getPlayer() ) );
 
             playerInfo.setActive();
             plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId() );

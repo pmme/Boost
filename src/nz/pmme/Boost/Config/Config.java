@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -269,8 +270,9 @@ public class Config
     public GameMode getLobbyGameMode() { return lobbyGameMode; }
 
     public boolean isBoostStickRandom() { return boostStickRandom; }
-    public String getDefaultBoostStick() { return defaultBoostStick; }
+
     public List<BoostStick> getBoostSticks() { return boostSticks; }
+
     public BoostStick getRandomBoostStick() {
         if( boostSticks.size() == 0 ) {
             plugin.getLogger().severe( "boost_sticks.stick_types configuration missing." );
@@ -278,7 +280,24 @@ public class Config
         }
         return boostSticks.get( (int)( Math.random() * ( boostSticks.size() ) ) );
     }
+
+    public BoostStick getBoostStickByPerms( Player player ) {
+        if( boostSticks.size() == 0 ) {
+            plugin.getLogger().severe( "boost_sticks.stick_types configuration missing." );
+            return null;
+        }
+        for( int stick = boostSticks.size()-1; stick >= 0; --stick ) {
+            if( player.hasPermission( "boost.stick." + boostSticks.get( stick ).getName() ) ) return boostSticks.get( stick );
+        }
+        return this.getBoostStick( defaultBoostStick );
+    }
+
     public BoostStick getBoostStick( String name ) { return boostSticksByName.get( name ); }
+
+    public BoostStick getBoostStick( Player player ) {
+        BoostStick boostStick = this.isBoostStickRandom() ? this.getRandomBoostStick() : getBoostStickByPerms( player );
+        return boostStick;
+    }
 
     public List<GameConfig> getGameList() { return gameConfigList; }
 
