@@ -426,16 +426,14 @@ public class Commands implements CommandExecutor
                         plugin.messageSender( sender, Messages.BOOST_DISABLED );
                         return true;
                     }
-                    if( args.length == 1 ) {
-                        if( sender instanceof Player ) {
-                            Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
-                            if( game == null ) break;
-                            plugin.getGameManager().queueGame( game, sender );
-                            return true;
-                        }
-                    }
                     if( args.length == 2 ) {
-                        plugin.getGameManager().queueGame( args[1], sender );
+                        if( args[1].equals( "*" ) ) {
+                            for( Game game : plugin.getGameManager().getGames() ) {
+                                plugin.getGameManager().queueGame( game, sender );
+                            }
+                        } else {
+                            plugin.getGameManager().queueGame( args[1], sender );
+                        }
                         return true;
                     }
                     break;

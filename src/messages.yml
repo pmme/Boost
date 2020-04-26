@@ -91,6 +91,7 @@ command_usage_admin:
   - "&f/boost autoqueue Arena1 [on/off] &3- Turn automatic queuing on or off."
   - "&f/boost setcountdown Arena1 [time] &3- Set the countdown time to start a game."
   - "&f/boost setannouncement Arena1 [time] &3- Set the period the countdown is announced."
+  - "&f/boost queue * &3- Start queuing all games."
   - "&f/boost queue Arena1 &3- Start queuing the named game."
   - "&f/boost start Arena1 &3- Force-start the named game."
   - "&f/boost end * &3- Force-end all games."
