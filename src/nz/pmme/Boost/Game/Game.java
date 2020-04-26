@@ -290,7 +290,7 @@ public class Game implements Comparable<Game>
 
     public boolean end( boolean noAutoQueue )
     {
-        boolean wasQueuing = ( gameState == GameState.QUEUING || ( queueTask != null && !queueTask.isCancelled() ) );
+//        boolean wasQueuing = ( gameState == GameState.QUEUING || ( queueTask != null && !queueTask.isCancelled() ) );
         if( queueTask != null && !queueTask.isCancelled() ) queueTask.cancel();  // Cancel the queue in case it's queuing rather than running.
         gameState = GameState.STOPPED;
         for( PlayerInfo playerInfo : players.values() )
@@ -307,7 +307,7 @@ public class Game implements Comparable<Game>
             plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
         }
         players.clear();
-        if( gameConfig.isAutoQueue() && !wasQueuing && !noAutoQueue ) this.startQueuing();    // Don't restart queuing if we were in the queuing state when end was called.
+        if( gameConfig.isAutoQueue() /*&& !wasQueuing*/ && !noAutoQueue ) this.startQueuing();
         return true;
     }
 }
