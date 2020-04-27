@@ -242,7 +242,8 @@ public class EventsListener implements Listener
         if( plugin.isBoostEnabled() && plugin.isInGameWorld( event.getPlayer() ) ) {
             event.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
             ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
-            event.getPlayer().getInventory().setItem( 0, instructionBook );
+            event.getPlayer().getInventory().setItem( 8, instructionBook );
+            event.getPlayer().getInventory().setHeldItemSlot( 8 );
         }
     }
 
@@ -264,7 +265,8 @@ public class EventsListener implements Listener
                 // Player arrived in the boost spawn world AND not from a boost arena world or other.
                 event.getPlayer().teleport( mainLobbySpawn );
                 ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
-                event.getPlayer().getInventory().setItem( 0, instructionBook );
+                event.getPlayer().getInventory().setItem( 8, instructionBook );
+                event.getPlayer().getInventory().setHeldItemSlot( 8 );
             }
         }
     }
