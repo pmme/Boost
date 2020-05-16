@@ -196,7 +196,7 @@ public class Config
             for( String boostStickName : boostSticksSection.getKeys( false ) ) {
                 BoostStick boostStick = new BoostStick( plugin, boostStickName.toLowerCase() );
                 boostSticks.add( boostStick );
-                boostSticksByName.put( boostStick.getName(), boostStick );
+                boostSticksByName.put( boostStick.getName().toLowerCase(), boostStick );
             }
         }
         ConfigurationSection gamesSection = plugin.getConfig().getConfigurationSection( "games" );
@@ -292,11 +292,10 @@ public class Config
         return this.getBoostStick( defaultBoostStick );
     }
 
-    public BoostStick getBoostStick( String name ) { return boostSticksByName.get( name ); }
+    public BoostStick getBoostStick( String name ) { return boostSticksByName.get( name.toLowerCase() ); }
 
     public BoostStick getBoostStick( Player player ) {
-        BoostStick boostStick = this.isBoostStickRandom() ? this.getRandomBoostStick() : getBoostStickByPerms( player );
-        return boostStick;
+        return this.isBoostStickRandom() ? this.getRandomBoostStick() : getBoostStickByPerms( player );
     }
 
     public List<GameConfig> getGameList() { return gameConfigList; }
