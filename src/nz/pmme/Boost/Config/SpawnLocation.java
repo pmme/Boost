@@ -52,7 +52,9 @@ public class SpawnLocation
     public Location getSpawn() {
         if( spread > 0 && spawn != null ) {
             Location location = new Location( spawn.getWorld(), spawn.getX(), spawn.getY(), spawn.getZ(), (float)( Math.random() * 360.0 ), 0 );
-            Vector spreadVector = new Vector( Math.random() * spread, 0, 0 ).rotateAroundY( Math.random() * 360.0 );
+            double angle = Math.random() * 2 * Math.PI;
+            double length = Math.random() * spread;
+            Vector spreadVector = new Vector( Math.cos(angle) * length, 0, -Math.sin(angle) * length );
             location.add( spreadVector );
             return location;
         } else {

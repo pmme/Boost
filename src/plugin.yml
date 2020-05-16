@@ -1,7 +1,7 @@
 name: Boost
 version: 1.6.3
 author: pmme
-api-version: 1.14
+api-version: 1.13
 main: nz.pmme.Boost.Main
 
 load: POSTWORLD
