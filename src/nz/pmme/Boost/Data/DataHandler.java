@@ -21,6 +21,7 @@ public class DataHandler
     public void generateTables()
     {
         Connection connection = this.database.getConnection();
+        if( connection == null ) return;
         try {
             PreparedStatement preparedStatement;
 
@@ -44,6 +45,7 @@ public class DataHandler
     {
         boolean versionOkay = true;
         Connection connection = this.database.getConnection();
+        if( connection == null ) return versionOkay;
         try {
             int version = 0;
             String statement = "SELECT value FROM other WHERE key='VERSION'";
@@ -89,6 +91,7 @@ public class DataHandler
     public void addPlayer( UUID playerId, String playerName )
     {
         Connection connection = this.database.getConnection();
+        if( connection == null ) return;
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             try {
                 String insertPlayerSql = "INSERT OR IGNORE INTO " + statsPeriod.getTable() + "(player_id,player_name,games,wins,losses) VALUES (?,?,0,0,0)";
@@ -107,6 +110,7 @@ public class DataHandler
     public void logGame( UUID playerId )
     {
         Connection connection = this.database.getConnection();
+        if( connection == null ) return;
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             try {
                 String updateGamesSql = "UPDATE " + statsPeriod.getTable() + " SET games=games+1 WHERE player_id=?";
@@ -124,6 +128,7 @@ public class DataHandler
     public void logLoss( UUID playerId )
     {
         Connection connection = this.database.getConnection();
+        if( connection == null ) return;
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             try {
                 String updateLossesSql = "UPDATE " + statsPeriod.getTable() + " SET losses=losses+1 WHERE player_id=?";
@@ -141,6 +146,7 @@ public class DataHandler
     public void logWin( UUID playerId )
     {
         Connection connection = this.database.getConnection();
+        if( connection == null ) return;
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             try {
                 String updateWinsSql = "UPDATE " + statsPeriod.getTable() + " SET wins=wins+1 WHERE player_id=?";
@@ -157,9 +163,10 @@ public class DataHandler
 
     public PlayerStats queryPlayerStats( StatsPeriod statsPeriod, UUID playerId )
     {
+        PlayerStats playerStats = null;
         Connection connection = this.database.getConnection();
+        if( connection == null ) return playerStats;
         try {
-            PlayerStats playerStats = null;
             String queryStatsSql = "SELECT * FROM " + statsPeriod.getTable() + " WHERE player_id=?";
             PreparedStatement queryStatsStatement = connection.prepareStatement( queryStatsSql );
             queryStatsStatement.setString( 1, playerId.toString() );
@@ -178,20 +185,20 @@ public class DataHandler
             }
             resultSetStats.close();
             queryStatsStatement.close();
-            return playerStats;
         }
         catch (SQLException sQLException) {
             plugin.getLogger().severe( "Failed to query " + statsPeriod.getTable() + " game statistics for player " + playerId.toString() );
             sQLException.printStackTrace();
         }
-        return null;
+        return playerStats;
     }
 
     public ArrayList<String> queryListOfPlayers( StatsPeriod statsPeriod )
     {
+        ArrayList<String> results = new ArrayList<>();
         Connection connection = this.database.getConnection();
+        if( connection == null ) return results;
         try {
-            ArrayList<String> results = new ArrayList<>();
             String queryPlayersSql = "SELECT player_name FROM " + statsPeriod.getTable() + " ORDER BY player_name";
             PreparedStatement queryPlayersStatement = connection.prepareStatement(queryPlayersSql);
             ResultSet resultSet = queryPlayersStatement.executeQuery();
@@ -200,19 +207,19 @@ public class DataHandler
             }
             resultSet.close();
             queryPlayersStatement.close();
-            return results;
         }
         catch (SQLException sQLException) {
             plugin.getLogger().severe( "Failed to query " + statsPeriod.getTable() + " list of players" );
             sQLException.printStackTrace();
         }
-        return null;
+        return results;
     }
 
     public List<PlayerStats> queryLeaderBoard( StatsPeriod statsPeriod )
     {
         List<PlayerStats> leaderBoard = new ArrayList<>();
         Connection connection = this.database.getConnection();
+        if( connection == null ) return leaderBoard;
         try {
             String queryLeaderBoardSql = "SELECT * FROM " + statsPeriod.getTable() + " ORDER BY wins DESC LIMIT 10";
             PreparedStatement queryLeaderBoardStatement = connection.prepareStatement( queryLeaderBoardSql );
@@ -231,9 +238,10 @@ public class DataHandler
     public void deleteStats( StatsPeriod statsPeriod, UUID playerId )
     {
         Connection connection = this.database.getConnection();
+        if( connection == null ) return;
         try {
             StringBuilder deleteStatsSql = new StringBuilder();
-            deleteStatsSql.append( "DELETE FROM " + statsPeriod.getTable() );
+            deleteStatsSql.append( "DELETE FROM " ).append( statsPeriod.getTable() );
             if( playerId != null ) {
                 deleteStatsSql.append( " WHERE player_id=?" );
             }
