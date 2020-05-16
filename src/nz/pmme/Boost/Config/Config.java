@@ -24,6 +24,9 @@ public class Config
 {
     private Main plugin;
 
+    private String languagePrefix;
+    private List<String> languagePrefixes;
+
     private File messagesConfigFile = null;
     private FileConfiguration messagesConfig = null;
     private String messagePrefix;
@@ -69,6 +72,8 @@ public class Config
     private GameMode lostGameMode;
     private GameMode lobbyGameMode;
 
+    private File sticksConfigFile = null;
+    private FileConfiguration sticksConfig = null;
     private boolean boostStickRandom;
     private String defaultBoostStick;
     private List<BoostStick> boostSticks = new ArrayList<>();
@@ -90,36 +95,12 @@ public class Config
     public void init()
     {
         plugin.saveDefaultConfig();
-        if( this.messagesConfigFile == null ) {
-            // Same as JavaPlugin.init
-            this.messagesConfigFile = new File( plugin.getDataFolder(), "messages.yml" );
-        }
-        // Same as JavaPlugin.saveDefaultConfig
-        if( !this.messagesConfigFile.exists() ) {
-            plugin.saveResource( "messages.yml", false );
-        }
-        this.createMessagesConfig();
-
-        if( this.statsResetConfigFile == null ) {
-            this.statsResetConfigFile = new File( plugin.getDataFolder(), "statsReset.yml" );
-        }
-        if( !this.statsResetConfigFile.exists() ) {
-            try {
-                this.statsResetConfigFile.createNewFile();
-            } catch( IOException e ) {
-                plugin.getLogger().log( Level.SEVERE, "Failed to create file \'" + this.statsResetConfigFile.getPath() + "\'", e );
-            }
-        }
-        this.statsResetConfig = YamlConfiguration.loadConfiguration( this.statsResetConfigFile );
-
         this.load();
     }
 
     public void reload()
     {
         plugin.reloadConfig();
-        this.createMessagesConfig();
-        this.statsResetConfig = YamlConfiguration.loadConfiguration( this.statsResetConfigFile );
         this.messages.clear();
         this.playerStatsTemplate.clear();
         this.commandUsageUser.clear();
@@ -131,14 +112,81 @@ public class Config
         this.load();
     }
 
-    private void createMessagesConfig()
+    private void loadMessagesConfig()
     {
-        // Same as JavaPlugin.reloadConfig
+        final String messagesConfigFileName = this.languagePrefix + "messages.yml";
+        this.messagesConfigFile = new File( plugin.getDataFolder(), messagesConfigFileName );
+        if( !this.messagesConfigFile.exists() ) {
+            try {
+                plugin.saveResource( messagesConfigFileName, false );
+            } catch( IllegalArgumentException e ) {
+                plugin.getLogger().severe( "There is no resource named " + messagesConfigFileName + " to create in the plugins folder. " + ( !this.languagePrefix.isEmpty() ? "Check the 'language' setting in the config." : "" ) );
+            }
+        }
         this.messagesConfig = YamlConfiguration.loadConfiguration( this.messagesConfigFile );
-        InputStream defConfigStream = plugin.getResource("messages.yml");
+        InputStream defConfigStream = plugin.getResource( messagesConfigFileName );
         if( defConfigStream != null ) {
             this.messagesConfig.setDefaults( YamlConfiguration.loadConfiguration( new InputStreamReader( defConfigStream, StandardCharsets.UTF_8 ) ) );
         }
+
+        // Check for previous signs in config.yml. These will now live in messages.yml
+        Object oldSignsConfigSection = plugin.getConfig().get( "signs", null );
+        if( oldSignsConfigSection != null ) {
+            this.messagesConfig.set( "signs", oldSignsConfigSection );
+            try {
+                this.messagesConfig.save( this.messagesConfigFile );
+            } catch (IOException var2) {
+                plugin.getLogger().severe( "Could not save to file '" + this.messagesConfigFile.getPath() + "'" );
+            }
+            plugin.getConfig().set( "signs", null );
+            plugin.saveConfig();
+        }
+    }
+
+    private void loadSticksConfig()
+    {
+        this.sticksConfig = null;
+        final String sticksConfigFileName = this.languagePrefix + "boostSticks.yml";
+        this.sticksConfigFile = new File( plugin.getDataFolder(), sticksConfigFileName );
+        if( !this.sticksConfigFile.exists() ) {
+            // Check for previous boost_sticks in config.yml
+            Object oldBoostSticksConfigSection = plugin.getConfig().get( "boost_sticks", null );
+            if( oldBoostSticksConfigSection != null ) {
+                this.sticksConfig = new YamlConfiguration();
+                this.sticksConfig.set( "boost_sticks", oldBoostSticksConfigSection );
+                try {
+                    this.sticksConfig.save( this.sticksConfigFile );
+                } catch (IOException var2) {
+                    plugin.getLogger().severe( "Could not save to file '" + this.sticksConfigFile.getPath() + "'" );
+                }
+                plugin.getConfig().set( "boost_sticks", null );
+                plugin.saveConfig();
+            } else {
+                try {
+                    plugin.saveResource( sticksConfigFileName, false );
+                } catch( IllegalArgumentException e ) {
+                    plugin.getLogger().severe( "There is no resource named " + sticksConfigFileName + " to create in the plugins folder. " + ( !this.languagePrefix.isEmpty() ? "Check the 'language' setting in the config." : "" ) );
+                }
+            }
+        }
+        if( this.sticksConfig == null ) this.sticksConfig = YamlConfiguration.loadConfiguration( this.sticksConfigFile );
+        InputStream defConfigStream = plugin.getResource( sticksConfigFileName );
+        if( defConfigStream != null ) {
+            this.sticksConfig.setDefaults( YamlConfiguration.loadConfiguration( new InputStreamReader( defConfigStream, StandardCharsets.UTF_8 ) ) );
+        }
+    }
+
+    private void loadStatsResetConfig()
+    {
+        this.statsResetConfigFile = new File( plugin.getDataFolder(), "statsReset.yml" );
+        if( !this.statsResetConfigFile.exists() ) {
+            try {
+                this.statsResetConfigFile.createNewFile();
+            } catch( IOException e ) {
+                plugin.getLogger().log( Level.SEVERE, "Failed to create file \'" + this.statsResetConfigFile.getPath() + "\'", e );
+            }
+        }
+        this.statsResetConfig = YamlConfiguration.loadConfiguration( this.statsResetConfigFile );
     }
 
     private Sound tryGetSoundFromConfig( String path, String def )
@@ -153,6 +201,15 @@ public class Config
 
     private void load()
     {
+        // See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for preferred codes.
+        String languagePrefixSetting = plugin.getConfig().getString( "language" );
+        languagePrefix = ( languagePrefixSetting == null || languagePrefixSetting.equalsIgnoreCase( "en" ) ) ? "" : ( languagePrefixSetting + "_" );
+        languagePrefixes = plugin.getConfig().getStringList( "languages" );
+
+        this.loadMessagesConfig();
+        this.loadSticksConfig();
+        this.loadStatsResetConfig();
+
         // targetDistance is the radius from the centre block, so a box of 3 blocks is (3-1)/2 = 1 block bigger than the main block. 1 block is (1-1)/2 = 0 blocks bigger, or just the main block.
         targetBoxH = ( plugin.getConfig().getInt( "physics.target_box_width", 3 ) - 1 ) / 2;
         targetBoxV = plugin.getConfig().getInt( "physics.target_box_height", 1 );
@@ -161,16 +218,16 @@ public class Config
         min_horizontal_velocity = plugin.getConfig().getDouble( "physics.min_horizontal_velocity", 0.1 );
         block_hit_horizontal_velocity = plugin.getConfig().getDouble( "physics.block_hit_horizontal_velocity", 2.5 );
 
-        signTitle = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.title", "[Boost]" ) );
-        signJoin = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.join", "Click to join" ) );
-        signLeave = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.leave", "Click to leave" ) );
-        signStatus = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.status", "Click for status" ) );
-        signStats = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.stats", "Your stats" ) );
-        signTop = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.top", "Leader board" ) );
-        signDaily = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.daily", "Daily" ) );
-        signWeekly = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.weekly", "Weekly" ) );
-        signMonthly = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.monthly", "Monthly" ) );
-        signTotal = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( "signs.total", "All time" ) );
+        signTitle = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.title", "[Boost]" ) );
+        signJoin = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.join", "Click to join" ) );
+        signLeave = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.leave", "Click to leave" ) );
+        signStatus = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.status", "Click for status" ) );
+        signStats = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.stats", "Your stats" ) );
+        signTop = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.top", "Leader board" ) );
+        signDaily = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.daily", "Daily" ) );
+        signWeekly = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.weekly", "Weekly" ) );
+        signMonthly = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.monthly", "Monthly" ) );
+        signTotal = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.total", "All time" ) );
 
         mainLobbySpawn = new SpawnLocation( plugin, "main_lobby" );
 
@@ -189,12 +246,12 @@ public class Config
         lostGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lost", "SPECTATOR" ) );
         lobbyGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lobby", "ADVENTURE" ) );
 
-        boostStickRandom = plugin.getConfig().getBoolean( "boost_sticks.random", true );
-        defaultBoostStick = plugin.getConfig().getString( "boost_sticks.default" );
-        ConfigurationSection boostSticksSection = plugin.getConfig().getConfigurationSection( "boost_sticks.stick_types" );
+        boostStickRandom = sticksConfig.getBoolean( "boost_sticks.random", true );
+        defaultBoostStick = sticksConfig.getString( "boost_sticks.default" );
+        ConfigurationSection boostSticksSection = sticksConfig.getConfigurationSection( "boost_sticks.stick_types" );
         if( boostSticksSection != null ) {
             for( String boostStickName : boostSticksSection.getKeys( false ) ) {
-                BoostStick boostStick = new BoostStick( plugin, boostStickName.toLowerCase() );
+                BoostStick boostStick = new BoostStick( plugin, boostStickName.toLowerCase(), sticksConfig );
                 boostSticks.add( boostStick );
                 boostSticksByName.put( boostStick.getName().toLowerCase(), boostStick );
             }
@@ -229,6 +286,8 @@ public class Config
         trackedWeek = statsResetConfig.getInt( "week", 0 );
         trackedMonth = statsResetConfig.getInt( "month", 0 );
     }
+
+    public List<String> getLanguagePrefixes() { return languagePrefixes; }
 
     public int getTargetBoxH() { return targetBoxH; }
     public int getTargetBoxV() { return targetBoxV; }

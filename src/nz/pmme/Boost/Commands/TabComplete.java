@@ -24,6 +24,7 @@ public class TabComplete implements TabCompleter
             "status"
     };
     private static final String[] adminCommands = {
+            "language",
             "creategame",
             "deletegame",
             "showgameconfig",
@@ -158,6 +159,9 @@ public class TabComplete implements TabCompleter
                     returnList.add( plugin.getLoadedConfig().getSignWeekly() );
                     returnList.add( plugin.getLoadedConfig().getSignMonthly() );
                     return returnList;
+
+                case "language":
+                    return plugin.getLoadedConfig().getLanguagePrefixes();
             }
         }
         else if( args.length == 3 )

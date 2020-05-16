@@ -1,0 +1,34 @@
+boost_sticks:
+  random: true
+  default: wood
+  stick_types:
+    wood:
+      name: '&2Wooden Whacker'
+      item: 'WOODEN_HOE'
+      lore:
+      - '&5Boost Stick'
+      - '&2Right click to boost players'
+    stone:
+      name: '&7Stone Stomper'
+      item: 'STONE_HOE'
+      lore:
+      - '&5Boost Stick'
+      - '&7Right click to boost players'
+    iron:
+      name: '&fSteel Smasher'
+      item: 'IRON_HOE'
+      lore:
+      - '&5Boost Stick'
+      - '&fRight click to boost players'
+    gold:
+      name: '&6Golden Glowstick'
+      item: 'GOLDEN_HOE'
+      lore:
+      - '&5Boost Stick'
+      - '&6Right click to boost players'
+    diamond:
+      name: '&bDiamond Destroyer'
+      item: 'DIAMOND_HOE'
+      lore:
+      - '&5Boost Stick'
+      - '&bRight click to boost players'

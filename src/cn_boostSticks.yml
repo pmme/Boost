@@ -1,0 +1,38 @@
+boost_sticks:
+  random: true
+  #默认物品材质为木头
+  default: wood
+  stick_types:
+    wood:
+    #可以将它改为其他名字
+      name: '&2击退棒'
+      #物品的英文ID
+      item: 'WOODEN_HOE'
+      #Lore物品介绍
+      lore:
+      - '&5击退棒'
+      - '&2右键击退玩家'
+    stone:
+      name: '&7击退棒'
+      item: 'STONE_HOE'
+      lore:
+      - '&5击退棒'
+      - '&7右键击退玩家'
+    iron:
+      name: '&f击退棒'
+      item: 'IRON_HOE'
+      lore:
+      - '&5击退棒'
+      - '&f右键击退玩家'
+    gold:
+      name: '&6击退棒'
+      item: 'GOLDEN_HOE'
+      lore:
+      - '&5击退棒'
+      - '&6右键击退玩家'
+    diamond:
+      name: '&b击退棒'
+      item: 'DIAMOND_HOE'
+      lore:
+      - '&5击退棒'
+      - '&b右键击退玩家'

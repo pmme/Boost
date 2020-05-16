@@ -1,22 +1,13 @@
+language: en
+languages: [en, cn]
+
 physics:
-  vertical_velocity: 2.0;
-  max_horizontal_velocity: 2.5;
-  min_horizontal_velocity: 0.1;
-  block_hit_horizontal_velocity: 2.5;
+  vertical_velocity: 2.0
+  max_horizontal_velocity: 2.5
+  min_horizontal_velocity: 0.1
+  block_hit_horizontal_velocity: 2.5
   target_box_width: 3
   target_box_height: 2
-
-signs:
-  title: '[Boost]'
-  join: 'Click to join'
-  leave: 'Click to leave'
-  status: 'Click for status'
-  stats: 'Your stats'
-  top: 'Leader board'
-  daily: 'Daily'
-  weekly: 'Weekly'
-  monthly: 'Monthly'
-  total: 'All time'
 
 SQLite: true
 sql:
@@ -52,68 +43,33 @@ gamemode:
   lost: 'SPECTATOR'
   lobby: 'ADVENTURE'
 
-boost_sticks:
-  random: true
-  default: wood
-  stick_types:
-    wood:
-      name: '&2Wooden Whacker'
-      item: 'WOODEN_HOE'
-      lore:
-      - '&5Boost Stick'
-      - '&2Right click to boost players'
-    stone:
-      name: '&7Stone Stomper'
-      item: 'STONE_HOE'
-      lore:
-      - '&5Boost Stick'
-      - '&7Right click to boost players'
-    iron:
-      name: '&fSteel Smasher'
-      item: 'IRON_HOE'
-      lore:
-      - '&5Boost Stick'
-      - '&fRight click to boost players'
-    gold:
-      name: '&6Golden Glowstick'
-      item: 'GOLDEN_HOE'
-      lore:
-      - '&5Boost Stick'
-      - '&6Right click to boost players'
-    diamond:
-      name: '&bDiamond Destroyer'
-      item: 'DIAMOND_HOE'
-      lore:
-      - '&5Boost Stick'
-      - '&bRight click to boost players'
-
-games:
-  #Sample game configuration
-  Arena1:
-    name: '&aArena1'
-    ground: 64
-    target_dist: 150
-    countdown: 30
-    min_players: 2
-    max_players: 0
-    auto_queue: true
-    countdown_announce_time: 10
-    game_start:
-      world: world
-      x: 100
-      y: 64
-      z: 0
-      spread: 4
-    game_loss:
-      world: world
-      x: 0
-      y: 64
-      z: 0
-      yaw: 0
-    game_lobby:
-      world: world
-      x: 0
-      y: 64
-      z: 0
-      yaw: 0
-
+#  Sample game configuration
+#  games:
+#    Arena1:
+#      name: '&aArena1'
+#      ground: 64
+#      target_dist: 150
+#      countdown: 30
+#      min_players: 2
+#      max_players: 0
+#      auto_queue: true
+#      countdown_announce_time: 10
+#      game_start:
+#        world: world
+#        x: 100
+#        y: 64
+#        z: 0
+#        spread: 4
+#      game_loss:
+#        world: world
+#        x: 0
+#        y: 64
+#        z: 0
+#        yaw: 0
+#      game_lobby:
+#        world: world
+#        x: 0
+#        y: 64
+#        z: 0
+#        yaw: 0
+#  

@@ -61,6 +61,17 @@ public class Commands implements CommandExecutor
                     plugin.messageSender( sender, Messages.CONFIG_RELOADED );
                     return true;
 
+                case "language":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 2 ) {
+                        plugin.getConfig().set( "language", args[1].toLowerCase() );
+                        plugin.saveConfig();
+                        plugin.reload();
+                        plugin.messageSender( sender, Messages.CONFIG_RELOADED );
+                        return true;
+                    }
+                    break;
+
                 case "addgameworld":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length == 2 ) {

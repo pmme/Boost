@@ -3,6 +3,7 @@ package nz.pmme.Boost.Config;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,23 +18,21 @@ public class BoostStick
     private Material material;
     private List<String> lore = new ArrayList<>();
 
-    private String configPath;
-
-    public BoostStick( Main plugin, String name )
+    public BoostStick( Main plugin, String name, FileConfiguration boostSticksConfig )
     {
         this.plugin = plugin;
         this.name = name;
 
-        this.configPath = "boost_sticks.stick_types." + this.name + ".";
+        String configPath = "boost_sticks.stick_types." + this.name + ".";
 
-        this.displayName = ChatColor.translateAlternateColorCodes( '&', plugin.getConfig().getString( this.configPath + "name", this.name ) );
-        String item = plugin.getConfig().getString( this.configPath + "item", "DIAMOND_HOE" ).toUpperCase();
+        this.displayName = ChatColor.translateAlternateColorCodes( '&', boostSticksConfig.getString( configPath + "name", this.name ) );
+        String item = boostSticksConfig.getString( configPath + "item", "DIAMOND_HOE" ).toUpperCase();
         this.material = Material.getMaterial( item );
         if( this.material == null ) {
             this.material = Material.DIAMOND_HOE;
             plugin.getLogger().severe( "Material for boost stick " + this.name + " is invalid." );
         }
-        for( String string : plugin.getConfig().getStringList( this.configPath + "lore" ) ) {
+        for( String string : boostSticksConfig.getStringList( configPath + "lore" ) ) {
             lore.add( ChatColor.translateAlternateColorCodes( '&', string ) );
         }
     }
