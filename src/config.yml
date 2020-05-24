@@ -42,6 +42,7 @@ gamemode:
   playing: 'ADVENTURE'
   lost: 'SPECTATOR'
   lobby: 'ADVENTURE'
+  build: 'CREATIVE'
 
 #  Sample game configuration
 #  games:

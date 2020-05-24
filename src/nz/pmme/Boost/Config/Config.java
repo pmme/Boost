@@ -71,6 +71,7 @@ public class Config
     private GameMode playingGameMode;
     private GameMode lostGameMode;
     private GameMode lobbyGameMode;
+    private GameMode buildGameMode;
 
     private File sticksConfigFile = null;
     private FileConfiguration sticksConfig = null;
@@ -245,6 +246,7 @@ public class Config
         playingGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.playing", "ADVENTURE" ) );
         lostGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lost", "SPECTATOR" ) );
         lobbyGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lobby", "ADVENTURE" ) );
+        buildGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.build", "CREATIVE" ) );
 
         boostStickRandom = sticksConfig.getBoolean( "boost_sticks.random", true );
         defaultBoostStick = sticksConfig.getString( "boost_sticks.default" );
@@ -327,6 +329,7 @@ public class Config
     public GameMode getPlayingGameMode() { return playingGameMode; }
     public GameMode getLostGameMode() { return lostGameMode; }
     public GameMode getLobbyGameMode() { return lobbyGameMode; }
+    public GameMode getBuildGameMode() { return buildGameMode; }
 
     public boolean isBoostStickRandom() { return boostStickRandom; }
 
