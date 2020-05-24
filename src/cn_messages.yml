@@ -58,6 +58,7 @@ countdown_set: "已设置游戏 %game%&r 的倒计时时间为 %count%"
 countdown_announcement_set: "已设置游戏 %game%&r 的倒计时宣布的时间为 %count%"
 display_name_set: "已设置游戏 %gameconfig%&r 的显示名为 %game%&r"
 display_name_mismatch: "格式错误！格式必须与 '%gameconfig%&r' 相同"
+ground_higher: "&cStart spawn Y %y% should be higher than ground %ground% for game %game%&r&c."
 
 player_stats:
   - "&5[平台争霸] &f玩家统计信息: %player%"

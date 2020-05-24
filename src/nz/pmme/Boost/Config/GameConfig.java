@@ -48,6 +48,11 @@ public class GameConfig
         this.lossSpawn = new SpawnLocation( plugin, configPath + "game_loss" );
 
         this.countdownAnnounceTime = plugin.getConfig().getInt( configPath + "countdown_announce_time", 10 );
+
+        Location spawn = this.startSpawn.getConfiguredSpawn();
+        if( spawn != null && spawn.getBlockY() <= this.groundLevel ) {
+            plugin.getLogger().warning( "Start spawn Y " + spawn.getBlockY() + " should be higher than ground " + this.groundLevel + " for game " + this.name );
+        }
     }
 
     public void setConfig()
@@ -223,6 +228,9 @@ public class GameConfig
             Location spawn = this.startSpawn.getConfiguredSpawn();
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn: &9" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn spread: &9" + this.startSpawn.getSpread() ) );
+            if( spawn.getBlockY() <= this.groundLevel ) {
+                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Start spawn Y " + spawn.getBlockY() + " should be higher than ground " + this.groundLevel ) );
+            }
         }
         if( this.lossSpawn.getConfiguredSpawn() == null ) {
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &cNot configured" ) );

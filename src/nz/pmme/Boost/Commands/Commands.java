@@ -235,6 +235,12 @@ public class Commands implements CommandExecutor
                             int y = Integer.parseInt( args[2] );
                             game.getGameConfig().setGroundLevel(y);
                             plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
+
+                            Location spawn = game.getGameConfig().getStartSpawn();
+                            if( spawn != null && spawn.getBlockY() <= y ) {
+                                String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
+                                plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
+                            }
                             return true;
                         }
                         if ( args.length == 2 ) {
@@ -246,6 +252,12 @@ public class Commands implements CommandExecutor
                                 int y = ((Player)sender).getLocation().getBlockY();
                                 game.getGameConfig().setGroundLevel(y);
                                 plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
+
+                                Location spawn = game.getGameConfig().getStartSpawn();
+                                if( spawn != null && spawn.getBlockY() <= y ) {
+                                    String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
+                                    plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
+                                }
                             } else {
                                 plugin.messageSender( sender, Messages.NO_CONSOLE );
                             }
@@ -291,6 +303,11 @@ public class Commands implements CommandExecutor
                                 case "setstart":
                                     game.getGameConfig().setStartSpawn( spawn );
                                     plugin.messageSender( sender, Messages.START_SPAWN_SET, game.getGameConfig().getDisplayName() );
+
+                                    if( spawn.getBlockY() <= game.getGameConfig().getGroundLevel() ) {
+                                        String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
+                                        plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( game.getGameConfig().getGroundLevel() ) ) );
+                                    }
                                     break;
                                 case "setlobby":
                                     game.getGameConfig().setLobbySpawn( spawn );

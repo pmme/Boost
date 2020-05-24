@@ -58,6 +58,7 @@ countdown_set: "Start countdown set to %count% for game %game%&r."
 countdown_announcement_set: "Countdown announcement period set to %count% for game %game%&r."
 display_name_set: "Display name set to %game%&r for configured game %gameconfig%&r."
 display_name_mismatch: "Display name without format must match '%gameconfig%&r'."
+ground_higher: "&cStart spawn Y %y% should be higher than ground %ground% for game %game%&r&c."
 
 player_stats:
   - "&5[Boost] &fPlayer stats: %player%"

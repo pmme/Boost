@@ -62,6 +62,7 @@ public enum Messages
     COUNTDOWN_ANNOUNCEMENT_SET("countdown_announcement_set"),
     DISPLAY_NAME_SET("display_name_set"),
     DISPLAY_NAME_MISMATCH("display_name_mismatch"),
+    GROUND_HIGHER("ground_higher"),
 
     END("end");
 
