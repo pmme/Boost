@@ -59,6 +59,8 @@ countdown_announcement_set: "Countdown announcement period set to %count% for ga
 display_name_set: "Display name set to %game%&r for configured game %gameconfig%&r."
 display_name_mismatch: "Display name without format must match '%gameconfig%&r'."
 ground_higher: "&cStart spawn Y %y% should be higher than ground %ground% for game %game%&r&c."
+not_facing_a_sign: "&cYou must be facing a sign within 5 blocks."
+sign_set: "Sign set."
 
 player_stats:
   - "&5[Boost] &fPlayer stats: %player%"
@@ -106,6 +108,7 @@ command_usage_admin:
   - "&f/boost addgameworld <world> &3- Add a world to be managed by Boost."
   - "&f/boost removegameworld <world> &3- Stop world being managed by Boost."
   - "&f/boost setmainlobby <world x y z> &3- Set the spawn for the main lobby."
+  - "&f/boost setsign <cmd> <option/game> &3- Set the text on a sign for the command."
   - "&f/boost build <player> &3- Enable building for player."
   - "&f/boost nobuild <player> &3- Turn off building for player."
   - "&f/boost on &3- Turn the Boost game and controls on."

@@ -9,7 +9,10 @@ import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -590,6 +593,66 @@ public class Commands implements CommandExecutor
                     if( !plugin.hasPermission( sender, "boost.status", Messages.NO_PERMISSION_CMD ) ) return true;
                     plugin.getGameManager().displayStatus( sender );
                     return true;
+
+                case "setsign":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( sender instanceof Player ) {
+                        Player player = (Player)sender;
+                        Block targetBlock = player.getTargetBlock( null,5 );
+                        if( targetBlock == null || !(targetBlock.getState() instanceof Sign ) ) {
+                            plugin.messageSender( sender, Messages.NOT_FACING_A_SIGN );
+                            return true;
+                        }
+                        if( args.length > 1 ) {
+                            String args1lower = args[1].toLowerCase();
+                            if( args.length != 3 && args1lower.equals( "join" ) ) break;
+                            Sign sign = (Sign)( targetBlock.getState() );
+                            int line = 0;
+                            sign.setLine( line++, plugin.getLoadedConfig().getMessage( Messages.TITLE ) );
+                            switch( args1lower ) {
+                                case "join":
+                                    sign.setLine( line++, plugin.getLoadedConfig().getSignJoin() );
+                                    sign.setLine( line++, args[2] );
+                                    break;
+                                case "leave":
+                                    sign.setLine( line++, plugin.getLoadedConfig().getSignLeave() );
+                                    break;
+                                case "status":
+                                    sign.setLine( line++, plugin.getLoadedConfig().getSignStatus() );
+                                    break;
+                                case "stats":
+                                    sign.setLine( line++, plugin.getLoadedConfig().getSignStats() );
+                                    break;
+                                case "top":
+                                    sign.setLine( line++, plugin.getLoadedConfig().getSignTop() );
+                                    if( args.length == 3 ) {
+                                        switch( args[2].toLowerCase() ) {
+                                            case "daily":
+                                                sign.setLine( line++, plugin.getLoadedConfig().getSignDaily() );
+                                                break;
+                                            case "weekly":
+                                                sign.setLine( line++, plugin.getLoadedConfig().getSignWeekly() );
+                                                break;
+                                            case "monthly":
+                                                sign.setLine( line++, plugin.getLoadedConfig().getSignMonthly() );
+                                                break;
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    sign.setLine( line++, args[1] );
+                                    break;
+                            }
+                            for( ; line < 4; ++line ) sign.setLine( line, "" );
+                            sign.update();
+                            plugin.messageSender( sender, Messages.SIGN_SET );
+                            return true;
+                        }
+                    } else {
+                        plugin.messageSender( sender, Messages.NO_CONSOLE );
+                        return true;
+                    }
+                    break;
 
                 case "build":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;

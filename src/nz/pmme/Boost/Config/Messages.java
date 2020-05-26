@@ -63,6 +63,8 @@ public enum Messages
     DISPLAY_NAME_SET("display_name_set"),
     DISPLAY_NAME_MISMATCH("display_name_mismatch"),
     GROUND_HIGHER("ground_higher"),
+    NOT_FACING_A_SIGN("not_facing_a_sign"),
+    SIGN_SET("sign_set"),
 
     END("end");
 

@@ -49,10 +49,23 @@ public class TabComplete implements TabCompleter
             "addgameworld",
             "removegameworld",
             "setmainlobby",
+            "setsign",
             "build",
             "nobuild",
             "on",
             "off"
+    };
+    private static final String[] signCommands = {
+            "join",
+            "leave",
+            "status",
+            "stats",
+            "top"
+    };
+    private static final String[] signTopArgs = {
+            "daily",
+            "weekly",
+            "monthly"
     };
 
     public TabComplete( Main plugin ) {
@@ -161,7 +174,12 @@ public class TabComplete implements TabCompleter
                     return returnList;
 
                 case "language":
+                    if( !sender.hasPermission( "boost.admin" ) ) break;
                     return plugin.getLoadedConfig().getLanguagePrefixes();
+
+                case "setsign":
+                    if( !sender.hasPermission( "boost.admin" ) ) break;
+                    return java.util.Arrays.asList( signCommands );
             }
         }
         else if( args.length == 3 )
@@ -170,7 +188,21 @@ public class TabComplete implements TabCompleter
             switch( arg0lower ) {
                 case "autoqueue":
                     if( !sender.hasPermission( "boost.admin" ) ) break;
-                    return new ArrayList<>( java.util.Arrays.asList( "on", "off" ) );
+                    return java.util.Arrays.asList( "on", "off" );
+
+                case "setsign":
+                    if( !sender.hasPermission( "boost.admin" ) ) break;
+                    String arg1lower = args[1].toLowerCase();
+                    if( arg1lower.equals( "join" ) ) {
+                        List<String> returnList = new ArrayList<>();
+                        for( String gameName : plugin.getGameManager().getGameNames() ) {
+                            returnList.add( ChatColor.stripColor( gameName ) );
+                        }
+                        return returnList;
+                    } else if( arg1lower.equals( "top" ) ) {
+                        return java.util.Arrays.asList( signTopArgs );
+                    }
+                    break;
             }
         }
         return Collections.emptyList();
