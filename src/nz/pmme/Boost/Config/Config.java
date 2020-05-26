@@ -299,15 +299,25 @@ public class Config
     public double getBlock_hit_horizontal_velocity() { return block_hit_horizontal_velocity; }
 
     public String getSignTitle() { return signTitle; }
+    public String getSignTitleStripped() { return ChatColor.stripColor( signTitle ); }
     public String getSignJoin() { return signJoin; }
+    public String getSignJoinStripped() { return ChatColor.stripColor( signJoin ); }
     public String getSignLeave() { return signLeave; }
+    public String getSignLeaveStripped() { return ChatColor.stripColor( signLeave ); }
     public String getSignStatus() { return signStatus; }
+    public String getSignStatusStripped() { return ChatColor.stripColor( signStatus ); }
     public String getSignStats() { return signStats; }
+    public String getSignStatsStripped() { return ChatColor.stripColor( signStats ); }
     public String getSignTop() { return signTop; }
+    public String getSignTopStripped() { return ChatColor.stripColor( signTop ); }
     public String getSignDaily() { return signDaily; }
+    public String getSignDailyStripped() { return ChatColor.stripColor( signDaily ); }
     public String getSignWeekly() { return signWeekly; }
+    public String getSignWeeklyStripped() { return ChatColor.stripColor( signWeekly ); }
     public String getSignMonthly() { return signMonthly; }
+    public String getSignMonthlyStripped() { return ChatColor.stripColor( signMonthly ); }
     public String getSignTotal() { return signTotal; }
+    public String getSignTotalStripped() { return ChatColor.stripColor( signTotal ); }
 
     public Location getMainLobbySpawn() { return mainLobbySpawn.getSpawn(); }
     public void setMainLobbySpawn( Location spawn ) {

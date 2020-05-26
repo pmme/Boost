@@ -77,34 +77,34 @@ public class EventsListener implements Listener
                 {
                     Sign sign = (Sign)event.getClickedBlock().getState();
                     String[] lines = sign.getLines();
-                    if( lines.length > 1 && ChatColor.stripColor( lines[0] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignTitle() ) )
+                    if( lines.length > 1 && ChatColor.stripColor( lines[0] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignTitleStripped() ) )
                     {
                         String strippedLine1 = ChatColor.stripColor( lines[1] );
-                        if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignJoin() ) && lines.length >= 3 ) {
+                        if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignJoinStripped() ) && lines.length >= 3 ) {
                             if( !plugin.hasPermission( thisPlayer, "boost.join", Messages.NO_PERMISSION_USE ) ) return;
                             plugin.getGameManager().joinGame( thisPlayer, ChatColor.stripColor( lines[2] ) );
                             return;
-                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignLeave() ) ) {
+                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignLeaveStripped() ) ) {
                             plugin.getGameManager().leaveGame( thisPlayer );
                             return;
-                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatus() ) ) {
+                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatusStripped() ) ) {
                             if( !plugin.hasPermission( thisPlayer, "boost.status", Messages.NO_PERMISSION_USE ) ) return;
                             plugin.getGameManager().displayStatus( thisPlayer );
                             return;
-                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStats() ) ) {
+                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatsStripped() ) ) {
                             if( lines.length > 2 ) {
 
                             }
                             plugin.getGameManager().displayPlayerStats( thisPlayer, thisPlayer );
                             return;
-                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignTop() ) ) {
+                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignTopStripped() ) ) {
                             if( lines.length > 2 ) {
                                 String strippedLine2 = ChatColor.stripColor( lines[2] );
-                                if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignDaily() ) ) {
+                                if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignDailyStripped() ) ) {
                                     plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.DAILY );
-                                } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignWeekly() ) ) {
+                                } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignWeeklyStripped() ) ) {
                                     plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.WEEKLY );
-                                } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignMonthly() ) ) {
+                                } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignMonthlyStripped() ) ) {
                                     plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.MONTHLY );
                                 } else {
                                     plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.TOTAL );

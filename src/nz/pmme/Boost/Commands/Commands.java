@@ -537,11 +537,11 @@ public class Commands implements CommandExecutor
                     if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length == 2 ) {
                         String period = args[1].toLowerCase();
-                        if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignDaily() ) ) {
+                        if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignDailyStripped() ) ) {
                             plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.DAILY );
-                        } else if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignWeekly() ) ) {
+                        } else if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignWeeklyStripped() ) ) {
                             plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.WEEKLY );
-                        } else if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignMonthly() ) ) {
+                        } else if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignMonthlyStripped() ) ) {
                             plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.MONTHLY );
                         } else break;
                         return true;
@@ -608,7 +608,7 @@ public class Commands implements CommandExecutor
                             if( args.length != 3 && args1lower.equals( "join" ) ) break;
                             Sign sign = (Sign)( targetBlock.getState() );
                             int line = 0;
-                            sign.setLine( line++, plugin.getLoadedConfig().getMessage( Messages.TITLE ) );
+                            sign.setLine( line++, plugin.getLoadedConfig().getSignTitle() );
                             switch( args1lower ) {
                                 case "join":
                                     sign.setLine( line++, plugin.getLoadedConfig().getSignJoin() );
