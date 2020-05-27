@@ -87,7 +87,7 @@ public class GameManager
     public void joinGame( Player player, String gameName )
     {
         if( this.isPlaying( player ) ) {
-            plugin.messageSender( player, Messages.ALREADY_IN_GAME, gameName );
+            plugin.messageSender( player, Messages.ALREADY_IN_GAME, this.getPlayersGame( player ).getGameConfig().getDisplayName() );
             return;
         }
         Game game = this.getGame( gameName );
