@@ -135,7 +135,7 @@ instructions:
   - "&2Designed and written by: &0pmme"
 
 signs:
-  title: '[Boost]'
+  title: '&5&l[Boost]'
   join: 'Click to join'
   leave: 'Click to leave'
   status: 'Click for status'

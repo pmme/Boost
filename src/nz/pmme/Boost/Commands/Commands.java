@@ -537,11 +537,11 @@ public class Commands implements CommandExecutor
                     if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length == 2 ) {
                         String period = args[1].toLowerCase();
-                        if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignDailyStripped() ) ) {
+                        if( period.equalsIgnoreCase( "daily" ) ) {
                             plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.DAILY );
-                        } else if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignWeeklyStripped() ) ) {
+                        } else if( period.equalsIgnoreCase( "weekly" ) ) {
                             plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.WEEKLY );
-                        } else if( period.equalsIgnoreCase( plugin.getLoadedConfig().getSignMonthlyStripped() ) ) {
+                        } else if( period.equalsIgnoreCase( "monthly" ) ) {
                             plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.MONTHLY );
                         } else break;
                         return true;

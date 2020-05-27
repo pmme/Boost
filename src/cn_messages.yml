@@ -135,7 +135,7 @@ instructions:
   - "&2作者: &0pmme"
 
 signs:
-  title: '[平台争霸]'
+  title: '&5&l[平台争霸]'
   join: '点击加入'
   leave: '点击离开'
   status: '查询状态'
