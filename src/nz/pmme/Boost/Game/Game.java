@@ -153,7 +153,6 @@ public class Game implements Comparable<Game>
                 return;
             }
         }
-
         player.playSound( player.getLocation(), plugin.getLoadedConfig().getLeaveSound(), 1, 1 );
     }
 
@@ -185,6 +184,7 @@ public class Game implements Comparable<Game>
         if( gameState == GameState.RUNNING )
         {
             PlayerInfo payerInfoLost = players.get( player.getUniqueId() );
+            player.getWorld().playSound( player.getLocation(), plugin.getLoadedConfig().getLoseSound(), plugin.getLoadedConfig().getWorldSoundRange() / 16f, 1 );
             if( payerInfoLost != null ) payerInfoLost.setLost();
             player.setVelocity( Game.VECTOR0 );
             player.setFlying( false );
@@ -281,7 +281,7 @@ public class Game implements Comparable<Game>
             playerInfo.setActive();
             plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId() );
         }
-        gameConfig.getStartSpawn().getWorld().playSound( gameConfig.getStartSpawn(), plugin.getLoadedConfig().getStartSound(), 1, 1 );
+        gameConfig.getStartSpawn().getWorld().playSound( gameConfig.getStartSpawn(), plugin.getLoadedConfig().getStartSound(), plugin.getLoadedConfig().getWorldSoundRange() / 16f, 1 );
         return true;
     }
 

@@ -57,6 +57,7 @@ public class Config
 
     private SpawnLocation mainLobbySpawn;
 
+    private int worldSoundRange;
     private Sound tickSound;
     private Sound joinSound;
     private Sound leaveSound;
@@ -232,6 +233,7 @@ public class Config
 
         mainLobbySpawn = new SpawnLocation( plugin, "main_lobby" );
 
+        worldSoundRange = plugin.getConfig().getInt( "sounds.world_sound_range", 80 );
         tickSound = this.tryGetSoundFromConfig( "sounds.tick", "ITEM_FLINTANDSTEEL_USE" );
         joinSound = this.tryGetSoundFromConfig( "sounds.join", "UI_LOOM_SELECT_PATTERN" );
         leaveSound = this.tryGetSoundFromConfig( "sounds.leave", "UI_LOOM_TAKE_RESULT" );
@@ -325,7 +327,8 @@ public class Config
         plugin.saveConfig();
     }
 
-    public Sound getTickSound() { return  tickSound; }
+    public int getWorldSoundRange() { return worldSoundRange; }
+    public Sound getTickSound() { return tickSound; }
     public Sound getJoinSound() { return joinSound; }
     public Sound getLeaveSound() { return leaveSound; }
     public Sound getStartSound() { return startSound; }

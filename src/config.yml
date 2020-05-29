@@ -27,6 +27,7 @@ main_lobby:
   yaw: 0
 
 sounds:
+  world_sound_range: 80
   tick: 'ITEM_FLINTANDSTEEL_USE'
   join: 'UI_LOOM_SELECT_PATTERN'
   leave: 'UI_LOOM_TAKE_RESULT'
