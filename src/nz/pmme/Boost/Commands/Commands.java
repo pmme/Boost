@@ -9,6 +9,7 @@ import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -559,6 +560,12 @@ public class Commands implements CommandExecutor
                                 return true;
                             }
                         }
+                        for( OfflinePlayer player : plugin.getServer().getOfflinePlayers() ) {
+                            if( player.getName().equalsIgnoreCase( args[1] ) ) {
+                                plugin.getGameManager().displayPlayerStats( sender, player );
+                                return true;
+                            }
+                        }
                         plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
                         return true;
                     } else if( sender instanceof Player ) {
@@ -577,6 +584,12 @@ public class Commands implements CommandExecutor
                         } else {
                             for( Player player : plugin.getServer().getOnlinePlayers() ) {
                                 if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
+                                    plugin.getGameManager().deletePlayerStats( sender, player );
+                                    return true;
+                                }
+                            }
+                            for( OfflinePlayer player : plugin.getServer().getOfflinePlayers() ) {
+                                if( player.getName().equalsIgnoreCase( args[1] ) ) {
                                     plugin.getGameManager().deletePlayerStats( sender, player );
                                     return true;
                                 }

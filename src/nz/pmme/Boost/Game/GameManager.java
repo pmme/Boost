@@ -8,6 +8,7 @@ import nz.pmme.Boost.Exceptions.GameDoesNotExistException;
 import nz.pmme.Boost.Main;
 import nz.pmme.Boost.Data.PlayerStats;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -260,16 +261,16 @@ public class GameManager
         }
     }
 
-    public void displayPlayerStats( CommandSender sender, Player player )
+    public void displayPlayerStats( CommandSender sender, OfflinePlayer player )
     {
         List<String> playerStatsMessage = new ArrayList<>();
         PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( StatsPeriod.TOTAL, player.getUniqueId() );
         if( playerStats == null ) {
-            plugin.messageSender( sender, Messages.PLAYER_NO_STATS, "", "%player%", player.getDisplayName() );
+            plugin.messageSender( sender, Messages.PLAYER_NO_STATS, "", "%player%", player.getName() );
         } else {
             for( String string : plugin.getLoadedConfig().getPlayerStatsTemplate() ) {
                 playerStatsMessage.add( ChatColor.translateAlternateColorCodes( '&', string
-                        .replaceAll( "%player%", player.getDisplayName() )
+                        .replaceAll( "%player%", player.getName() )
                         .replaceAll( "%games%", String.valueOf( playerStats.getGames() ) )
                         .replaceAll( "%wins%", String.valueOf( playerStats.getWins() ) )
                         .replaceAll( "%losses%", String.valueOf( playerStats.getLosses() ) )
@@ -304,7 +305,7 @@ public class GameManager
         }
     }
 
-    public void deletePlayerStats( CommandSender sender, Player player )
+    public void deletePlayerStats( CommandSender sender, OfflinePlayer player )
     {
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             plugin.getDataHandler().deleteStats( statsPeriod, player != null ? player.getUniqueId() : null );
