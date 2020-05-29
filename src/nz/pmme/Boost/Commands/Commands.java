@@ -9,7 +9,6 @@ import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -612,7 +611,18 @@ public class Commands implements CommandExecutor
                             switch( args1lower ) {
                                 case "join":
                                     sign.setLine( line++, plugin.getLoadedConfig().getSignJoin() );
-                                    sign.setLine( line++, args[2] );
+                                    String gameNameForSign = null;
+                                    if( args[2].contains( "&" ) ) {
+                                        gameNameForSign = ChatColor.translateAlternateColorCodes( '&', args[2] );
+                                    } else {
+                                        for( String game : plugin.getGameManager().getGameNames() ) {
+                                            if( ChatColor.stripColor( game ).equalsIgnoreCase( args[2] ) ) {
+                                                gameNameForSign = game;
+                                            }
+                                        }
+                                        if( gameNameForSign == null ) gameNameForSign = args[2];
+                                    }
+                                    sign.setLine( line++, gameNameForSign );
                                     break;
                                 case "leave":
                                     sign.setLine( line++, plugin.getLoadedConfig().getSignLeave() );
@@ -640,7 +650,9 @@ public class Commands implements CommandExecutor
                                     }
                                     break;
                                 default:
-                                    sign.setLine( line++, args[1] );
+                                    String arg1Coloured = ChatColor.translateAlternateColorCodes( '&', args[1] );
+                                    sign.setLine( line++, arg1Coloured );
+                                    plugin.messageSender( sender, Messages.SIGN_COMMAND_NOT_RECOGNISED, "%command%", arg1Coloured );
                                     break;
                             }
                             for( ; line < 4; ++line ) sign.setLine( line, "" );

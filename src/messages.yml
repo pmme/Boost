@@ -61,6 +61,7 @@ display_name_mismatch: "Display name without format must match '%gameconfig%&r'.
 ground_higher: "&cStart spawn Y %y% should be higher than ground %ground% for game %game%&r&c."
 not_facing_a_sign: "&cYou must be facing a sign within 5 blocks."
 sign_set: "Sign set."
+sign_command_not_recognised: "&cSign command '%command%&r&c' not recognised."
 
 player_stats:
   - "&5[Boost] &fPlayer stats: %player%"

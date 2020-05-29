@@ -65,6 +65,7 @@ public enum Messages
     GROUND_HIGHER("ground_higher"),
     NOT_FACING_A_SIGN("not_facing_a_sign"),
     SIGN_SET("sign_set"),
+    SIGN_COMMAND_NOT_RECOGNISED("sign_command_not_recognised"),
 
     END("end");
 
