@@ -64,6 +64,28 @@ public class EventsListener implements Listener
         return false;
     }
 
+    private void boostPlayer( Player otherPlayer, Player booster, boolean blockHit )
+    {
+        VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, booster );
+
+        if( blockHit ) {
+            // Set a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
+            vectorToOtherPlayer.multiply( plugin.getLoadedConfig().getBlock_hit_horizontal_velocity() );
+        } else {
+            // Calculate a horizontal boost velocity that is greater the closer you are to the target.
+            double horizontalVelocity = plugin.getLoadedConfig().getMax_horizontal_velocity() - vectorToOtherPlayer.getDistanceBetweenPlayers();
+            if( horizontalVelocity < plugin.getLoadedConfig().getMin_horizontal_velocity() )
+                horizontalVelocity = plugin.getLoadedConfig().getMin_horizontal_velocity();
+            vectorToOtherPlayer.multiply( horizontalVelocity );
+        }
+
+        // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
+        Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
+        otherPlayer.setVelocity( vectorBoost );
+
+        otherPlayer.getWorld().playSound( otherPlayer.getLocation(), plugin.getLoadedConfig().getBoostedSound(), 1, 1 );
+    }
+
     @EventHandler
     public void onPlayerInteract( PlayerInteractEvent event )
     {
@@ -122,7 +144,7 @@ public class EventsListener implements Listener
 
             final Game playersGame = plugin.getGameManager().getPlayersGame( thisPlayer );
             if( playersGame == null ) return;
-            if( !playersGame.isActiveInGame( thisPlayer ) ) return;
+            if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
 
             Block targetBlock = null;
             switch( event.getAction() ) {
@@ -143,20 +165,18 @@ public class EventsListener implements Listener
                 // Check if there is a player standing on the target block.
                 final Vector targetPotentialPlayerPosition = targetBlock.getLocation().toVector().add( VECTOR_UP );
 
-                List< Player > otherPlayers = playersGame.getActivePlayerList();
-                for( Player otherPlayer : otherPlayers ) {
-                    if( this.inTargetBox( thisPlayer.getWorld(), targetPotentialPlayerPosition, otherPlayer.getLocation() ) && this.hasBlockUnder( otherPlayer.getLocation() ) )
-                    {
-                        VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
-
-                        // Set a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
-                        vectorToOtherPlayer.multiply( plugin.getLoadedConfig().getBlock_hit_horizontal_velocity() );
-
-                        // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
-                        Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
-                        otherPlayer.setVelocity( vectorBoost );
-
-                        otherPlayer.getWorld().playSound( otherPlayer.getLocation(), plugin.getLoadedConfig().getBoostedSound(), 1, 1 );
+                if( !playersGame.isQueuing() ) {
+                    List< Player > otherPlayers = playersGame.getActivePlayerList();
+                    for( Player otherPlayer : otherPlayers ) {
+                        if( this.inTargetBox( thisPlayer.getWorld(), targetPotentialPlayerPosition, otherPlayer.getLocation() ) && this.hasBlockUnder( otherPlayer.getLocation() ) ) {
+                            this.boostPlayer( otherPlayer, thisPlayer, true );
+                        }
+                    }
+                }
+                else if( plugin.getLoadedConfig().canBoostWhileQueuing() )
+                {
+                    if( this.inTargetBox( thisPlayer.getWorld(), targetPotentialPlayerPosition, thisPlayer.getLocation() ) && this.hasBlockUnder( thisPlayer.getLocation() ) ) {
+                        this.boostPlayer( thisPlayer, thisPlayer, true );
                     }
                 }
             }
@@ -173,19 +193,7 @@ public class EventsListener implements Listener
                 final Player otherPlayer = (Player)event.getRightClicked();
                 if( plugin.getGameManager().activeInSameGame( thisPlayer, otherPlayer ) )
                 {
-                    VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, thisPlayer );
-
-                    // Calculate a horizontal boost velocity that is greater the closer you are to the target.
-                    double horizontalVelocity = plugin.getLoadedConfig().getMax_horizontal_velocity() - vectorToOtherPlayer.getDistanceBetweenPlayers();
-                    if( horizontalVelocity < plugin.getLoadedConfig().getMin_horizontal_velocity() )
-                        horizontalVelocity = plugin.getLoadedConfig().getMin_horizontal_velocity();
-                    vectorToOtherPlayer.multiply( horizontalVelocity );
-
-                    // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
-                    Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
-                    otherPlayer.setVelocity( vectorBoost );
-
-                    otherPlayer.getWorld().playSound( otherPlayer.getLocation(), plugin.getLoadedConfig().getBoostedSound(), 1, 1 );
+                    this.boostPlayer( otherPlayer, thisPlayer, false );
                 }
             }
         }

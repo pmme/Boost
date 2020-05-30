@@ -66,6 +66,8 @@ public enum Messages
     NOT_FACING_A_SIGN("not_facing_a_sign"),
     SIGN_SET("sign_set"),
     SIGN_COMMAND_NOT_RECOGNISED("sign_command_not_recognised"),
+    BOOST_WHILE_QUEUING("boost_while_queuing"),
+    NO_BOOST_WHILE_QUEUING("no_boost_while_queuing"),
 
     END("end");
 

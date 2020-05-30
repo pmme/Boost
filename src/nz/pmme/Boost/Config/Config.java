@@ -74,6 +74,8 @@ public class Config
     private GameMode lobbyGameMode;
     private GameMode buildGameMode;
 
+    private boolean boostWhileQueuing;
+
     private File sticksConfigFile = null;
     private FileConfiguration sticksConfig = null;
     private boolean boostStickRandom;
@@ -251,6 +253,8 @@ public class Config
         lobbyGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lobby", "ADVENTURE" ) );
         buildGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.build", "CREATIVE" ) );
 
+        boostWhileQueuing = plugin.getConfig().getBoolean( "boost_while_queuing", false );
+
         boostStickRandom = sticksConfig.getBoolean( "boost_sticks.random", true );
         defaultBoostStick = sticksConfig.getString( "boost_sticks.default" );
         giveOnlyBestBoostStick = sticksConfig.getBoolean( "boost_sticks.give_only_best", false );
@@ -345,6 +349,12 @@ public class Config
     public GameMode getLostGameMode() { return lostGameMode; }
     public GameMode getLobbyGameMode() { return lobbyGameMode; }
     public GameMode getBuildGameMode() { return buildGameMode; }
+
+    public boolean canBoostWhileQueuing() { return boostWhileQueuing; }
+    public void setBoostWhileQueuing( boolean boostWhileQueuing ) {
+        this.boostWhileQueuing = boostWhileQueuing;
+        plugin.saveConfig();
+    }
 
     public boolean isBoostStickRandom() { return boostStickRandom; }
     public boolean isGiveOnlyBestBoostStick() { return giveOnlyBestBoostStick; }

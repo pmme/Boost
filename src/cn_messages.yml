@@ -62,6 +62,8 @@ ground_higher: "&cStart spawn Y %y% should be higher than ground %ground% for ga
 not_facing_a_sign: "&cYou must be facing a sign within 5 blocks."
 sign_set: "Sign set."
 sign_command_not_recognised: "&cSign command '%command%&r&c' not recognised."
+boost_while_queuing: "Boosting &aenabled&r in game lobbies."
+no_boost_while_queuing: "Boosting &cdisabled&r in game lobbies."
 
 player_stats:
   - "&5[平台争霸] &f玩家统计信息: %player%"
@@ -95,6 +97,7 @@ command_usage_admin:
   - "&f/boost autoqueue Arena1 [on/off] &3- 是否打开排队"
   - "&f/boost setcountdown Arena1 [time] &3- 设置游戏开始的倒计时时间"
   - "&f/boost setannouncement Arena1 [time] &3- 设置宣布倒计时的时间"
+  - "&f/boost togglelobbyboost &3- Toggle boosting in game lobbies."
   - "&f/boost queue * &3- 开启游戏的排队所有游戏"
   - "&f/boost queue Arena1 &3- 开启游戏的排队"
   - "&f/boost start Arena1 &3- 强制开启游戏"

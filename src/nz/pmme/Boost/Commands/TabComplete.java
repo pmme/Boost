@@ -39,6 +39,7 @@ public class TabComplete implements TabCompleter
             "autoqueue",
             "setcountdown",
             "setannouncement",
+            "togglelobbyboost",
             "queue",
             "start",
             "end",

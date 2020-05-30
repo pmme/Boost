@@ -416,6 +416,12 @@ public class Commands implements CommandExecutor
                     }
                     break;
 
+                case "togglelobbyboost":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    plugin.getLoadedConfig().setBoostWhileQueuing( plugin.getLoadedConfig().canBoostWhileQueuing() ? false : true );
+                    plugin.messageSender( sender, plugin.getLoadedConfig().canBoostWhileQueuing() ? Messages.BOOST_WHILE_QUEUING : Messages.NO_BOOST_WHILE_QUEUING );
+                    return true;
+
                 case "join":
                     if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( !plugin.hasPermission( sender, "boost.join", Messages.NO_PERMISSION_CMD ) ) return true;

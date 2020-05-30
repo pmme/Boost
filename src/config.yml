@@ -45,6 +45,8 @@ gamemode:
   lobby: 'ADVENTURE'
   build: 'CREATIVE'
 
+boost_while_queuing: false
+
 #  Sample game configuration
 #  games:
 #    Arena1:
