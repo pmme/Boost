@@ -12,7 +12,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -86,74 +85,77 @@ public class EventsListener implements Listener
         otherPlayer.getWorld().playSound( otherPlayer.getLocation(), plugin.getLoadedConfig().getBoostedSound(), 1, 1 );
     }
 
+    private boolean handleSignClickEvent( Block clickedBlock, Player player)
+    {
+        if( clickedBlock.getState() instanceof Sign )
+        {
+            Sign sign = (Sign)clickedBlock.getState();
+            String[] lines = sign.getLines();
+            if( lines.length > 1 && ChatColor.stripColor( lines[0] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignTitleStripped() ) )
+            {
+                String strippedLine1 = ChatColor.stripColor( lines[1] );
+                if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignJoinStripped() ) && lines.length >= 3 ) {
+                    if( !plugin.hasPermission( player, "boost.join", Messages.NO_PERMISSION_USE ) ) return true;
+                    plugin.getGameManager().joinGame( player, ChatColor.stripColor( lines[2] ) );
+                    return true;
+                } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignLeaveStripped() ) ) {
+                    plugin.getGameManager().leaveGame( player );
+                    return true;
+                } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatusStripped() ) ) {
+                    if( !plugin.hasPermission( player, "boost.status", Messages.NO_PERMISSION_USE ) ) return true;
+                    plugin.getGameManager().displayStatus( player );
+                    return true;
+                } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatsStripped() ) ) {
+                    if( lines.length > 2 ) {
+
+                    }
+                    plugin.getGameManager().displayPlayerStats( player, player );
+                    return true;
+                } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignTopStripped() ) ) {
+                    if( lines.length > 2 ) {
+                        String strippedLine2 = ChatColor.stripColor( lines[2] );
+                        if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignDailyStripped() ) ) {
+                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.DAILY );
+                        } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignWeeklyStripped() ) ) {
+                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.WEEKLY );
+                        } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignMonthlyStripped() ) ) {
+                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.MONTHLY );
+                        } else {
+                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.TOTAL );
+                        }
+                    } else {
+                        plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.TOTAL );
+                    }
+                    return true;
+                }
+                plugin.messageSender( player, Messages.ERROR_IN_SIGN );
+                return true;
+            }
+        }
+        return false;   // Not a sign-click.
+    }
+
     @EventHandler
     public void onPlayerInteract( PlayerInteractEvent event )
     {
         if( plugin.isBoostEnabled() && plugin.isInGameWorld( event.getPlayer() ) && !plugin.isInBuildMode( event.getPlayer().getUniqueId() ) )
         {
             final Player thisPlayer = event.getPlayer();
-
-            if( event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK )
-            {
-                if( event.getClickedBlock().getState() instanceof Sign )
-                {
-                    Sign sign = (Sign)event.getClickedBlock().getState();
-                    String[] lines = sign.getLines();
-                    if( lines.length > 1 && ChatColor.stripColor( lines[0] ).equalsIgnoreCase( plugin.getLoadedConfig().getSignTitleStripped() ) )
-                    {
-                        String strippedLine1 = ChatColor.stripColor( lines[1] );
-                        if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignJoinStripped() ) && lines.length >= 3 ) {
-                            if( !plugin.hasPermission( thisPlayer, "boost.join", Messages.NO_PERMISSION_USE ) ) return;
-                            plugin.getGameManager().joinGame( thisPlayer, ChatColor.stripColor( lines[2] ) );
-                            return;
-                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignLeaveStripped() ) ) {
-                            plugin.getGameManager().leaveGame( thisPlayer );
-                            return;
-                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatusStripped() ) ) {
-                            if( !plugin.hasPermission( thisPlayer, "boost.status", Messages.NO_PERMISSION_USE ) ) return;
-                            plugin.getGameManager().displayStatus( thisPlayer );
-                            return;
-                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatsStripped() ) ) {
-                            if( lines.length > 2 ) {
-
-                            }
-                            plugin.getGameManager().displayPlayerStats( thisPlayer, thisPlayer );
-                            return;
-                        } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignTopStripped() ) ) {
-                            if( lines.length > 2 ) {
-                                String strippedLine2 = ChatColor.stripColor( lines[2] );
-                                if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignDailyStripped() ) ) {
-                                    plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.DAILY );
-                                } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignWeeklyStripped() ) ) {
-                                    plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.WEEKLY );
-                                } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignMonthlyStripped() ) ) {
-                                    plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.MONTHLY );
-                                } else {
-                                    plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.TOTAL );
-                                }
-                            } else {
-                                plugin.getGameManager().displayLeaderBoard( thisPlayer, StatsPeriod.TOTAL );
-                            }
-                            return;
-                        }
-                        plugin.messageSender( thisPlayer, Messages.ERROR_IN_SIGN );
-                        return;
-                    }
-                }
-            }
-
             final Game playersGame = plugin.getGameManager().getPlayersGame( thisPlayer );
-            if( playersGame == null ) return;
-            if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
 
             Block targetBlock = null;
             switch( event.getAction() ) {
                 case LEFT_CLICK_BLOCK:
                 case RIGHT_CLICK_BLOCK:
+                    if( handleSignClickEvent( event.getClickedBlock(), event.getPlayer() ) ) return;
+                    if( playersGame == null ) return;
+                    if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
                     targetBlock = event.getClickedBlock();
                     break;
                 case LEFT_CLICK_AIR:
                 case RIGHT_CLICK_AIR:
+                    if( playersGame == null ) return;
+                    if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
                     targetBlock = event.getPlayer().getTargetBlock( null, playersGame.getGameConfig().getTargetDist() );
                     break;
                 case PHYSICAL:
