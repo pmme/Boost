@@ -78,6 +78,7 @@ public class Config
     private FileConfiguration sticksConfig = null;
     private boolean boostStickRandom;
     private String defaultBoostStick;
+    private boolean giveOnlyBestBoostStick;
     private List<BoostStick> boostSticks = new ArrayList<>();
     private Map< String, BoostStick > boostSticksByName = new HashMap<>();
     private List<GameConfig> gameConfigList = new ArrayList<>();
@@ -252,6 +253,7 @@ public class Config
 
         boostStickRandom = sticksConfig.getBoolean( "boost_sticks.random", true );
         defaultBoostStick = sticksConfig.getString( "boost_sticks.default" );
+        giveOnlyBestBoostStick = sticksConfig.getBoolean( "boost_sticks.give_only_best", false );
         ConfigurationSection boostSticksSection = sticksConfig.getConfigurationSection( "boost_sticks.stick_types" );
         if( boostSticksSection != null ) {
             for( String boostStickName : boostSticksSection.getKeys( false ) ) {
@@ -345,6 +347,7 @@ public class Config
     public GameMode getBuildGameMode() { return buildGameMode; }
 
     public boolean isBoostStickRandom() { return boostStickRandom; }
+    public boolean isGiveOnlyBestBoostStick() { return giveOnlyBestBoostStick; }
 
     public List<BoostStick> getBoostSticks() { return boostSticks; }
 
@@ -356,21 +359,34 @@ public class Config
         return boostSticks.get( (int)( Math.random() * ( boostSticks.size() ) ) );
     }
 
-    public BoostStick getBoostStickByPerms( Player player ) {
+    public List<BoostStick> getBoostSticksByPerms( Player player ) {
         if( boostSticks.size() == 0 ) {
             plugin.getLogger().severe( "boost_sticks.stick_types configuration missing." );
             return null;
         }
+        List<BoostStick> sticks = new ArrayList<>();
         for( int stick = boostSticks.size()-1; stick >= 0; --stick ) {
-            if( player.hasPermission( "boost.stick." + boostSticks.get( stick ).getName() ) ) return boostSticks.get( stick );
+            if( player.hasPermission( "boost.stick." + boostSticks.get( stick ).getName() ) ) {
+                sticks.add( boostSticks.get( stick ) );
+                if( plugin.getLoadedConfig().isGiveOnlyBestBoostStick() ) break;
+            }
         }
-        return this.getBoostStick( defaultBoostStick );
+        if( sticks.isEmpty() && this.getBoostStick( defaultBoostStick ) != null ) {
+            sticks.add( this.getBoostStick( defaultBoostStick ) );
+        }
+        return sticks;
     }
 
     public BoostStick getBoostStick( String name ) { return boostSticksByName.get( name.toLowerCase() ); }
 
-    public BoostStick getBoostStick( Player player ) {
-        return this.isBoostStickRandom() ? this.getRandomBoostStick() : getBoostStickByPerms( player );
+    public List<BoostStick> getBoostSticksAllowedForPlayer( Player player ) {
+        if( this.isBoostStickRandom() ) {
+            List<BoostStick> sticks = new ArrayList<>();
+            sticks.add( this.getRandomBoostStick() );
+            return sticks;
+        } else {
+            return this.getBoostSticksByPerms( player );
+        }
     }
 
     public List<GameConfig> getGameList() { return gameConfigList; }

@@ -1,5 +1,6 @@
 package nz.pmme.Boost.Game;
 
+import nz.pmme.Boost.Config.BoostStick;
 import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
@@ -122,6 +123,9 @@ public class Game implements Comparable<Game>
         if( playersRequired > 0 ) plugin.messageSender( player, messagePlayerCount );
         plugin.getDataHandler().addPlayer( player.getUniqueId(), player.getDisplayName() );
         player.playSound( player.getLocation(), plugin.getLoadedConfig().getJoinSound(), 1, 1 );
+
+        this.giveBoostSticks( player );
+
         return true;
     }
 
@@ -253,14 +257,20 @@ public class Game implements Comparable<Game>
         return gameState.toString();
     }
 
-    private ItemStack createBoostStick( Player player )
+    private void giveBoostSticks( Player player )
     {
-        try {
-            return plugin.getLoadedConfig().getBoostStick( player ).create();
-        } catch( NullPointerException e ) {
-            // Empty catch to drop through to hard-coded default.
+        List<BoostStick> sticks = plugin.getLoadedConfig().getBoostSticksAllowedForPlayer( player );
+        if( sticks != null && !sticks.isEmpty() ) {
+            int slot = 0;
+            for( BoostStick stick : sticks ) {
+                player.getInventory().setItem( slot++, stick.create() );
+                if( slot == 8 ) slot = 9;   // Skip the slot used for the instruction book.
+                if( slot > 35 ) break;
+            }
+        } else {
+            player.getInventory().setItem( 0, new ItemStack( Material.DIAMOND_HOE ) );
         }
-        return new ItemStack( Material.DIAMOND_HOE );
+        player.getInventory().setHeldItemSlot( 0 );
     }
 
     public boolean start()
@@ -274,9 +284,6 @@ public class Game implements Comparable<Game>
             playerInfo.getPlayer().teleport( gameConfig.getStartSpawn() );
             playerInfo.getPlayer().setGameMode( plugin.getLoadedConfig().getPlayingGameMode() );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
-
-            playerInfo.getPlayer().getInventory().setItem( 0, this.createBoostStick( playerInfo.getPlayer() ) );
-            playerInfo.getPlayer().getInventory().setHeldItemSlot( 0 );
 
             playerInfo.setActive();
             plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId() );

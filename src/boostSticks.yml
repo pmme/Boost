@@ -1,6 +1,7 @@
 boost_sticks:
   random: true
   default: wood
+  give_only_best: false
   stick_types:
     wood:
       name: '&2Wooden Whacker'

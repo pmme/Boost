@@ -2,6 +2,7 @@ boost_sticks:
   random: true
   #默认物品材质为木头
   default: wood
+  give_only_best: false
   stick_types:
     wood:
     #可以将它改为其他名字
