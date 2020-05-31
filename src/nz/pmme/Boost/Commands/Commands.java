@@ -235,14 +235,18 @@ public class Commands implements CommandExecutor
                             return true;
                         }
                         if( args.length == 3 ) {
-                            int y = Integer.parseInt( args[2] );
-                            game.getGameConfig().setGroundLevel(y);
-                            plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
+                            try {
+                                int y = Integer.parseInt( args[2] );
+                                game.getGameConfig().setGroundLevel(y);
+                                plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
-                            Location spawn = game.getGameConfig().getStartSpawn();
-                            if( spawn != null && spawn.getBlockY() <= y ) {
-                                String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                                plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
+                                Location spawn = game.getGameConfig().getStartSpawn();
+                                if( spawn != null && spawn.getBlockY() <= y ) {
+                                    String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
+                                    plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
+                                }
+                            } catch( NumberFormatException e ) {
+                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be an integer number." ) );
                             }
                             return true;
                         }
@@ -412,6 +416,46 @@ public class Commands implements CommandExecutor
                         int countdownAnnouncementTime = Integer.parseInt( args[2] );
                         game.getGameConfig().setCountdownAnnounceTime( countdownAnnouncementTime );
                         plugin.messageSender( sender, Messages.COUNTDOWN_ANNOUNCEMENT_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( countdownAnnouncementTime ) );
+                        return true;
+                    }
+                    break;
+
+                case "addwincommand":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length >= 3 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        StringBuilder winCommand = new StringBuilder();
+                        winCommand.append( args[2] );
+                        for( int i = 3; i < args.length; ++i ) {
+                            winCommand.append( " " );
+                            winCommand.append( args[i] );
+                        }
+                        game.getGameConfig().addWinCommand( winCommand.toString() );
+                        plugin.messageSender( sender, Messages.COMMANDS_UPDATED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
+                        return true;
+                    }
+                    break;
+
+                case "removewincommand":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 3 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        try {
+                            game.getGameConfig().removeWinCommand( Integer.parseUnsignedInt( args[2], 10 ) - 1 );
+                            plugin.messageSender( sender, Messages.COMMANDS_UPDATED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
+                        } catch( NumberFormatException e ) {
+                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a integer number 1 or more." ) );
+                        } catch( IndexOutOfBoundsException e ) {
+                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be the number of the command to remove." ) );
+                        }
                         return true;
                     }
                     break;

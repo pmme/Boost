@@ -68,6 +68,7 @@ public enum Messages
     SIGN_COMMAND_NOT_RECOGNISED("sign_command_not_recognised"),
     BOOST_WHILE_QUEUING("boost_while_queuing"),
     NO_BOOST_WHILE_QUEUING("no_boost_while_queuing"),
+    COMMANDS_UPDATED("commands_updated"),
 
     END("end");
 

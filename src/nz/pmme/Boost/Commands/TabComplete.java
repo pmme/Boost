@@ -39,6 +39,8 @@ public class TabComplete implements TabCompleter
             "autoqueue",
             "setcountdown",
             "setannouncement",
+            "addwincommand",
+            "removewincommand",
             "togglelobbyboost",
             "queue",
             "start",
@@ -143,6 +145,8 @@ public class TabComplete implements TabCompleter
                 case "autoqueue":
                 case "setcountdown":
                 case "setannouncement":
+                case "addwincommand":
+                case "removewincommand":
                 case "queue":
                 case "start":
                 case "end":

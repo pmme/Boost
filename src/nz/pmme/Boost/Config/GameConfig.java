@@ -6,6 +6,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
+import java.util.Collections;
+import java.util.List;
+
 public class GameConfig
 {
     private Main plugin;
@@ -26,6 +29,7 @@ public class GameConfig
     private SpawnLocation lossSpawn;
 
     private int countdownAnnounceTime;
+    private List<String> winCommands;
 
     public GameConfig( Main plugin, String name )
     {
@@ -48,6 +52,7 @@ public class GameConfig
         this.lossSpawn = new SpawnLocation( plugin, configPath + "game_loss" );
 
         this.countdownAnnounceTime = plugin.getConfig().getInt( configPath + "countdown_announce_time", 10 );
+        this.winCommands = plugin.getConfig().getStringList( configPath + "win_commands" );
 
         Location spawn = this.startSpawn.getConfiguredSpawn();
         if( spawn != null && spawn.getBlockY() <= this.groundLevel ) {
@@ -71,7 +76,7 @@ public class GameConfig
         this.lossSpawn.setConfig();
 
         plugin.getConfig().set( configPath + "countdown_announce_time", this.countdownAnnounceTime );
-
+        plugin.getConfig().set( configPath + "win_commands", this.winCommands != null ? this.winCommands : Collections.emptyList() );
     }
 
     public String getName() {
@@ -79,7 +84,7 @@ public class GameConfig
     }
 
     public String getDisplayName() {
-        return displayName;
+        return ChatColor.translateAlternateColorCodes( '&', displayName );
     }
 
     public void setDisplayName( String newDisplayName ) throws GameDisplayNameMustMatchConfigurationException
@@ -197,6 +202,26 @@ public class GameConfig
         plugin.saveConfig();
     }
 
+    public List<String> getWinCommands() {
+        return winCommands;
+    }
+
+    public void addWinCommand( String winCommand )
+    {
+        if( winCommand != null && !winCommand.isEmpty() ) {
+            winCommands.add( winCommand );
+            this.setConfig();
+            plugin.saveConfig();
+        }
+    }
+
+    public void removeWinCommand( int index ) throws IndexOutOfBoundsException
+    {
+        winCommands.remove( index );
+        this.setConfig();
+        plugin.saveConfig();
+    }
+
     public boolean isProperlyConfigured(){
         if( this.getLobbySpawn() == null ) return false;
         if( this.getLossSpawn() == null ) return false;
@@ -237,6 +262,14 @@ public class GameConfig
         } else {
             Location spawn = this.lossSpawn.getConfiguredSpawn();
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &9" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
+        }
+        if( this.winCommands == null || this.winCommands.isEmpty() ) {
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Win commands: &3None configured" ) );
+        } else {
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Win commands:" ) );
+            for( String winCommand : this.winCommands ) {
+                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|   &3- '" ) + winCommand + ChatColor.translateAlternateColorCodes( '&',"&3'." ) );
+            }
         }
     }
 }

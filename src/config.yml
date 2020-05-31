@@ -76,4 +76,5 @@ boost_while_queuing: false
 #        y: 64
 #        z: 0
 #        yaw: 0
+#      win_commands: []
 #  
