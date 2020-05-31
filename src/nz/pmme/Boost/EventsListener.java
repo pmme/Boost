@@ -6,6 +6,7 @@ import nz.pmme.Boost.Game.Game;
 import nz.pmme.Utils.VectorToOtherPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -39,7 +40,7 @@ public class EventsListener implements Listener
         if( !targetWorld.equals( playerPosition.getWorld() ) ) return false;
         int yDelta = playerPosition.getBlockY() - targetPosition.getBlockY();
         if(     Math.abs( playerPosition.getBlockX() - targetPosition.getBlockX() ) <= plugin.getLoadedConfig().getTargetBoxH()
-            &&  yDelta >= 0 && yDelta <= plugin.getLoadedConfig().getTargetBoxV()
+            &&  yDelta >= -1 && yDelta <= plugin.getLoadedConfig().getTargetBoxV()
             &&  Math.abs( playerPosition.getBlockZ() - targetPosition.getBlockZ() ) <= plugin.getLoadedConfig().getTargetBoxH() )
         {
             return true;
@@ -54,7 +55,7 @@ public class EventsListener implements Listener
                 for( int z = playerPosition.getBlockZ() - 1; z <= playerPosition.getBlockZ() + 1; ++z ) {
                     Block block = playerPosition.getWorld().getBlockAt( x, y, z );
                     Block blockUnder = playerPosition.getWorld().getBlockAt( x, y - 1, z );
-                    if( block.isEmpty() && !blockUnder.isEmpty() ) {
+                    if( ( block.isEmpty() || !block.getType().isOccluding() ) && !blockUnder.isEmpty() ) {
                         return true;
                     }
                 }
