@@ -353,6 +353,7 @@ public class Config
     public boolean canBoostWhileQueuing() { return boostWhileQueuing; }
     public void setBoostWhileQueuing( boolean boostWhileQueuing ) {
         this.boostWhileQueuing = boostWhileQueuing;
+        plugin.getConfig().set( "boost_while_queuing", this.boostWhileQueuing );
         plugin.saveConfig();
     }
 
