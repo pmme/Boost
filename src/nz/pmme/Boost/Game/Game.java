@@ -261,16 +261,19 @@ public class Game implements Comparable<Game>
     {
         List<BoostStick> sticks = plugin.getLoadedConfig().getBoostSticksAllowedForPlayer( player );
         if( sticks != null && !sticks.isEmpty() ) {
+            int firstStickSlot = -1;
             int slot = 0;
             for( BoostStick stick : sticks ) {
-                player.getInventory().setItem( slot++, stick.create() );
-                if( slot == 8 ) slot = 9;   // Skip the slot used for the instruction book.
-                if( slot > 35 ) break;
+                for( ; slot < 36; ++slot ) {
+                    if( player.getInventory().getItem( slot ) == null || player.getInventory().getItem( slot ).getType() == Material.AIR ) {
+                        player.getInventory().setItem( slot, stick.create() );
+                        if( firstStickSlot == -1 ) firstStickSlot = slot;
+                        break;
+                    }
+                }
             }
-        } else {
-            player.getInventory().setItem( 0, new ItemStack( Material.DIAMOND_HOE ) );
+            if( firstStickSlot >= 0 && firstStickSlot <= 8 ) player.getInventory().setHeldItemSlot( firstStickSlot );
         }
-        player.getInventory().setHeldItemSlot( 0 );
     }
 
     public boolean start()

@@ -23,17 +23,25 @@ public class BoostStick
         this.plugin = plugin;
         this.name = name;
 
-        String configPath = "boost_sticks.stick_types." + this.name + ".";
+        if( boostSticksConfig != null )
+        {
+            String configPath = "boost_sticks.stick_types." + this.name + ".";
 
-        this.displayName = ChatColor.translateAlternateColorCodes( '&', boostSticksConfig.getString( configPath + "name", this.name ) );
-        String item = boostSticksConfig.getString( configPath + "item", "DIAMOND_HOE" ).toUpperCase();
-        this.material = Material.getMaterial( item );
-        if( this.material == null ) {
-            this.material = Material.DIAMOND_HOE;
-            plugin.getLogger().severe( "Material for boost stick " + this.name + " is invalid." );
+            this.displayName = ChatColor.translateAlternateColorCodes( '&', boostSticksConfig.getString( configPath + "name", this.name ) );
+            String item = boostSticksConfig.getString( configPath + "item", "DIAMOND_HOE" ).toUpperCase();
+            this.material = Material.getMaterial( item );
+            if( this.material == null ) {
+                this.material = Material.DIAMOND_HOE;
+                plugin.getLogger().severe( "Material for boost stick " + this.name + " is invalid." );
+            }
+            for( String string : boostSticksConfig.getStringList( configPath + "lore" ) ) {
+                lore.add( ChatColor.translateAlternateColorCodes( '&', string ) );
+            }
         }
-        for( String string : boostSticksConfig.getStringList( configPath + "lore" ) ) {
-            lore.add( ChatColor.translateAlternateColorCodes( '&', string ) );
+        else
+        {
+            this.displayName = this.name;
+            this.material = Material.DIAMOND_HOE;
         }
     }
 

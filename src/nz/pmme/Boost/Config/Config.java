@@ -371,19 +371,23 @@ public class Config
     }
 
     public List<BoostStick> getBoostSticksByPerms( Player player ) {
+        List<BoostStick> sticks = new ArrayList<>();
         if( boostSticks.size() == 0 ) {
             plugin.getLogger().severe( "boost_sticks.stick_types configuration missing." );
-            return null;
-        }
-        List<BoostStick> sticks = new ArrayList<>();
-        for( int stick = boostSticks.size()-1; stick >= 0; --stick ) {
-            if( player.hasPermission( "boost.stick." + boostSticks.get( stick ).getName() ) ) {
-                sticks.add( boostSticks.get( stick ) );
-                if( plugin.getLoadedConfig().isGiveOnlyBestBoostStick() ) break;
+        } else {
+            for( int stick = boostSticks.size() - 1; stick >= 0; --stick ) {
+                if( player.hasPermission( "boost.stick." + boostSticks.get( stick ).getName() ) ) {
+                    sticks.add( boostSticks.get( stick ) );
+                    if( plugin.getLoadedConfig().isGiveOnlyBestBoostStick() ) break;
+                }
             }
-        }
-        if( sticks.isEmpty() && this.getBoostStick( defaultBoostStick ) != null ) {
-            sticks.add( this.getBoostStick( defaultBoostStick ) );
+            if( sticks.isEmpty() ) {
+                if( this.getBoostStick( defaultBoostStick ) == null ) {
+                    plugin.getLogger().severe( "boost_sticks.default of '" + defaultBoostStick + "' does not match boost_sticks.stick_types.");
+                } else {
+                    sticks.add( this.getBoostStick( defaultBoostStick ) );
+                }
+            }
         }
         return sticks;
     }
@@ -393,10 +397,19 @@ public class Config
     public List<BoostStick> getBoostSticksAllowedForPlayer( Player player ) {
         if( this.isBoostStickRandom() ) {
             List<BoostStick> sticks = new ArrayList<>();
-            sticks.add( this.getRandomBoostStick() );
+            BoostStick stick = this.getRandomBoostStick();
+            if( stick != null ) {
+                sticks.add( stick );
+            } else {
+                sticks.add( new BoostStick( plugin, "Boost stick", null ) );
+            }
             return sticks;
         } else {
-            return this.getBoostSticksByPerms( player );
+            List<BoostStick> sticks = this.getBoostSticksByPerms( player );
+            if( sticks.isEmpty() ) {
+                sticks.add( new BoostStick( plugin, "Boost stick", null ) );
+            }
+            return sticks;
         }
     }
 
