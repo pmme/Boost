@@ -2,6 +2,7 @@ package nz.pmme.Boost.Commands;
 
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.StatsPeriod;
+import nz.pmme.Boost.Enums.Winner;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import nz.pmme.Boost.Exceptions.GameDisplayNameMustMatchConfigurationException;
 import nz.pmme.Boost.Exceptions.GameDoesNotExistException;
@@ -422,41 +423,91 @@ public class Commands implements CommandExecutor
 
                 case "addwincommand":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length >= 3 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                    if( args.length >= 3 )
+                    {
+                        StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
+                        if( statsPeriod != null )
+                        {
+                            if( args.length >= 4 ) {
+                                Winner winner = Winner.fromString( args[2] );
+                                if( winner != null ) {
+                                    StringBuilder winCommand = new StringBuilder();
+                                    winCommand.append( args[3] );
+                                    for( int i = 4; i < args.length; ++i ) {
+                                        winCommand.append( " " );
+                                        winCommand.append( args[i] );
+                                    }
+                                    plugin.getLoadedConfig().addWinCommand( statsPeriod, winner, winCommand.toString() );
+                                    String message = plugin.formatMessage( Messages.PERIODIC_COMMANDS_UPDATED, "", "%period%", statsPeriod.toString() )
+                                            .replaceAll( "%winner%", winner.toString() )
+                                            .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ).size() ) );
+                                    plugin.messageSender( sender, message );
+                                    return true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Game game = plugin.getGameManager().getGame( args[1] );
+                            if( game == null ) {
+                                plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                                return true;
+                            }
+                            StringBuilder winCommand = new StringBuilder();
+                            winCommand.append( args[2] );
+                            for( int i = 3; i < args.length; ++i ) {
+                                winCommand.append( " " );
+                                winCommand.append( args[i] );
+                            }
+                            game.getGameConfig().addWinCommand( winCommand.toString() );
+                            plugin.messageSender( sender, Messages.GAME_COMMANDS_UPDATED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
                             return true;
                         }
-                        StringBuilder winCommand = new StringBuilder();
-                        winCommand.append( args[2] );
-                        for( int i = 3; i < args.length; ++i ) {
-                            winCommand.append( " " );
-                            winCommand.append( args[i] );
-                        }
-                        game.getGameConfig().addWinCommand( winCommand.toString() );
-                        plugin.messageSender( sender, Messages.COMMANDS_UPDATED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
-                        return true;
                     }
                     break;
 
                 case "removewincommand":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 3 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                    if( args.length >= 3 )
+                    {
+                        StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
+                        if( statsPeriod != null )
+                        {
+                            if( args.length == 4 ) {
+                                Winner winner = Winner.fromString( args[2] );
+                                if( winner != null ) {
+                                    try {
+                                        plugin.getLoadedConfig().removeWinCommand( statsPeriod, winner, Integer.parseUnsignedInt( args[3], 10 ) - 1 );
+                                        String message = plugin.formatMessage( Messages.PERIODIC_COMMANDS_UPDATED, "", "%period%", statsPeriod.toString() )
+                                                .replaceAll( "%winner%", winner.toString() )
+                                                .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ).size() ) );
+                                        plugin.messageSender( sender, message );
+                                    } catch( NumberFormatException e ) {
+                                        plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a integer number 1 or more." ) );
+                                    } catch( IndexOutOfBoundsException e ) {
+                                        plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be the number of the command to remove." ) );
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Game game = plugin.getGameManager().getGame( args[1] );
+                            if( game == null ) {
+                                plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                                return true;
+                            }
+                            try {
+                                game.getGameConfig().removeWinCommand( Integer.parseUnsignedInt( args[2], 10 ) - 1 );
+                                plugin.messageSender( sender, Messages.GAME_COMMANDS_UPDATED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
+                            } catch( NumberFormatException e ) {
+                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a integer number 1 or more." ) );
+                            } catch( IndexOutOfBoundsException e ) {
+                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be the number of the command to remove." ) );
+                            }
                             return true;
                         }
-                        try {
-                            game.getGameConfig().removeWinCommand( Integer.parseUnsignedInt( args[2], 10 ) - 1 );
-                            plugin.messageSender( sender, Messages.COMMANDS_UPDATED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
-                        } catch( NumberFormatException e ) {
-                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a integer number 1 or more." ) );
-                        } catch( IndexOutOfBoundsException e ) {
-                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be the number of the command to remove." ) );
-                        }
-                        return true;
                     }
                     break;
 

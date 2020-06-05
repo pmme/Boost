@@ -47,6 +47,20 @@ gamemode:
 
 boost_while_queuing: false
 
+win_commands:
+  daily:
+    first: []
+    second: []
+    third: []
+  weekly:
+    first: []
+    second: []
+    third: []
+  monthly:
+    first: []
+    second: []
+    third: []
+
 #  Sample game configuration
 #  games:
 #    Arena1:

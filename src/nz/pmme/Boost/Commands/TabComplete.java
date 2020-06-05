@@ -1,6 +1,8 @@
 package nz.pmme.Boost.Commands;
 
+import com.sun.org.glassfish.external.statistics.Stats;
 import nz.pmme.Boost.Enums.StatsPeriod;
+import nz.pmme.Boost.Enums.Winner;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -122,6 +124,7 @@ public class TabComplete implements TabCompleter
         }
         else if( args.length == 2 )
         {
+            List<String> returnList = new ArrayList<>();
             String arg1lower = args[1].toLowerCase();
             switch( arg0lower )
             {
@@ -145,8 +148,6 @@ public class TabComplete implements TabCompleter
                 case "autoqueue":
                 case "setcountdown":
                 case "setannouncement":
-                case "addwincommand":
-                case "removewincommand":
                 case "queue":
                 case "start":
                 case "end":
@@ -155,10 +156,19 @@ public class TabComplete implements TabCompleter
                     if( !sender.hasPermission( "boost.admin" ) ) break;
                     return getMatchingStrings( plugin.getGameManager().getGameNames(), arg1lower );
 
+                case "addwincommand":
+                case "removewincommand":
+                    if( !sender.hasPermission( "boost.admin" ) ) break;
+                    for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
+                        if( statsPeriod == StatsPeriod.TOTAL ) break;
+                        returnList.add( statsPeriod.toString().toLowerCase() );
+                    }
+                    returnList.addAll( plugin.getGameManager().getGameNames() );
+                    return getMatchingStrings( returnList, arg1lower );
+
                 case "build":
                 case "nobuild":
                     if( !sender.hasPermission( "boost.admin" ) ) break;
-                    List<String> returnList = new ArrayList<>();
                     for( Player player : plugin.getServer().getOnlinePlayers() ) {
                         String playerNameLower = player.getName().toLowerCase();
                         if( arg1lower.isEmpty() || playerNameLower.startsWith( arg1lower ) ) {
@@ -175,9 +185,8 @@ public class TabComplete implements TabCompleter
 
                 case "addgameworld":
                     if( !sender.hasPermission( "boost.admin" ) ) break;
-                    List<String> worlds = new ArrayList<>();
-                    for( World world : plugin.getServer().getWorlds() ) worlds.add( world.getName() );
-                    return getMatchingStrings( worlds, arg1lower );
+                    for( World world : plugin.getServer().getWorlds() ) returnList.add( world.getName() );
+                    return getMatchingStrings( returnList, arg1lower );
 
                 case "removegameworld":
                     if( !sender.hasPermission( "boost.admin" ) ) break;
@@ -210,6 +219,19 @@ public class TabComplete implements TabCompleter
                         return getMatchingStrings( plugin.getGameManager().getGameNames(), arg2lower );
                     } else if( arg1lower.equals( "top" ) ) {
                         return getMatchingStrings( statsPeriods, arg2lower );
+                    }
+                    break;
+
+                case "addwincommand":
+                case "removewincommand":
+                    if( !sender.hasPermission( "boost.admin" ) ) break;
+                    StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
+                    if( statsPeriod != null ) {
+                        List<String> winners = new ArrayList<>();
+                        for( Winner winner : Winner.values() ) {
+                            winners.add( winner.toString().toLowerCase() );
+                        }
+                        return getMatchingStrings( winners, arg2lower );
                     }
                     break;
             }
