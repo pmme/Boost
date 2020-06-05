@@ -463,6 +463,29 @@ public class Config
         return commandUsage.toArray(new String[0]);
     }
 
+    public String[] getCommandUsage( boolean isAdmin, String boostCommand )
+    {
+        List<String> commandUsage = new ArrayList<>();
+        commandUsage.add( commandUsageUser.get(0) );
+        for( String command : commandUsageUser ) {
+            try {
+                if( command.split( " ", 3 )[1].equalsIgnoreCase( boostCommand ) ) {
+                    commandUsage.add( command );
+                }
+            } catch( IndexOutOfBoundsException ignored ) {}
+        }
+        if( isAdmin ) {
+            for( String command : commandUsageAdmin ) {
+                try {
+                    if( command.split( " ", 3 )[1].equalsIgnoreCase( boostCommand ) ) {
+                        commandUsage.add( command );
+                    }
+                } catch( IndexOutOfBoundsException ignored ) {}
+            }
+        }
+        return commandUsage.size() > 1 ? commandUsage.toArray(new String[0]) : getCommandUsage( isAdmin );
+    }
+
     public int getPeriodTracker( StatsPeriod statsPeriod )
     {
         switch( statsPeriod ) {

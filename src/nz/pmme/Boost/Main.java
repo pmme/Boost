@@ -45,7 +45,7 @@ public class Main extends JavaPlugin
 
     @Override
     public void onDisable() {
-        try { this.statsResetTask.cancel(); } catch( IllegalStateException e ) {};
+        try { this.statsResetTask.cancel(); } catch( IllegalStateException ignored ) {};
         this.getGameManager().clearAllGames();
         this.disableBoost();
         this.getDatabase().closeConnection();

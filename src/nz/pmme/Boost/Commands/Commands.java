@@ -733,8 +733,8 @@ public class Commands implements CommandExecutor
                         return true;
                     }
             }
+            sender.sendMessage( plugin.getLoadedConfig().getCommandUsage( sender.hasPermission( "boost.admin" ), boostCommand ) );
         }
-        sender.sendMessage( plugin.getLoadedConfig().getCommandUsage( sender.hasPermission( "boost.admin" ) ) );
         return true;
     }
 }
