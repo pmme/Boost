@@ -207,27 +207,27 @@ public class GameConfig
     public void displayConfig( CommandSender sender )
     {
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost game config:" ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Config name: &9" + this.name ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Display name: &9" + this.displayName ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: &9" + this.groundLevel ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Target distance: &9" + this.targetDist ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start countdown: &9" + this.countdown ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Countdown announcement period: &9" + this.countdownAnnounceTime ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Minimum players to start: &9" + this.minPlayers ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Maximum players: &9" + this.maxPlayers ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Auto queue: &9" + ( this.autoQueue ? "&aon" : "&coff" ) ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Config name: &3" + this.name ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Display name: &3" + this.displayName ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: &3" + this.groundLevel ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Target distance: &3" + this.targetDist ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start countdown: &3" + this.countdown ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Countdown announcement period: &3" + this.countdownAnnounceTime ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Minimum players to start: &3" + this.minPlayers ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Maximum players: &3" + this.maxPlayers ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Auto queue: &3" + ( this.autoQueue ? "&aon" : "&coff" ) ) );
         if( this.lobbySpawn.getConfiguredSpawn() == null ) {
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Lobby spawn: &cNot configured" ) );
         } else {
             Location spawn = this.lobbySpawn.getConfiguredSpawn();
-            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Lobby spawn: &9" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Lobby spawn: &3" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
         }
         if( this.startSpawn.getConfiguredSpawn() == null ) {
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn: &cNot configured" ) );
         } else {
             Location spawn = this.startSpawn.getConfiguredSpawn();
-            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn: &9" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
-            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn spread: &9" + this.startSpawn.getSpread() ) );
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn: &3" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn spread: &3" + this.startSpawn.getSpread() ) );
             if( spawn.getBlockY() <= this.groundLevel ) {
                 sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Start spawn Y " + spawn.getBlockY() + " should be higher than ground " + this.groundLevel ) );
             }
@@ -236,7 +236,7 @@ public class GameConfig
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &cNot configured" ) );
         } else {
             Location spawn = this.lossSpawn.getConfiguredSpawn();
-            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &9" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &3" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
         }
     }
 }
