@@ -554,6 +554,44 @@ public class Commands implements CommandExecutor
                     }
                     break;
 
+                case "testwincommands":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( sender instanceof Player ) {
+                        if( args.length >= 2 )
+                        {
+                            StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
+                            if( statsPeriod != null )
+                            {
+                                if( args.length >= 3 ) {
+                                    Winner winner = Winner.fromString( args[2] );
+                                    if( winner != null ) {
+                                        plugin.getLoadedConfig().runWinCommands( ((Player)sender).getUniqueId(), null, plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ) );
+                                        String message = plugin.formatMessage( Messages.PERIODIC_COMMANDS_TESTED, "", "%period%", statsPeriod.toString() )
+                                                .replaceAll( "%winner%", winner.toString() )
+                                                .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ).size() ) );
+                                        plugin.messageSender( sender, message );
+                                        return true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Game game = plugin.getGameManager().getGame( args[1] );
+                                if( game == null ) {
+                                    plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                                    return true;
+                                }
+                                plugin.getLoadedConfig().runWinCommands( ((Player)sender).getUniqueId(), game.getGameConfig().getDisplayName(), game.getGameConfig().getWinCommands() );
+                                plugin.messageSender( sender, Messages.GAME_COMMANDS_TESTED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
+                                return true;
+                            }
+                        }
+                    } else {
+                        plugin.messageSender( sender, Messages.NO_CONSOLE );
+                        return true;
+                    }
+                    break;
+
                 case "togglelobbyboost":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     plugin.getLoadedConfig().setBoostWhileQueuing( plugin.getLoadedConfig().canBoostWhileQueuing() ? false : true );

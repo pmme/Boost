@@ -44,6 +44,7 @@ public class TabComplete implements TabCompleter
             "addwincommand",
             "removewincommand",
             "showwincommands",
+            "testwincommands",
             "togglelobbyboost",
             "queue",
             "start",
@@ -158,6 +159,7 @@ public class TabComplete implements TabCompleter
                     if( !sender.hasPermission( "boost.admin" ) ) break;
                     return getMatchingStrings( plugin.getGameManager().getGameNames(), arg1lower );
 
+                case "testwincommands":
                 case "addwincommand":
                 case "removewincommand":
                     if( !sender.hasPermission( "boost.admin" ) ) break;
@@ -224,6 +226,7 @@ public class TabComplete implements TabCompleter
                     }
                     break;
 
+                case "testwincommands":
                 case "addwincommand":
                 case "removewincommand":
                     if( !sender.hasPermission( "boost.admin" ) ) break;

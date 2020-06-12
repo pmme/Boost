@@ -50,7 +50,7 @@ public class StatsResetTask extends BukkitRunnable
                     List<UUID> top3 = plugin.getDataHandler().queryTop3( statsPeriod );
                     new BukkitRunnable() {
                         @Override
-                        public void run() { plugin.getLoadedConfig().runWinCommands( statsPeriod, top3 ); }
+                        public void run() { plugin.getLoadedConfig().runPeriodicWinCommandsForTop3( statsPeriod, top3 ); }
                     }.runTask( this.plugin );
 
                     plugin.getDataHandler().deleteStats( statsPeriod, null );

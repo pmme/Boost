@@ -227,21 +227,7 @@ public class Game implements Comparable<Game>
             plugin.messageSender( playerInfo.getPlayer(), message );
         }
         plugin.getDataHandler().logWin( player.getUniqueId() );
-
-        if( this.getGameConfig().getWinCommands() != null && !this.getGameConfig().getWinCommands().isEmpty() ) {
-            for( String commandTemplate : this.getGameConfig().getWinCommands() ) {
-                String command = commandTemplate
-                        .replace( "%player%", player.getDisplayName() )
-                        .replace( "%uuid%", player.getUniqueId().toString() )
-                        .replace( "%game%", this.getGameConfig().getDisplayName() );
-                try {
-                    plugin.getServer().dispatchCommand( plugin.getServer().getConsoleSender(), command );
-                } catch( CommandException e ) {
-                    plugin.getLogger().severe( "Error in win command: '" + command + "'." );
-                    break;
-                }
-            }
-        }
+        plugin.getLoadedConfig().runWinCommands( player.getUniqueId(), this.getGameConfig().getDisplayName(), this.getGameConfig().getWinCommands() );
     }
 
     public boolean isActiveInGame( Player player )

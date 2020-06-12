@@ -525,29 +525,35 @@ public class Config
         return winCommands.get( statsPeriod ).get( winner );
     }
 
-    public void runWinCommands( StatsPeriod statsPeriod, List<UUID> top3 )
+    public void runWinCommands( UUID playerUuid, String gameName, List<String> winCommands )
+    {
+        if( winCommands == null || winCommands.isEmpty() ) return;
+        OfflinePlayer player = plugin.getServer().getOfflinePlayer( playerUuid );
+        for( String commandTemplate : winCommands ) {
+            if( player == null && commandTemplate.contains( "%player%" ) ) {
+                plugin.getLogger().warning( "Offline player '" + playerUuid.toString() + "' missing name for command '" + commandTemplate + "'." );
+            } else {
+                String command = commandTemplate
+                        .replace( "%player%", player != null ? player.getName() : "" )
+                        .replace( "%uuid%", playerUuid.toString() )
+                        .replace( "%game%", gameName != null ? gameName : "" );
+                try {
+                    plugin.getServer().dispatchCommand( plugin.getServer().getConsoleSender(), command );
+                } catch( CommandException e ) {
+                    plugin.getLogger().severe( "Error in win command: '" + command + "'." );
+                    break;
+                }
+            }
+        }
+    }
+
+    public void runPeriodicWinCommandsForTop3( StatsPeriod statsPeriod, List<UUID> top3 )
     {
         for( Winner winner : Winner.values() ) {
             try {
                 UUID uuid = top3.get( winner.getTop3Listing() );
                 if( uuid == null ) break;
-                OfflinePlayer player = plugin.getServer().getOfflinePlayer( uuid );
-                List< String > winCommands = this.getWinCommands( statsPeriod, winner );
-                for( String commandTemplate : winCommands ) {
-                    if( player == null && commandTemplate.contains( "%player%" ) ) {
-                        plugin.getLogger().warning( "Offline player '" + uuid.toString() + "' missing name for command '" + commandTemplate + "'." );
-                    } else {
-                        String command = commandTemplate
-                                .replace( "%player%", player.getName() )
-                                .replace( "%uuid%", uuid.toString() );
-                        try {
-                            plugin.getServer().dispatchCommand( plugin.getServer().getConsoleSender(), command );
-                        } catch( CommandException e ) {
-                            plugin.getLogger().severe( "Error in win command: '" + command + "'." );
-                            break;
-                        }
-                    }
-                }
+                this.runWinCommands( uuid, null, this.getWinCommands( statsPeriod, winner ) );
             } catch( IndexOutOfBoundsException e ) {
                 break;
             }
