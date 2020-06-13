@@ -9,6 +9,7 @@ import nz.pmme.Boost.Tasks.StatsResetTask;
 import nz.pmme.Boost.Data.Database;
 import nz.pmme.Boost.Data.DataHandler;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -87,6 +88,21 @@ public class Main extends JavaPlugin
 
     public DataHandler getDataHandler() {
         return dataHandler;
+    }
+
+    public UUID findPlayerByName( String name )
+    {
+        for( Player player : this.getServer().getOnlinePlayers() ) {
+            if( ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( name ) || player.getName().equalsIgnoreCase( name ) ) {
+                return player.getUniqueId();
+            }
+        }
+        for( OfflinePlayer player : this.getServer().getOfflinePlayers() ) {
+            if( player.getName().equalsIgnoreCase( name ) ) {
+                return player.getUniqueId();
+            }
+        }
+        return null;
     }
 
     public void messageSender( CommandSender sender, String message ) {
