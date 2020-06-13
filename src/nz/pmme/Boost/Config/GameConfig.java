@@ -23,6 +23,7 @@ public class GameConfig
     private int minPlayers;
     private int maxPlayers;
     private boolean autoQueue;
+    private boolean requiresPermission;
 
     private SpawnLocation lobbySpawn;
     private SpawnLocation startSpawn;
@@ -46,6 +47,7 @@ public class GameConfig
         this.minPlayers = plugin.getConfig().getInt( configPath + "min_players", 2 );
         this.maxPlayers = plugin.getConfig().getInt( configPath + "max_players", 0 );
         this.autoQueue = plugin.getConfig().getBoolean( configPath + "auto_queue", false );
+        this.requiresPermission = plugin.getConfig().getBoolean( configPath + "requires_permission", false );
 
         this.lobbySpawn = new SpawnLocation( plugin, configPath + "game_lobby" );
         this.startSpawn = new SpawnLocation( plugin, configPath + "game_start" );
@@ -70,6 +72,7 @@ public class GameConfig
         plugin.getConfig().set( configPath + "min_players", this.minPlayers );
         plugin.getConfig().set( configPath + "max_players", this.maxPlayers );
         plugin.getConfig().set( configPath + "auto_queue", this.autoQueue );
+        plugin.getConfig().set( configPath + "requires_permission", this.requiresPermission );
 
         this.lobbySpawn.setConfig();
         this.startSpawn.setConfig();
@@ -138,6 +141,17 @@ public class GameConfig
     public void setAutoQueue( boolean newAutoQueue )
     {
         autoQueue = newAutoQueue;
+        this.setConfig();
+        plugin.saveConfig();
+    }
+
+    public boolean doesRequirePermission() {
+        return requiresPermission;
+    }
+
+    public void setRequiresPermission( boolean newRequiresPermission )
+    {
+        requiresPermission = newRequiresPermission;
         this.setConfig();
         plugin.saveConfig();
     }
@@ -241,6 +255,7 @@ public class GameConfig
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Minimum players to start: &3" + this.minPlayers ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Maximum players: &3" + this.maxPlayers ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Auto queue: &3" + ( this.autoQueue ? "&aon" : "&coff" ) ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Requires permission: &3" + ( this.requiresPermission ? "&atrue" : "&cfalse" ) ) );
         if( this.lobbySpawn.getConfiguredSpawn() == null ) {
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Lobby spawn: &cNot configured" ) );
         } else {

@@ -392,6 +392,21 @@ public class Commands implements CommandExecutor
                     }
                     break;
 
+                case "requirespermission":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 3 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        boolean requiresPermission = trueValues.contains( args[2].toLowerCase() );
+                        game.getGameConfig().setRequiresPermission( requiresPermission );
+                        plugin.messageSender( sender, requiresPermission ? Messages.GAME_PERM_ENABLED : Messages.GAME_PERM_DISABLED, game.getGameConfig().getDisplayName() );
+                        return true;
+                    }
+                    break;
+
                 case "setcountdown":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length == 3 ) {

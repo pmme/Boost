@@ -6,7 +6,6 @@ import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
 import nz.pmme.Boost.Main;
 import org.bukkit.Material;
-import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -88,6 +87,10 @@ public class Game implements Comparable<Game>
 
     public boolean join( Player player )
     {
+        if( this.gameConfig.doesRequirePermission() && !player.hasPermission( "boost.join." + gameConfig.getName() ) ) {
+            plugin.messageSender( player, Messages.GAME_NOT_AVAILABLE, gameConfig.getDisplayName() );
+            return false;
+        }
         if( gameState != GameState.QUEUING )
         {
             switch( gameState )

@@ -72,6 +72,7 @@ win_commands:
 #      max_players: 0
 #      auto_queue: true
 #      countdown_announce_time: 10
+#      requires_permission: false
 #      game_start:
 #        world: world
 #        x: 100

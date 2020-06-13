@@ -72,6 +72,9 @@ public enum Messages
     PERIODIC_COMMANDS_UPDATED("periodic_commands_updated"),
     GAME_COMMANDS_TESTED("game_commands_tested"),
     PERIODIC_COMMANDS_TESTED("periodic_commands_tested"),
+    GAME_PERM_ENABLED("game_perm_enabled"),
+    GAME_PERM_DISABLED("game_perm_disabled"),
+    GAME_NOT_AVAILABLE("game_not_available"),
 
     END("end");
 

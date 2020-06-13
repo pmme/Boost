@@ -68,6 +68,9 @@ game_commands_updated: "Now %count% win commands for game %game%&r."
 periodic_commands_updated: "Now %count% win commands for %period% %winner%."
 game_commands_tested: "Tested %count% win commands for game %game%&r."
 periodic_commands_tested: "Tested %count% win commands for %period% %winner%."
+game_perm_enabled: "Require permission &aenabled&r for game %game%&r."
+game_perm_disabled: "Require permission &cdisabled&r for game %game%&r."
+game_not_available: "%game%&r is not available to you."
 
 player_stats:
   - "&5[平台争霸] &f玩家统计信息: %player%"
@@ -99,6 +102,7 @@ command_usage_admin:
   - "&f/boost setminplayers Arena1 [min] &3- 设置游戏开始的最小玩家数"
   - "&f/boost setmaxplayers Arena1 [max] &3- 设置加入游戏的最大玩家数"
   - "&f/boost autoqueue Arena1 [on/off] &3- 是否打开排队"
+  - "&f/boost requirespermission Arena1 [on/off] &3- Make game only available with permission."
   - "&f/boost setcountdown Arena1 [time] &3- 设置游戏开始的倒计时时间"
   - "&f/boost setannouncement Arena1 [time] &3- 设置宣布倒计时的时间"
   - "&f/boost addwincommand Arena1 [command] &3- Add a command executed for the winner."

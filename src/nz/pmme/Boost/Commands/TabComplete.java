@@ -39,6 +39,7 @@ public class TabComplete implements TabCompleter
             "setminplayers",
             "setmaxplayers",
             "autoqueue",
+            "requirespermission",
             "setcountdown",
             "setannouncement",
             "addwincommand",
@@ -148,6 +149,7 @@ public class TabComplete implements TabCompleter
                 case "setminplayers":
                 case "setmaxplayers":
                 case "autoqueue":
+                case "requirespermission":
                 case "setcountdown":
                 case "setannouncement":
                 case "queue":
@@ -213,6 +215,7 @@ public class TabComplete implements TabCompleter
             String arg2lower = args[2].toLowerCase();
             switch( arg0lower ) {
                 case "autoqueue":
+                case "requirespermission":
                     if( !sender.hasPermission( "boost.admin" ) ) break;
                     return getMatchingStrings( onOff, arg2lower );
 
