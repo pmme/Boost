@@ -6,6 +6,7 @@ import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
 import nz.pmme.Boost.Main;
 import org.bukkit.Material;
+import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -226,6 +227,7 @@ public class Game implements Comparable<Game>
             plugin.messageSender( playerInfo.getPlayer(), message );
         }
         plugin.getDataHandler().logWin( player.getUniqueId() );
+        plugin.getLoadedConfig().runWinCommands( player.getUniqueId(), this.getGameConfig().getDisplayName(), this.getGameConfig().getWinCommands() );
     }
 
     public boolean isActiveInGame( Player player )

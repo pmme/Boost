@@ -1,11 +1,10 @@
 package nz.pmme.Boost.Config;
 
 import nz.pmme.Boost.Enums.StatsPeriod;
+import nz.pmme.Boost.Enums.Winner;
 import nz.pmme.Boost.Main;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
+import org.bukkit.command.CommandException;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -75,6 +74,8 @@ public class Config
     private GameMode buildGameMode;
 
     private boolean boostWhileQueuing;
+
+    private Map< StatsPeriod, EnumMap< Winner, List<String> > > winCommands = new EnumMap<>(StatsPeriod.class);
 
     private File sticksConfigFile = null;
     private FileConfiguration sticksConfig = null;
@@ -254,6 +255,15 @@ public class Config
         buildGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.build", "CREATIVE" ) );
 
         boostWhileQueuing = plugin.getConfig().getBoolean( "boost_while_queuing", false );
+
+        for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
+            if( statsPeriod == StatsPeriod.TOTAL ) break;
+            EnumMap< Winner, List<String> > periodicWinCommands = new EnumMap<>(Winner.class);
+            for( Winner winner : Winner.values() ) {
+                periodicWinCommands.put( winner, plugin.getConfig().getStringList( "win_commands." + statsPeriod.toString().toLowerCase() + "." + winner.toString().toLowerCase() ) );
+            }
+            winCommands.put( statsPeriod, periodicWinCommands );
+        }
 
         boostStickRandom = sticksConfig.getBoolean( "boost_sticks.random", true );
         defaultBoostStick = sticksConfig.getString( "boost_sticks.default" );
@@ -509,5 +519,66 @@ public class Config
         } catch( IOException e ) {
             plugin.getLogger().log( Level.SEVERE, "Could not save config to \'" + statsResetConfigFile.getPath() + "\'", e );
         }
+    }
+
+    public List<String> getWinCommands( StatsPeriod statsPeriod, Winner winner ) {
+        return winCommands.get( statsPeriod ).get( winner );
+    }
+
+    public void runWinCommands( UUID playerUuid, String gameName, List<String> winCommands )
+    {
+        if( winCommands == null || winCommands.isEmpty() ) return;
+        OfflinePlayer player = plugin.getServer().getOfflinePlayer( playerUuid );
+        for( String commandTemplate : winCommands ) {
+            if( player == null && commandTemplate.contains( "%player%" ) ) {
+                plugin.getLogger().warning( "Offline player '" + playerUuid.toString() + "' missing name for command '" + commandTemplate + "'." );
+            } else {
+                String command = commandTemplate
+                        .replace( "%player%", player != null ? player.getName() : "" )
+                        .replace( "%uuid%", playerUuid.toString() )
+                        .replace( "%game%", gameName != null ? gameName : "" );
+                try {
+                    plugin.getServer().dispatchCommand( plugin.getServer().getConsoleSender(), command );
+                } catch( CommandException e ) {
+                    plugin.getLogger().severe( "Error in win command: '" + command + "'." );
+                    break;
+                }
+            }
+        }
+    }
+
+    public void runPeriodicWinCommandsForTop3( StatsPeriod statsPeriod, List<UUID> top3 )
+    {
+        for( Winner winner : Winner.values() ) {
+            try {
+                UUID uuid = top3.get( winner.getTop3Listing() );
+                if( uuid == null ) break;
+                this.runWinCommands( uuid, null, this.getWinCommands( statsPeriod, winner ) );
+            } catch( IndexOutOfBoundsException e ) {
+                break;
+            }
+        }
+    }
+
+    public void addWinCommand( StatsPeriod statsPeriod, Winner winner, String winCommand )
+    {
+        EnumMap< Winner, List<String> > periodicWinCommands = winCommands.get( statsPeriod );
+        List<String> periodicWinCommandForWinner = periodicWinCommands.get( winner );
+        periodicWinCommandForWinner.add( winCommand );
+        periodicWinCommands.put( winner, periodicWinCommandForWinner );
+        winCommands.put( statsPeriod, periodicWinCommands );
+        plugin.getConfig().set( "win_commands." + statsPeriod.toString().toLowerCase() + "." + winner.toString().toLowerCase(), periodicWinCommandForWinner );
+        plugin.saveConfig();
+    }
+
+    public void removeWinCommand( StatsPeriod statsPeriod, Winner winner, int index ) throws IndexOutOfBoundsException
+    {
+        EnumMap< Winner, List<String> > periodicWinCommands = winCommands.get( statsPeriod );
+        List<String> periodicWinCommandForWinner = periodicWinCommands.get( winner );
+        periodicWinCommandForWinner.remove( index );
+        periodicWinCommands.put( winner, periodicWinCommandForWinner );
+        winCommands.put( statsPeriod, periodicWinCommands );
+        plugin.getConfig().set( "win_commands." + statsPeriod.toString().toLowerCase() + "." + winner.toString().toLowerCase(), periodicWinCommandForWinner );
+        plugin.saveConfig();
     }
 }

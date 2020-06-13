@@ -5,6 +5,8 @@ import nz.pmme.Boost.Main;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Calendar;
+import java.util.List;
+import java.util.UUID;
 
 public class StatsResetTask extends BukkitRunnable
 {
@@ -45,9 +47,15 @@ public class StatsResetTask extends BukkitRunnable
                 }
                 if( periodCounter != plugin.getLoadedConfig().getPeriodTracker( statsPeriod ) )
                 {
+                    List<UUID> top3 = plugin.getDataHandler().queryTop3( statsPeriod );
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() { plugin.getLoadedConfig().runPeriodicWinCommandsForTop3( statsPeriod, top3 ); }
+                    }.runTask( this.plugin );
+
                     plugin.getDataHandler().deleteStats( statsPeriod, null );
                     plugin.getLoadedConfig().setPeriodTracker( statsPeriod, periodCounter );
-                    plugin.getLogger().info( statsPeriod.getName() + " player stats reset." );
+                    plugin.getLogger().info( statsPeriod.getLogName() + " player stats reset." );
                 }
             }
         }

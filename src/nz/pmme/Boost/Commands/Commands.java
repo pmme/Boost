@@ -2,6 +2,7 @@ package nz.pmme.Boost.Commands;
 
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.StatsPeriod;
+import nz.pmme.Boost.Enums.Winner;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import nz.pmme.Boost.Exceptions.GameDisplayNameMustMatchConfigurationException;
 import nz.pmme.Boost.Exceptions.GameDoesNotExistException;
@@ -19,6 +20,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by paul on 24-Apr-16.
@@ -235,14 +237,18 @@ public class Commands implements CommandExecutor
                             return true;
                         }
                         if( args.length == 3 ) {
-                            int y = Integer.parseInt( args[2] );
-                            game.getGameConfig().setGroundLevel(y);
-                            plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
+                            try {
+                                int y = Integer.parseInt( args[2] );
+                                game.getGameConfig().setGroundLevel(y);
+                                plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
-                            Location spawn = game.getGameConfig().getStartSpawn();
-                            if( spawn != null && spawn.getBlockY() <= y ) {
-                                String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                                plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
+                                Location spawn = game.getGameConfig().getStartSpawn();
+                                if( spawn != null && spawn.getBlockY() <= y ) {
+                                    String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
+                                    plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
+                                }
+                            } catch( NumberFormatException e ) {
+                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be an integer number." ) );
                             }
                             return true;
                         }
@@ -416,6 +422,201 @@ public class Commands implements CommandExecutor
                     }
                     break;
 
+                case "addwincommand":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length >= 3 )
+                    {
+                        StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
+                        if( statsPeriod != null )
+                        {
+                            if( args.length >= 4 ) {
+                                Winner winner = Winner.fromString( args[2] );
+                                if( winner != null ) {
+                                    StringBuilder winCommand = new StringBuilder();
+                                    winCommand.append( args[3] );
+                                    for( int i = 4; i < args.length; ++i ) {
+                                        winCommand.append( " " );
+                                        winCommand.append( args[i] );
+                                    }
+                                    plugin.getLoadedConfig().addWinCommand( statsPeriod, winner, winCommand.toString() );
+                                    String message = plugin.formatMessage( Messages.PERIODIC_COMMANDS_UPDATED, "", "%period%", statsPeriod.toString() )
+                                            .replaceAll( "%winner%", winner.toString() )
+                                            .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ).size() ) );
+                                    plugin.messageSender( sender, message );
+                                    return true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Game game = plugin.getGameManager().getGame( args[1] );
+                            if( game == null ) {
+                                plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                                return true;
+                            }
+                            StringBuilder winCommand = new StringBuilder();
+                            winCommand.append( args[2] );
+                            for( int i = 3; i < args.length; ++i ) {
+                                winCommand.append( " " );
+                                winCommand.append( args[i] );
+                            }
+                            game.getGameConfig().addWinCommand( winCommand.toString() );
+                            plugin.messageSender( sender, Messages.GAME_COMMANDS_UPDATED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
+                            return true;
+                        }
+                    }
+                    break;
+
+                case "removewincommand":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length >= 3 )
+                    {
+                        StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
+                        if( statsPeriod != null )
+                        {
+                            if( args.length == 4 ) {
+                                Winner winner = Winner.fromString( args[2] );
+                                if( winner != null ) {
+                                    try {
+                                        plugin.getLoadedConfig().removeWinCommand( statsPeriod, winner, Integer.parseUnsignedInt( args[3], 10 ) - 1 );
+                                        String message = plugin.formatMessage( Messages.PERIODIC_COMMANDS_UPDATED, "", "%period%", statsPeriod.toString() )
+                                                .replaceAll( "%winner%", winner.toString() )
+                                                .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ).size() ) );
+                                        plugin.messageSender( sender, message );
+                                    } catch( NumberFormatException e ) {
+                                        plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a integer number 1 or more." ) );
+                                    } catch( IndexOutOfBoundsException e ) {
+                                        plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be the number of the command to remove." ) );
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Game game = plugin.getGameManager().getGame( args[1] );
+                            if( game == null ) {
+                                plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                                return true;
+                            }
+                            try {
+                                game.getGameConfig().removeWinCommand( Integer.parseUnsignedInt( args[2], 10 ) - 1 );
+                                plugin.messageSender( sender, Messages.GAME_COMMANDS_UPDATED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
+                            } catch( NumberFormatException e ) {
+                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a integer number 1 or more." ) );
+                            } catch( IndexOutOfBoundsException e ) {
+                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be the number of the command to remove." ) );
+                            }
+                            return true;
+                        }
+                    }
+                    break;
+
+                case "showwincommands":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 1 )
+                    {
+                        for( StatsPeriod statsPeriod : StatsPeriod.values() )
+                        {
+                            if( statsPeriod == StatsPeriod.TOTAL ) break;
+                            for( Winner winner : Winner.values() )
+                            {
+                                List<String> winCommands = plugin.getLoadedConfig().getWinCommands( statsPeriod, winner );
+                                if( winCommands == null || winCommands.isEmpty() ) {
+                                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + statsPeriod.toString() + " " + winner.toString() + "&r : &3None configured" ) );
+                                } else {
+                                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + statsPeriod.toString() + " " + winner.toString() + "&r :" ) );
+                                    for( String winCommand : winCommands ) {
+                                        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|   &3- '" ) + winCommand + ChatColor.translateAlternateColorCodes( '&',"&3'." ) );
+                                    }
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                    else if( args.length == 2 )
+                    {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        List<String> winCommands = game.getGameConfig().getWinCommands();
+                        if( winCommands == null || winCommands.isEmpty() ) {
+                            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + game.getGameConfig().getDisplayName() + "&r : &3None configured" ) );
+                        } else {
+                            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + game.getGameConfig().getDisplayName() + "&r :" ) );
+                            for( String winCommand : winCommands ) {
+                                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|   &3- '" ) + winCommand + ChatColor.translateAlternateColorCodes( '&',"&3'." ) );
+                            }
+                        }
+                        return true;
+                    }
+                    break;
+
+                case "testwincommands":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length >= 2 )
+                    {
+                        StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
+                        if( statsPeriod != null )
+                        {
+                            if( args.length >= 3 ) {
+                                Winner winner = Winner.fromString( args[2] );
+                                if( winner != null ) {
+                                    UUID playerUuid = null;
+                                    if( args.length == 4 ) {
+                                        playerUuid = plugin.findPlayerByName( args[3] );
+                                        if( playerUuid == null ) {
+                                            plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[3] );
+                                            return true;
+                                        }
+                                    } else {
+                                        if( sender instanceof Player ) {
+                                            playerUuid = ((Player)sender).getUniqueId();
+                                        } else {
+                                            plugin.messageSender( sender, Messages.NO_CONSOLE );
+                                            return true;
+                                        }
+                                    }
+                                    plugin.getLoadedConfig().runWinCommands( playerUuid, null, plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ) );
+                                    String message = plugin.formatMessage( Messages.PERIODIC_COMMANDS_TESTED, "", "%period%", statsPeriod.toString() )
+                                            .replaceAll( "%winner%", winner.toString() )
+                                            .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ).size() ) );
+                                    plugin.messageSender( sender, message );
+                                    return true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Game game = plugin.getGameManager().getGame( args[1] );
+                            if( game == null ) {
+                                plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                                return true;
+                            }
+                            UUID playerUuid = null;
+                            if( args.length == 3 ) {
+                                playerUuid = plugin.findPlayerByName( args[2] );
+                                if( playerUuid == null ) {
+                                    plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[2] );
+                                    return true;
+                                }
+                            } else {
+                                if( sender instanceof Player ) {
+                                    playerUuid = ((Player)sender).getUniqueId();
+                                } else {
+                                    plugin.messageSender( sender, Messages.NO_CONSOLE );
+                                    return true;
+                                }
+                            }
+                            plugin.getLoadedConfig().runWinCommands( playerUuid, game.getGameConfig().getDisplayName(), game.getGameConfig().getWinCommands() );
+                            plugin.messageSender( sender, Messages.GAME_COMMANDS_TESTED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
+                            return true;
+                        }
+                    }
+                    break;
+
                 case "togglelobbyboost":
                     if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
                     plugin.getLoadedConfig().setBoostWhileQueuing( plugin.getLoadedConfig().canBoostWhileQueuing() ? false : true );
@@ -560,14 +761,10 @@ public class Commands implements CommandExecutor
                 case "stats":
                     if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( args.length == 2 ) {
-                        for( Player player : plugin.getServer().getOnlinePlayers() ) {
-                            if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
-                                plugin.getGameManager().displayPlayerStats( sender, player );
-                                return true;
-                            }
-                        }
-                        for( OfflinePlayer player : plugin.getServer().getOfflinePlayers() ) {
-                            if( player.getName().equalsIgnoreCase( args[1] ) ) {
+                        UUID playerUuid = plugin.findPlayerByName( args[1] );
+                        if( playerUuid != null ) {
+                            OfflinePlayer player = plugin.getServer().getOfflinePlayer( playerUuid );
+                            if( player != null ) {
                                 plugin.getGameManager().displayPlayerStats( sender, player );
                                 return true;
                             }
@@ -588,14 +785,10 @@ public class Commands implements CommandExecutor
                         if( args[1].equals( "*" ) ) {
                             plugin.getGameManager().deletePlayerStats( sender, null );
                         } else {
-                            for( Player player : plugin.getServer().getOnlinePlayers() ) {
-                                if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
-                                    plugin.getGameManager().deletePlayerStats( sender, player );
-                                    return true;
-                                }
-                            }
-                            for( OfflinePlayer player : plugin.getServer().getOfflinePlayers() ) {
-                                if( player.getName().equalsIgnoreCase( args[1] ) ) {
+                            UUID playerUuid = plugin.findPlayerByName( args[1] );
+                            if( playerUuid != null ) {
+                                OfflinePlayer player = plugin.getServer().getOfflinePlayer( playerUuid );
+                                if( player != null ) {
                                     plugin.getGameManager().deletePlayerStats( sender, player );
                                     return true;
                                 }

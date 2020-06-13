@@ -8,20 +8,28 @@ public enum StatsPeriod
     TOTAL( "player_stats","Total", "total", false );
 
     private String table;
-    private String name;
+    private String logName;
     private String configNode;
     private boolean resettable;
 
     StatsPeriod( String table, String name, String config, boolean resettable )
     {
         this.table = table;
-        this.name = name;
+        this.logName = name;
         this.configNode = config;
         this.resettable = resettable;
     }
 
     public String getTable() { return this.table; }
-    public String getName() { return this.name; }
+    public String getLogName() { return this.logName; }
     public String getConfigNode() { return this.configNode; }
     public boolean isResettable() { return this.resettable; }
+
+    public static StatsPeriod fromString( String statsPeriod ) {
+        try {
+            return StatsPeriod.valueOf( statsPeriod.toUpperCase() );
+        } catch( IllegalArgumentException e ) {
+            return null;
+        }
+    }
 }

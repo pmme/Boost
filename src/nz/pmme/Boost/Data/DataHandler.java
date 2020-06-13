@@ -221,7 +221,7 @@ public class DataHandler
         Connection connection = this.database.getConnection();
         if( connection == null ) return leaderBoard;
         try {
-            String queryLeaderBoardSql = "SELECT * FROM " + statsPeriod.getTable() + " ORDER BY wins DESC LIMIT 10";
+            String queryLeaderBoardSql = "SELECT * FROM " + statsPeriod.getTable() + " ORDER BY wins DESC, losses ASC, games DESC LIMIT 10";
             PreparedStatement queryLeaderBoardStatement = connection.prepareStatement( queryLeaderBoardSql );
             ResultSet resultSet = queryLeaderBoardStatement.executeQuery();
             while( resultSet.next() ) {
@@ -233,6 +233,30 @@ public class DataHandler
             sQLException.printStackTrace();
         }
         return leaderBoard;
+    }
+
+    public List<UUID> queryTop3( StatsPeriod statsPeriod )
+    {
+        List<UUID> top3 = new ArrayList<>();
+        Connection connection = this.database.getConnection();
+        if( connection == null ) return top3;
+        try {
+            String queryLeaderBoardSql = "SELECT player_id FROM " + statsPeriod.getTable() + " WHERE wins>0 ORDER BY wins DESC, losses ASC, games ASC LIMIT 3";
+            PreparedStatement queryLeaderBoardStatement = connection.prepareStatement( queryLeaderBoardSql );
+            ResultSet resultSet = queryLeaderBoardStatement.executeQuery();
+            while( resultSet.next() ) {
+                try {
+                    top3.add( UUID.fromString( resultSet.getString( "player_id" ) ) );
+                } catch( IllegalArgumentException e ) {
+                    plugin.getLogger().warning( "Failed to convert player_id '" + resultSet.getString( "player_id" ) + "' to UUID when issuing rewards." );
+                }
+            }
+        }
+        catch (SQLException sQLException) {
+            plugin.getLogger().severe( "Failed to query " + statsPeriod.getTable() + " leader board" );
+            sQLException.printStackTrace();
+        }
+        return top3;
     }
 
     public void deleteStats( StatsPeriod statsPeriod, UUID playerId )
