@@ -135,6 +135,8 @@ public class Game implements Comparable<Game>
 
     public void leave( Player player )
     {
+        PlayerInfo playerInfo = players.get( player.getUniqueId() );
+        if( playerInfo != null ) playerInfo.resetCoolDown();
         players.remove( player.getUniqueId() );
         player.setVelocity( Game.VECTOR0 );
         player.setFlying( false );
@@ -247,6 +249,20 @@ public class Game implements Comparable<Game>
         return playerInfo.getPlayerStateText();
     }
 
+    public boolean isOnCoolDown( Player player )
+    {
+        PlayerInfo playerInfo = players.get( player.getUniqueId() );
+        return playerInfo != null && playerInfo.isOnCoolDown();
+    }
+
+    public void coolDown( Player player )
+    {
+        PlayerInfo playerInfo = players.get( player.getUniqueId() );
+        if( playerInfo != null ) {
+            playerInfo.setOnCoolDown( plugin, plugin.getLoadedConfig().getCoolDown() );
+        }
+    }
+
     public boolean isRunning()
     {
         return gameState == GameState.RUNNING;
@@ -287,6 +303,7 @@ public class Game implements Comparable<Game>
         gameState = GameState.RUNNING;
         for( PlayerInfo playerInfo : players.values() )
         {
+            playerInfo.resetCoolDown();
             playerInfo.getPlayer().setVelocity( Game.VECTOR0 );
             playerInfo.getPlayer().setFlying( false );
             playerInfo.getPlayer().teleport( gameConfig.getStartSpawn() );
@@ -307,6 +324,7 @@ public class Game implements Comparable<Game>
         gameState = GameState.STOPPED;
         for( PlayerInfo playerInfo : players.values() )
         {
+            playerInfo.resetCoolDown();
             playerInfo.getPlayer().setVelocity( Game.VECTOR0 );
             playerInfo.getPlayer().setFlying( false );
             playerInfo.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
