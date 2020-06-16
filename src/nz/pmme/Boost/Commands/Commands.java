@@ -138,9 +138,13 @@ public class Commands implements CommandExecutor
                     if( args.length == 5 ) {
                         World world = plugin.getServer().getWorld( args[1] );
                         if( world != null ) {
-                            Location spawn = new Location( world, Double.parseDouble( args[2] ), Double.parseDouble( args[3] ), Double.parseDouble( args[4] ) );
-                            plugin.getLoadedConfig().setMainLobbySpawn( spawn );
-                            plugin.messageSender( sender, Messages.MAIN_SPAWN_SET );
+                            try {
+                                Location spawn = new Location( world, Double.parseDouble( args[2] ), Double.parseDouble( args[3] ), Double.parseDouble( args[4] ) );
+                                plugin.getLoadedConfig().setMainLobbySpawn( spawn );
+                                plugin.messageSender( sender, Messages.MAIN_SPAWN_SET );
+                            } catch( NumberFormatException e ) {
+                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last three parameters must be numbers." ) );
+                            }
                         } else {
                             plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, "%world%", args[1] );
                         }
@@ -289,7 +293,12 @@ public class Commands implements CommandExecutor
                         if( args.length == 6 ) {
                             World world = plugin.getServer().getWorld( args[2] );
                             if( world != null ) {
-                                spawn = new Location( world, Double.parseDouble( args[3] ), Double.parseDouble( args[4] ), Double.parseDouble( args[5] ) );
+                                try {
+                                    spawn = new Location( world, Double.parseDouble( args[3] ), Double.parseDouble( args[4] ), Double.parseDouble( args[5] ) );
+                                } catch( NumberFormatException e ) {
+                                    plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last three parameters must be numbers." ) );
+                                    return true;
+                                }
                             } else {
                                 plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, "%world%", args[2] );
                                 return true;
@@ -340,9 +349,13 @@ public class Commands implements CommandExecutor
                             plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
                             return true;
                         }
-                        int spread = Integer.parseInt( args[2] );
-                        game.getGameConfig().setSpawnSpread( spread );
-                        plugin.messageSender( sender, Messages.SPREAD_SET, game.getGameConfig().getDisplayName(), "%spread%", String.valueOf( spread ) );
+                        try {
+                            int spread = Integer.parseUnsignedInt( args[2] );
+                            game.getGameConfig().setSpawnSpread( spread );
+                            plugin.messageSender( sender, Messages.SPREAD_SET, game.getGameConfig().getDisplayName(), "%spread%", String.valueOf( spread ) );
+                        } catch( NumberFormatException e ) {
+                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
+                        }
                         return true;
                     }
                     break;
@@ -355,9 +368,13 @@ public class Commands implements CommandExecutor
                             plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
                             return true;
                         }
-                        int minPlayers = Integer.parseInt( args[2] );
-                        game.getGameConfig().setMinPlayers( minPlayers );
-                        plugin.messageSender( sender, Messages.MIN_PLAYERS_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( minPlayers ) );
+                        try {
+                            int minPlayers = Integer.parseUnsignedInt( args[2] );
+                            game.getGameConfig().setMinPlayers( minPlayers );
+                            plugin.messageSender( sender, Messages.MIN_PLAYERS_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( minPlayers ) );
+                        } catch( NumberFormatException e ) {
+                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
+                        }
                         return true;
                     }
                     break;
@@ -370,9 +387,13 @@ public class Commands implements CommandExecutor
                             plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
                             return true;
                         }
-                        int maxPlayers = Integer.parseInt( args[2] );
-                        game.getGameConfig().setMaxPlayers( maxPlayers );
-                        plugin.messageSender( sender, Messages.MAX_PLAYERS_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( maxPlayers ) );
+                        try {
+                            int maxPlayers = Integer.parseUnsignedInt( args[2] );
+                            game.getGameConfig().setMaxPlayers( maxPlayers );
+                            plugin.messageSender( sender, Messages.MAX_PLAYERS_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( maxPlayers ) );
+                        } catch( NumberFormatException e ) {
+                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
+                        }
                         return true;
                     }
                     break;
@@ -415,9 +436,13 @@ public class Commands implements CommandExecutor
                             plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
                             return true;
                         }
-                        int countdown = Integer.parseInt( args[2] );
-                        game.getGameConfig().setCountdown( countdown );
-                        plugin.messageSender( sender, Messages.COUNTDOWN_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( countdown ) );
+                        try {
+                            int countdown = Integer.parseUnsignedInt( args[2] );
+                            game.getGameConfig().setCountdown( countdown );
+                            plugin.messageSender( sender, Messages.COUNTDOWN_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( countdown ) );
+                        } catch( NumberFormatException e ) {
+                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
+                        }
                         return true;
                     }
                     break;
@@ -430,9 +455,13 @@ public class Commands implements CommandExecutor
                             plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
                             return true;
                         }
-                        int countdownAnnouncementTime = Integer.parseInt( args[2] );
-                        game.getGameConfig().setCountdownAnnounceTime( countdownAnnouncementTime );
-                        plugin.messageSender( sender, Messages.COUNTDOWN_ANNOUNCEMENT_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( countdownAnnouncementTime ) );
+                        try {
+                            int countdownAnnouncementTime = Integer.parseUnsignedInt( args[2] );
+                            game.getGameConfig().setCountdownAnnounceTime( countdownAnnouncementTime );
+                            plugin.messageSender( sender, Messages.COUNTDOWN_ANNOUNCEMENT_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( countdownAnnouncementTime ) );
+                        } catch( NumberFormatException e ) {
+                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
+                        }
                         return true;
                     }
                     break;
