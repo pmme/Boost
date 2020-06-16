@@ -638,6 +638,19 @@ public class Commands implements CommandExecutor
                     plugin.messageSender( sender, plugin.getLoadedConfig().canBoostWhileQueuing() ? Messages.BOOST_WHILE_QUEUING : Messages.NO_BOOST_WHILE_QUEUING );
                     return true;
 
+                case "setcooldown":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 2 ) {
+                        try {
+                            plugin.getLoadedConfig().setCoolDown( Long.parseUnsignedLong( args[1] ) );
+                            plugin.messageSender( sender, Messages.COOL_DOWN_SET, "%count%", String.valueOf( plugin.getLoadedConfig().getCoolDown() ) );
+                        } catch( NumberFormatException e ) {
+                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
+                        }
+                        return true;
+                    }
+                    break;
+
                 case "join":
                     if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
                     if( !plugin.hasPermission( sender, "boost.join", Messages.NO_PERMISSION_CMD ) ) return true;

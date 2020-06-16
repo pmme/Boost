@@ -47,6 +47,7 @@ public class TabComplete implements TabCompleter
             "showwincommands",
             "testwincommands",
             "togglelobbyboost",
+            "setcooldown",
             "queue",
             "start",
             "end",

@@ -44,11 +44,13 @@ public class PlayerInfo
     }
 
     public void setOnCoolDown( JavaPlugin plugin, long coolDown ) {
-        onCoolDown = true;
-        coolDownTask = (new BukkitRunnable() {
-            @Override
-            public void run() { onCoolDown = false; }
-        }).runTaskLaterAsynchronously( plugin, coolDown );
+        if( coolDown > 0 ) {
+            onCoolDown = true;
+            coolDownTask = ( new BukkitRunnable() {
+                @Override
+                public void run() { onCoolDown = false; }
+            } ).runTaskLaterAsynchronously( plugin, coolDown );
+        }
     }
 
     public void resetCoolDown() {

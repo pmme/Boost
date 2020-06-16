@@ -224,7 +224,7 @@ public class Config
         max_horizontal_velocity = plugin.getConfig().getDouble( "physics.max_horizontal_velocity", 2.5 );
         min_horizontal_velocity = plugin.getConfig().getDouble( "physics.min_horizontal_velocity", 0.1 );
         block_hit_horizontal_velocity = plugin.getConfig().getDouble( "physics.block_hit_horizontal_velocity", 2.5 );
-        coolDown = plugin.getConfig().getLong( "physics.cooldown", 5L );
+        coolDown = plugin.getConfig().getLong( "physics.cooldown", 10L );
 
         signTitle = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.title", "[Boost]" ) );
         signJoin = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.join", "Click to join" ) );
@@ -317,7 +317,13 @@ public class Config
     public double getMax_horizontal_velocity() { return max_horizontal_velocity; }
     public double getMin_horizontal_velocity() { return min_horizontal_velocity;}
     public double getBlock_hit_horizontal_velocity() { return block_hit_horizontal_velocity; }
+
     public long getCoolDown() { return coolDown; }
+    public void setCoolDown( long coolDown ) {
+        this.coolDown = coolDown;
+        plugin.getConfig().set( "physics.cooldown", this.coolDown );
+        plugin.saveConfig();
+    }
 
     public String getSignTitle() { return signTitle; }
     public String getSignTitleStripped() { return ChatColor.stripColor( signTitle ); }
