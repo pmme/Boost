@@ -75,6 +75,7 @@ public enum Messages
     GAME_PERM_ENABLED("game_perm_enabled"),
     GAME_PERM_DISABLED("game_perm_disabled"),
     GAME_NOT_AVAILABLE("game_not_available"),
+    COOL_DOWN_SET("cool_down_set"),
 
     END("end");
 

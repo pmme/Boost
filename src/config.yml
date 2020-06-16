@@ -8,6 +8,7 @@ physics:
   block_hit_horizontal_velocity: 2.5
   target_box_width: 3
   target_box_height: 2
+  cooldown: 10
 
 SQLite: true
 sql:

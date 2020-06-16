@@ -151,12 +151,14 @@ public class EventsListener implements Listener
                     if( handleSignClickEvent( event.getClickedBlock(), event.getPlayer() ) ) return;
                     if( playersGame == null ) return;
                     if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
+                    if( playersGame.isOnCoolDown( thisPlayer ) ) return;
                     targetBlock = event.getClickedBlock();
                     break;
                 case LEFT_CLICK_AIR:
                 case RIGHT_CLICK_AIR:
                     if( playersGame == null ) return;
                     if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
+                    if( playersGame.isOnCoolDown( thisPlayer ) ) return;
                     targetBlock = event.getPlayer().getTargetBlock( null, playersGame.getGameConfig().getTargetDist() );
                     break;
                 case PHYSICAL:
@@ -182,6 +184,7 @@ public class EventsListener implements Listener
                         this.boostPlayer( thisPlayer, thisPlayer, true );
                     }
                 }
+                playersGame.coolDown( thisPlayer );
             }
         }
     }
@@ -193,11 +196,14 @@ public class EventsListener implements Listener
             if( event.getRightClicked() instanceof Player )
             {
                 final Player thisPlayer = event.getPlayer();
+                final Game playersGame = plugin.getGameManager().getPlayersGame( thisPlayer );
+                if( playersGame.isOnCoolDown( thisPlayer ) ) return;
                 final Player otherPlayer = (Player)event.getRightClicked();
                 if( plugin.getGameManager().activeInSameGame( thisPlayer, otherPlayer ) )
                 {
                     this.boostPlayer( otherPlayer, thisPlayer, false );
                 }
+                playersGame.coolDown( thisPlayer );
             }
         }
     }
