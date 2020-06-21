@@ -42,6 +42,10 @@ public class Main extends JavaPlugin
         this.getCommand( "boost" ).setTabCompleter( new TabComplete(this) );
         this.getServer().getPluginManager().registerEvents( new EventsListener(this), this );
         this.statsResetTask.startTask();
+
+        if( this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new nz.pmme.Boost.papi.BoostExpansion(this).register();
+        }
     }
 
     @Override
