@@ -3,6 +3,7 @@ package nz.pmme.Boost.papi;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import nz.pmme.Boost.Data.PlayerStats;
 import nz.pmme.Boost.Enums.StatsPeriod;
+import nz.pmme.Boost.Enums.Winner;
 import nz.pmme.Boost.Main;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -77,13 +78,14 @@ public class BoostExpansion extends PlaceholderExpansion {
         String paramsLower = params.toLowerCase();
         int firstUnderscore = paramsLower.indexOf( '_' );
         int secondUnderscore = ( firstUnderscore != -1 ) ? paramsLower.indexOf( '_', firstUnderscore + 1 ) : -1;
+        int thirdUnderscore = ( secondUnderscore != -1 ) ? paramsLower.indexOf( '_', secondUnderscore + 1 ) : -1;
         if( paramsLower.startsWith( "top" ) )
         {
-            // top2_daily_player
-            // top1_total_wins
-            // top3_monthly_losses
-            // top2_weekly_games
-            // top3_total_rank
+            // top_daily_first_player
+            // top_weekly_second_wins
+            // top_monthly_third_losses
+            // top_total_first_rank
+            // top_daily_third_games
             try {
                 String periodParam = paramsLower.substring( firstUnderscore+1, secondUnderscore );
                 StatsPeriod period = StatsPeriod.fromString( periodParam );
@@ -91,12 +93,17 @@ public class BoostExpansion extends PlaceholderExpansion {
                     plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
                     return "";
                 }
-                List< UUID > top3 = plugin.getDataHandler().queryTop3( period );
-                String positionParam = paramsLower.substring( 3, 4 );
-                int position = Integer.parseInt( positionParam );
-                OfflinePlayer topPlayer = position < top3.size() ? plugin.getServer().getOfflinePlayer( top3.get( position-1 ) ) : null;
+                String positionParam = paramsLower.substring( secondUnderscore+1, thirdUnderscore );
+                Winner winner = Winner.fromString( positionParam );
+                if( winner == null ) {
+                    plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
+                    return "";
+                }
 
-                String param = paramsLower.substring( secondUnderscore+1 );
+                List< UUID > top3 = plugin.getDataHandler().queryTop3( period );
+                OfflinePlayer topPlayer = winner.getTop3Listing() < top3.size() ? plugin.getServer().getOfflinePlayer( top3.get( winner.getTop3Listing() ) ) : null;
+
+                String param = paramsLower.substring( thirdUnderscore+1 );
                 return getStatsValue( topPlayer, params, period, param );
             } catch( NumberFormatException | StringIndexOutOfBoundsException e ) {
                 plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
