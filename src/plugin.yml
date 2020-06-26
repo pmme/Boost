@@ -7,6 +7,7 @@ main: nz.pmme.Boost.Main
 load: POSTWORLD
 softdepend:
   - Multiverse-Core
+  - PlaceholderAPI
 
 commands:
   boost:
