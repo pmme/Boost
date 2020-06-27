@@ -102,7 +102,8 @@ public class Main extends JavaPlugin
             }
         }
         for( OfflinePlayer player : this.getServer().getOfflinePlayers() ) {
-            if( player.getName().equalsIgnoreCase( name ) ) {
+            String playerName = player.getName();
+            if( playerName != null && playerName.equalsIgnoreCase( name ) ) {
                 return player.getUniqueId();
             }
         }

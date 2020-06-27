@@ -263,14 +263,15 @@ public class GameManager
 
     public void displayPlayerStats( CommandSender sender, OfflinePlayer player )
     {
+        String playerName = player.getName();
         List<String> playerStatsMessage = new ArrayList<>();
         PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( StatsPeriod.TOTAL, player.getUniqueId() );
         if( playerStats == null ) {
-            plugin.messageSender( sender, Messages.PLAYER_NO_STATS, "", "%player%", player.getName() );
+            plugin.messageSender( sender, Messages.PLAYER_NO_STATS, "", "%player%", playerName != null ? playerName : player.getUniqueId().toString() );
         } else {
             for( String string : plugin.getLoadedConfig().getPlayerStatsTemplate() ) {
                 playerStatsMessage.add( ChatColor.translateAlternateColorCodes( '&', string
-                        .replaceAll( "%player%", player.getName() )
+                        .replaceAll( "%player%", playerName != null ? playerName : player.getUniqueId().toString() )
                         .replaceAll( "%games%", String.valueOf( playerStats.getGames() ) )
                         .replaceAll( "%wins%", String.valueOf( playerStats.getWins() ) )
                         .replaceAll( "%losses%", String.valueOf( playerStats.getLosses() ) )

@@ -537,13 +537,13 @@ public class Config
     public void runWinCommands( UUID playerUuid, String gameName, List<String> winCommands )
     {
         if( winCommands == null || winCommands.isEmpty() ) return;
-        OfflinePlayer player = plugin.getServer().getOfflinePlayer( playerUuid );
+        String playerName = plugin.getServer().getOfflinePlayer( playerUuid ).getName();
         for( String commandTemplate : winCommands ) {
-            if( player == null && commandTemplate.contains( "%player%" ) ) {
+            if( playerName == null && commandTemplate.contains( "%player%" ) ) {
                 plugin.getLogger().warning( "Offline player '" + playerUuid.toString() + "' missing name for command '" + commandTemplate + "'." );
             } else {
                 String command = commandTemplate
-                        .replace( "%player%", player != null ? player.getName() : "" )
+                        .replace( "%player%", playerName != null ? playerName : "" )
                         .replace( "%uuid%", playerUuid.toString() )
                         .replace( "%game%", gameName != null ? gameName : "" );
                 try {
