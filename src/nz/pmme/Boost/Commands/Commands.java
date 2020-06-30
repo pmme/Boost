@@ -10,6 +10,7 @@ import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -406,6 +407,29 @@ public class Commands implements CommandExecutor
                             plugin.messageSender( sender, Messages.SPREAD_SET, game.getGameConfig().getDisplayName(), "%spread%", String.valueOf( spread ) );
                         } catch( NumberFormatException e ) {
                             plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
+                        }
+                        return true;
+                    }
+                    break;
+
+                case "setboostblock":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length == 2 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        if( sender instanceof Player ) {
+                            Material material = ((Player)sender).getInventory().getItemInMainHand().getType();
+                            game.getGameConfig().setBoostBlock( material );
+                            if( game.getGameConfig().getBoostBlock() != null ) {
+                                plugin.messageSender( sender, Messages.BOOST_BLOCK_SET, game.getGameConfig().getDisplayName(), "%block%", game.getGameConfig().getBoostBlock().toString() );
+                            } else {
+                                plugin.messageSender( sender, Messages.BOOST_BLOCK_DISABLED, game.getGameConfig().getDisplayName() );
+                            }
+                        } else {
+                            plugin.messageSender( sender, Messages.NO_CONSOLE );
                         }
                         return true;
                     }

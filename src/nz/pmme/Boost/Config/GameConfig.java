@@ -4,6 +4,7 @@ import nz.pmme.Boost.Exceptions.GameDisplayNameMustMatchConfigurationException;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -25,6 +26,7 @@ public class GameConfig
     private int maxPlayers;
     private boolean autoQueue;
     private boolean requiresPermission;
+    private Material boostBlock = null;
 
     private SpawnLocation lobbySpawn;
     private SpawnLocation startSpawn;
@@ -50,6 +52,15 @@ public class GameConfig
         this.maxPlayers = plugin.getConfig().getInt( configPath + "max_players", 0 );
         this.autoQueue = plugin.getConfig().getBoolean( configPath + "auto_queue", false );
         this.requiresPermission = plugin.getConfig().getBoolean( configPath + "requires_permission", false );
+
+        String boostBlockName = plugin.getConfig().getString( configPath + "boost_block", "" ).toUpperCase();
+        if( !boostBlockName.isEmpty() ) {
+            try {
+                this.boostBlock = Material.valueOf( boostBlockName );
+            } catch( IllegalArgumentException e ) {
+                plugin.getLogger().warning( "Boost block " + boostBlockName + " is not a recognised material name." );
+            }
+        }
 
         this.lobbySpawn = new SpawnLocation( plugin, configPath + "game_lobby" );
         this.startSpawn = new SpawnLocation( plugin, configPath + "game_start" );
@@ -84,6 +95,7 @@ public class GameConfig
         plugin.getConfig().set( configPath + "max_players", this.maxPlayers );
         plugin.getConfig().set( configPath + "auto_queue", this.autoQueue );
         plugin.getConfig().set( configPath + "requires_permission", this.requiresPermission );
+        plugin.getConfig().set( configPath + "boost_block", this.boostBlock != null ? this.boostBlock.toString() : "" );
 
         this.lobbySpawn.setConfig();
         this.startSpawn.setConfig();
@@ -163,6 +175,17 @@ public class GameConfig
     public void setRequiresPermission( boolean newRequiresPermission )
     {
         requiresPermission = newRequiresPermission;
+        this.setConfig();
+        plugin.saveConfig();
+    }
+
+    public Material getBoostBlock() {
+        return boostBlock;
+    }
+
+    public void setBoostBlock( Material material )
+    {
+        boostBlock = material != Material.AIR ? material : null;
         this.setConfig();
         plugin.saveConfig();
     }
@@ -280,6 +303,7 @@ public class GameConfig
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Maximum players: &3" + this.maxPlayers ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Auto queue: &3" + ( this.autoQueue ? "&aon" : "&coff" ) ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Requires permission: &3" + ( this.requiresPermission ? "&atrue" : "&cfalse" ) ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Boost block: &3" + ( this.boostBlock != null ? this.boostBlock.toString() : "-" ) ) );
         if( this.lobbySpawn.getConfiguredSpawn() == null ) {
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Lobby spawn: &cNot configured" ) );
         } else {

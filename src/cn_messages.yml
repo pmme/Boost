@@ -74,6 +74,8 @@ game_perm_enabled: "Require permission &aenabled&r for game %game%&r."
 game_perm_disabled: "Require permission &cdisabled&r for game %game%&r."
 game_not_available: "%game%&r is not available to you."
 cool_down_set: "Cool down set to %count%ms."
+boost_block_set: "Boost block for %game%&r set to %block%."
+boost_block_disabled: "%game%&r set to have no Boost block."
 
 player_stats:
   - "&5[平台争霸] &f玩家统计信息: %player%"
@@ -103,6 +105,7 @@ command_usage_admin:
   - "&f/boost setlobby Arena1 <world x y z> &3- 设置加入大厅传送的位置"
   - "&f/boost setloss Arena1 <world x y z> &3- 设置离开游戏传送的位置"
   - "&f/boost setspread Arena1 [spread] &3- 设置玩家传送时的分散距离"
+  - "&f/boost setboostblock Arena1 &3- Set a block that boosts you when stepped on."
   - "&f/boost setminplayers Arena1 [min] &3- 设置游戏开始的最小玩家数"
   - "&f/boost setmaxplayers Arena1 [max] &3- 设置加入游戏的最大玩家数"
   - "&f/boost autoqueue Arena1 [on/off] &3- 是否打开排队"

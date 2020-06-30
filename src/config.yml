@@ -75,6 +75,7 @@ win_commands:
 #      auto_queue: true
 #      countdown_announce_time: 10
 #      requires_permission: false
+#      boost_block: REDSTONE_ORE
 #      game_start:
 #        world: world
 #        x: 100

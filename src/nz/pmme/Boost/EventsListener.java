@@ -6,7 +6,6 @@ import nz.pmme.Boost.Game.Game;
 import nz.pmme.Utils.VectorToOtherPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -64,26 +63,31 @@ public class EventsListener implements Listener
         return false;
     }
 
-    private void boostPlayer( Player otherPlayer, Player booster, boolean blockHit )
+    private void boostPlayer( Player player, Vector vector )
     {
-        VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( otherPlayer, booster );
-
-        if( blockHit ) {
-            // Set a horizontal boost velocity of medium magnitude, a medium gain from hitting their block.
-            vectorToOtherPlayer.multiply( plugin.getLoadedConfig().getBlock_hit_horizontal_velocity() );
-        } else {
-            // Calculate a horizontal boost velocity that is greater the closer you are to the target.
-            double horizontalVelocity = plugin.getLoadedConfig().getMax_horizontal_velocity() - vectorToOtherPlayer.getDistanceBetweenPlayers();
-            if( horizontalVelocity < plugin.getLoadedConfig().getMin_horizontal_velocity() )
-                horizontalVelocity = plugin.getLoadedConfig().getMin_horizontal_velocity();
-            vectorToOtherPlayer.multiply( horizontalVelocity );
-        }
-
         // Final boost vector is our calculated horizontal velocity and our constant vertical velocity.
-        Vector vectorBoost = new Vector( vectorToOtherPlayer.getX(), plugin.getLoadedConfig().getVertical_velocity(), vectorToOtherPlayer.getZ() );
-        otherPlayer.setVelocity( vectorBoost );
+        Vector vectorBoost = new Vector( vector.getX(), plugin.getLoadedConfig().getVertical_velocity(), vector.getZ() );
+        player.setVelocity( vectorBoost );
 
-        otherPlayer.getWorld().playSound( otherPlayer.getLocation(), plugin.getLoadedConfig().getBoostedSound(), 1, 1 );
+        player.getWorld().playSound( player.getLocation(), plugin.getLoadedConfig().getBoostedSound(), 1, 1 );
+    }
+
+    private void boostPlayer( Player player, Location from, Location to )
+    {
+        VectorToOtherPlayer vector = new VectorToOtherPlayer( from, to );
+        vector.multiply( plugin.getLoadedConfig().getBlock_hit_horizontal_velocity() );
+        this.boostPlayer( player, vector );
+    }
+
+    private void boostPlayer( Player otherPlayer, Player booster )
+    {
+        VectorToOtherPlayer vectorToOtherPlayer = new VectorToOtherPlayer( booster.getLocation(), otherPlayer.getLocation() );
+        // Calculate a horizontal boost velocity that is greater the closer you are to the target.
+        double horizontalVelocity = plugin.getLoadedConfig().getMax_horizontal_velocity() - vectorToOtherPlayer.getDistanceBetweenPlayers();
+        if( horizontalVelocity < plugin.getLoadedConfig().getMin_horizontal_velocity() )
+            horizontalVelocity = plugin.getLoadedConfig().getMin_horizontal_velocity();
+        vectorToOtherPlayer.multiply( horizontalVelocity );
+        this.boostPlayer( otherPlayer, vectorToOtherPlayer );
     }
 
     private boolean handleSignClickEvent( Block clickedBlock, Player player)
@@ -174,14 +178,14 @@ public class EventsListener implements Listener
                     List< Player > otherPlayers = playersGame.getActivePlayerList();
                     for( Player otherPlayer : otherPlayers ) {
                         if( this.inTargetBox( thisPlayer.getWorld(), targetPotentialPlayerPosition, otherPlayer.getLocation() ) && this.hasBlockUnder( otherPlayer.getLocation() ) ) {
-                            this.boostPlayer( otherPlayer, thisPlayer, true );
+                            this.boostPlayer( otherPlayer, thisPlayer.getLocation(), otherPlayer.getLocation() );
                         }
                     }
                 }
                 else if( plugin.getLoadedConfig().canBoostWhileQueuing() )
                 {
                     if( this.inTargetBox( thisPlayer.getWorld(), targetPotentialPlayerPosition, thisPlayer.getLocation() ) && this.hasBlockUnder( thisPlayer.getLocation() ) ) {
-                        this.boostPlayer( thisPlayer, thisPlayer, true );
+                        this.boostPlayer( thisPlayer, thisPlayer.getLocation(), thisPlayer.getLocation() );
                     }
                 }
                 playersGame.coolDown( thisPlayer );
@@ -201,7 +205,7 @@ public class EventsListener implements Listener
                 final Player otherPlayer = (Player)event.getRightClicked();
                 if( plugin.getGameManager().activeInSameGame( thisPlayer, otherPlayer ) )
                 {
-                    this.boostPlayer( otherPlayer, thisPlayer, false );
+                    this.boostPlayer( otherPlayer, thisPlayer );
                 }
                 playersGame.coolDown( thisPlayer );
             }
@@ -243,6 +247,12 @@ public class EventsListener implements Listener
                     }
                     else if( event.getTo().getBlockY() >= game.getGameConfig().getCeilingLevel() && game.getGameConfig().getCeilingLevel() != -1 ) {
                         game.setPlayerWon( event.getPlayer() );
+                    }
+                    else if( game.getGameConfig().getBoostBlock() != null ) {
+                        Block block = event.getPlayer().getWorld().getBlockAt( event.getTo().getBlockX(), event.getTo().getBlockY()-1, event.getTo().getBlockZ() );
+                        if( block.getType() == game.getGameConfig().getBoostBlock() ) {
+                            this.boostPlayer( event.getPlayer(), event.getFrom(), event.getTo() );
+                        }
                     }
                 }
             }

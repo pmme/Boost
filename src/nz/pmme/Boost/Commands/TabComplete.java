@@ -37,6 +37,7 @@ public class TabComplete implements TabCompleter
             "setlobby",
             "setloss",
             "setspread",
+            "setboostblock",
             "setminplayers",
             "setmaxplayers",
             "autoqueue",
@@ -149,6 +150,7 @@ public class TabComplete implements TabCompleter
                 case "setlobby":
                 case "setloss":
                 case "setspread":
+                case "setboostblock":
                 case "setminplayers":
                 case "setmaxplayers":
                 case "autoqueue":
