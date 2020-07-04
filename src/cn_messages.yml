@@ -71,7 +71,7 @@ periodic_commands_tested: "Tested %count% win commands for %period% %winner%."
 game_perm_enabled: "Require permission &aenabled&r for game %game%&r."
 game_perm_disabled: "Require permission &cdisabled&r for game %game%&r."
 game_not_available: "%game%&r is not available to you."
-cool_down_set: "Cool down set to %count%."
+cool_down_set: "Cool down set to %count%ms."
 
 player_stats:
   - "&5[平台争霸] &f玩家统计信息: %player%"
@@ -114,7 +114,7 @@ command_usage_admin:
   - "&f/boost testwincommands Arena1 <player> &3- Test win commands executed for the winner."
   - "&f/boost testwincommands [daily|weekly|monthly] [first|second|third] <player>"
   - "&f/boost togglelobbyboost &3- Toggle boosting in game lobbies."
-  - "&f/boost setcooldown [ticks] &3- Set the cool down between boosts."
+  - "&f/boost setcooldown [milliseconds] &3- Set the cool down between boosts."
   - "&f/boost queue * &3- 开启游戏的排队所有游戏"
   - "&f/boost queue Arena1 &3- 开启游戏的排队"
   - "&f/boost start Arena1 &3- 强制开启游戏"
