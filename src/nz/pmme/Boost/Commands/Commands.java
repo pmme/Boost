@@ -247,7 +247,7 @@ public class Commands implements CommandExecutor
                                 plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
                                 Location spawn = game.getGameConfig().getStartSpawn();
-                                if( spawn != null && spawn.getBlockY() <= y ) {
+                                if( spawn != null && spawn.getBlockY() <= y && y != -1 ) {
                                     String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
                                     plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
                                 }
@@ -267,9 +267,56 @@ public class Commands implements CommandExecutor
                                 plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
                                 Location spawn = game.getGameConfig().getStartSpawn();
-                                if( spawn != null && spawn.getBlockY() <= y ) {
+                                if( spawn != null && spawn.getBlockY() <= y && y != -1 ) {
                                     String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
                                     plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
+                                }
+                            } else {
+                                plugin.messageSender( sender, Messages.NO_CONSOLE );
+                            }
+                            return true;
+                        }
+                    }
+                    break;
+
+                case "setceiling":
+                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
+                    if( args.length > 1 ) {
+                        Game game = plugin.getGameManager().getGame( args[1] );
+                        if( game == null ) {
+                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
+                            return true;
+                        }
+                        if( args.length == 3 ) {
+                            try {
+                                int y = Integer.parseInt( args[2] );
+                                game.getGameConfig().setCeilingLevel(y);
+                                plugin.messageSender( sender, Messages.CEILING_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
+
+                                Location spawn = game.getGameConfig().getStartSpawn();
+                                if( spawn != null && spawn.getBlockY() >= y && y != -1 ) {
+                                    String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
+                                    plugin.messageSender( sender, message.replaceAll( "%ceiling%", String.valueOf( y ) ) );
+                                }
+                            } catch( NumberFormatException e ) {
+                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be an integer number." ) );
+                            }
+                            return true;
+                        }
+                        if ( args.length == 2 ) {
+                            if( sender instanceof Player ) {
+                                if( !plugin.isInGameWorld(sender) ) {
+                                    plugin.messageSender( sender, Messages.NOT_IN_GAME_WORLD );
+                                    return true;
+                                }
+                                int y = ((Player)sender).getLocation().getBlockY();
+                                game.getGameConfig().setCeilingLevel(y);
+                                plugin.messageSender( sender, Messages.CEILING_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
+
+                                Location spawn = game.getGameConfig().getStartSpawn();
+                                if( spawn != null && spawn.getBlockY() >= y && y != -1 ) {
+                                    String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
+                                    plugin.messageSender( sender, message.replaceAll( "%ceiling%", String.valueOf( y ) ) );
                                 }
                             } else {
                                 plugin.messageSender( sender, Messages.NO_CONSOLE );
@@ -322,9 +369,13 @@ public class Commands implements CommandExecutor
                                     game.getGameConfig().setStartSpawn( spawn );
                                     plugin.messageSender( sender, Messages.START_SPAWN_SET, game.getGameConfig().getDisplayName() );
 
-                                    if( spawn.getBlockY() <= game.getGameConfig().getGroundLevel() ) {
+                                    if( spawn.getBlockY() <= game.getGameConfig().getGroundLevel() && game.getGameConfig().getGroundLevel() != -1 ) {
                                         String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
                                         plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( game.getGameConfig().getGroundLevel() ) ) );
+                                    }
+                                    if( spawn.getBlockY() >= game.getGameConfig().getCeilingLevel() && game.getGameConfig().getCeilingLevel() != -1 ) {
+                                        String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
+                                        plugin.messageSender( sender, message.replaceAll( "%ceiling%", String.valueOf( game.getGameConfig().getCeilingLevel() ) ) );
                                     }
                                     break;
                                 case "setlobby":

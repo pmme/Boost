@@ -67,6 +67,7 @@ win_commands:
 #    Arena1:
 #      name: '&aArena1'
 #      ground: 64
+#      ceiling: -1
 #      target_dist: 150
 #      countdown: 30
 #      min_players: 2

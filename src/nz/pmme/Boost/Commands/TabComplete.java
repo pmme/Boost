@@ -32,6 +32,7 @@ public class TabComplete implements TabCompleter
             "showgameconfig",
             "setdisplayname",
             "setground",
+            "setceiling",
             "setstart",
             "setlobby",
             "setloss",
@@ -143,6 +144,7 @@ public class TabComplete implements TabCompleter
                 case "showgameconfig":
                 case "setdisplayname":
                 case "setground":
+                case "setceiling":
                 case "setstart":
                 case "setlobby":
                 case "setloss":

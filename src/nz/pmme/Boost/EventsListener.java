@@ -237,8 +237,13 @@ public class EventsListener implements Listener
             Game game = plugin.getGameManager().getPlayersGame( event.getPlayer() );
             if( game == null ) return;
             if( game.isActiveInGame( event.getPlayer() ) ) {
-                if( event.getTo() != null && event.getTo().getBlockY() <= game.getGameConfig().getGroundLevel() ) {
-                    game.setPlayerLost( event.getPlayer() );
+                if( event.getTo() != null ) {
+                    if( event.getTo().getBlockY() <= game.getGameConfig().getGroundLevel() && game.getGameConfig().getGroundLevel() != -1 ) {
+                        game.setPlayerLost( event.getPlayer() );
+                    }
+                    else if( event.getTo().getBlockY() >= game.getGameConfig().getCeilingLevel() && game.getGameConfig().getCeilingLevel() != -1 ) {
+                        game.setPlayerWon( event.getPlayer() );
+                    }
                 }
             }
         }

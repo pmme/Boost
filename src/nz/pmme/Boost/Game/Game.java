@@ -223,6 +223,16 @@ public class Game implements Comparable<Game>
         }
     }
 
+    public void setPlayerWon( Player player )
+    {
+        if( gameState == GameState.RUNNING )
+        {
+            gameState = GameState.STOPPED;
+            this.playerWon( player );
+            this.end( false );
+        }
+    }
+
     private void playerWon( Player player )
     {
         String message = plugin.formatMessage( Messages.WINNER, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
