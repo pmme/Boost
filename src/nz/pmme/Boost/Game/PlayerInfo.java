@@ -2,16 +2,12 @@ package nz.pmme.Boost.Game;
 
 import nz.pmme.Boost.Enums.PlayerGameState;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 public class PlayerInfo
 {
     private Player player;
     private PlayerGameState playerGameState;
-    private boolean onCoolDown = false;
-    private BukkitTask coolDownTask = null;
+    private long coolDownEndMillis = 0L;
 
     public PlayerInfo( Player player )
     {
@@ -40,23 +36,14 @@ public class PlayerInfo
     }
 
     public boolean isOnCoolDown() {
-        return onCoolDown;
+        return ( System.currentTimeMillis() < this.coolDownEndMillis );
     }
 
-    public void setOnCoolDown( JavaPlugin plugin, long coolDown ) {
-        if( coolDown > 0 ) {
-            onCoolDown = true;
-            coolDownTask = ( new BukkitRunnable() {
-                @Override
-                public void run() { onCoolDown = false; }
-            } ).runTaskLaterAsynchronously( plugin, coolDown );
-        }
+    public void setCoolDown( long coolDownMillis ) {
+        this.coolDownEndMillis = System.currentTimeMillis() + coolDownMillis;
     }
 
     public void resetCoolDown() {
-        onCoolDown = false;
-        if( coolDownTask != null && !coolDownTask.isCancelled() ) {
-            coolDownTask.cancel();
-        }
+        this.coolDownEndMillis = 0L;
     }
 }

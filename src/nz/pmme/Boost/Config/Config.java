@@ -224,7 +224,7 @@ public class Config
         max_horizontal_velocity = plugin.getConfig().getDouble( "physics.max_horizontal_velocity", 2.5 );
         min_horizontal_velocity = plugin.getConfig().getDouble( "physics.min_horizontal_velocity", 0.1 );
         block_hit_horizontal_velocity = plugin.getConfig().getDouble( "physics.block_hit_horizontal_velocity", 2.5 );
-        coolDown = plugin.getConfig().getLong( "physics.cooldown", 10L );
+        coolDown = plugin.getConfig().getLong( "physics.cooldown", 500L );
 
         signTitle = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.title", "[Boost]" ) );
         signJoin = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.join", "Click to join" ) );

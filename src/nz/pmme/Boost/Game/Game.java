@@ -259,7 +259,7 @@ public class Game implements Comparable<Game>
     {
         PlayerInfo playerInfo = players.get( player.getUniqueId() );
         if( playerInfo != null ) {
-            playerInfo.setOnCoolDown( plugin, plugin.getLoadedConfig().getCoolDown() );
+            playerInfo.setCoolDown( plugin.getLoadedConfig().getCoolDown() );
         }
     }
 
