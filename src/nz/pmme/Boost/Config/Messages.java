@@ -78,6 +78,8 @@ public enum Messages
     GAME_PERM_DISABLED("game_perm_disabled"),
     GAME_NOT_AVAILABLE("game_not_available"),
     COOL_DOWN_SET("cool_down_set"),
+    BOOST_BLOCK_SET("boost_block_set"),
+    BOOST_BLOCK_DISABLED("boost_block_disabled"),
 
     END("end");
 

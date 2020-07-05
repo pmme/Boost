@@ -1,7 +1,6 @@
 package nz.pmme.Utils;
 
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 /**
@@ -19,13 +18,13 @@ public class VectorToOtherPlayer extends Vector
      * Construct a normalised Vector to another player and store the original un-normalised vector and distance
      * between players.
      *
-     * @param otherPlayer   The "other" player. The target of the vector.
      * @param thisPlayer    The "current" player. The source of the vector.
+     * @param otherPlayer   The "other" player. The target of the vector.
      */
-    public VectorToOtherPlayer( final LivingEntity otherPlayer, final Player thisPlayer )
+    public VectorToOtherPlayer( final Location thisPlayer, final Location otherPlayer )
     {
         // Get the normalized vector to the other player. Don't use the normalize() method though because we want the distance and it involves Math.sqrt, so we normalize ourselves.
-        rawVectorToOtherPlayer = new Vector( otherPlayer.getLocation().getX() - thisPlayer.getLocation().getX(), 0.0, otherPlayer.getLocation().getZ() - thisPlayer.getLocation().getZ() );
+        rawVectorToOtherPlayer = new Vector( otherPlayer.getX() - thisPlayer.getX(), 0.0, otherPlayer.getZ() - thisPlayer.getZ() );
         distanceBetweenPlayers = rawVectorToOtherPlayer.length();
         if( distanceBetweenPlayers > 0.0 ) {
             this.copy( rawVectorToOtherPlayer );
@@ -33,8 +32,8 @@ public class VectorToOtherPlayer extends Vector
         } else {
             // Players are in the exact same spot and cannot be normalised OR the player is boosting themselves.
             // Set a unit vector in the direction the player is facing.
-            rawVectorToOtherPlayer.setX( -Math.sin( Math.toRadians( thisPlayer.getLocation().getYaw() ) ) );
-            rawVectorToOtherPlayer.setZ( Math.cos( Math.toRadians( thisPlayer.getLocation().getYaw() ) ) );
+            rawVectorToOtherPlayer.setX( -Math.sin( Math.toRadians( thisPlayer.getYaw() ) ) );
+            rawVectorToOtherPlayer.setZ( Math.cos( Math.toRadians( thisPlayer.getYaw() ) ) );
             rawVectorToOtherPlayer.setY( 0.0 );
             this.copy( rawVectorToOtherPlayer );
         }
