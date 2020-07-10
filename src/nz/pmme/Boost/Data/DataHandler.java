@@ -26,13 +26,13 @@ public class DataHandler
             PreparedStatement preparedStatement;
 
             preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS other(id INTEGER PRIMARY KEY,key VARCHAR(255) NOT NULL,value VARCHAR(255) NOT NULL)");
-            preparedStatement.execute();
+            preparedStatement.executeUpdate();
             preparedStatement.close();
 
             for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
                 PreparedStatement preparedStatsStatement;
                 preparedStatsStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL UNIQUE,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL)");
-                preparedStatsStatement.execute();
+                preparedStatsStatement.executeUpdate();
                 preparedStatsStatement.close();
             }
         }
@@ -62,7 +62,7 @@ public class DataHandler
             {
                 // Set the first version number.
                 preparedStatement = connection.prepareStatement( "INSERT INTO other(key, value) VALUES ('VERSION','" + thisVersion + "')" );
-                preparedStatement.execute();
+                preparedStatement.executeUpdate();
                 preparedStatement.close();
             }
             else if( version > thisVersion )
@@ -78,7 +78,7 @@ public class DataHandler
 
                 // Update version number.
                 preparedStatement = connection.prepareStatement( "UPDATE other SET value='" + thisVersion + "' WHERE key='VERSION'" );
-                preparedStatement.execute();
+                preparedStatement.executeUpdate();
                 preparedStatement.close();
             }
         }
@@ -98,7 +98,7 @@ public class DataHandler
                 PreparedStatement insertPlayerStatement = connection.prepareStatement( insertPlayerSql );
                 insertPlayerStatement.setString( 1, playerId.toString() );
                 insertPlayerStatement.setString( 2, playerName );
-                insertPlayerStatement.execute();
+                insertPlayerStatement.executeUpdate();
                 insertPlayerStatement.close();
             } catch( SQLException sQLException ) {
                 plugin.getLogger().severe( "Failed to create or update " + statsPeriod.getTable() + " statistics record for " + playerName + " " + playerId.toString() );
@@ -116,7 +116,7 @@ public class DataHandler
                 String updateGamesSql = "UPDATE " + statsPeriod.getTable() + " SET games=games+1 WHERE player_id=?";
                 PreparedStatement updateGamesStatement = connection.prepareStatement( updateGamesSql );
                 updateGamesStatement.setString( 1, playerId.toString() );
-                updateGamesStatement.execute();
+                updateGamesStatement.executeUpdate();
                 updateGamesStatement.close();
             } catch( SQLException sQLException ) {
                 plugin.getLogger().severe( "Failed to update " + statsPeriod.getTable() + " games count for player " + playerId.toString() );
@@ -134,7 +134,7 @@ public class DataHandler
                 String updateLossesSql = "UPDATE " + statsPeriod.getTable() + " SET losses=losses+1 WHERE player_id=?";
                 PreparedStatement updateLossesStatement = connection.prepareStatement( updateLossesSql );
                 updateLossesStatement.setString( 1, playerId.toString() );
-                updateLossesStatement.execute();
+                updateLossesStatement.executeUpdate();
                 updateLossesStatement.close();
             } catch( SQLException sQLException ) {
                 plugin.getLogger().severe( "Failed to update " + statsPeriod.getTable() + " losses count for player " + playerId.toString() );
@@ -152,7 +152,7 @@ public class DataHandler
                 String updateWinsSql = "UPDATE " + statsPeriod.getTable() + " SET wins=wins+1 WHERE player_id=?";
                 PreparedStatement updateWinsStatement = connection.prepareStatement( updateWinsSql );
                 updateWinsStatement.setString( 1, playerId.toString() );
-                updateWinsStatement.execute();
+                updateWinsStatement.executeUpdate();
                 updateWinsStatement.close();
             } catch( SQLException sQLException ) {
                 plugin.getLogger().severe( "Failed to update " + statsPeriod.getTable() + " wins count for player " + playerId.toString() );
@@ -227,6 +227,8 @@ public class DataHandler
             while( resultSet.next() ) {
                 leaderBoard.add( new PlayerStats( resultSet.getString( "player_name" ), resultSet.getInt( "games" ), resultSet.getInt( "wins" ), resultSet.getInt( "losses" ), 0 ) );
             }
+            resultSet.close();
+            queryLeaderBoardStatement.close();
         }
         catch (SQLException sQLException) {
             plugin.getLogger().severe( "Failed to query " + statsPeriod.getTable() + " leader board" );
@@ -251,6 +253,8 @@ public class DataHandler
                     plugin.getLogger().warning( "Failed to convert player_id '" + resultSet.getString( "player_id" ) + "' to UUID when issuing rewards." );
                 }
             }
+            resultSet.close();
+            queryLeaderBoardStatement.close();
         }
         catch (SQLException sQLException) {
             plugin.getLogger().severe( "Failed to query " + statsPeriod.getTable() + " leader board" );
@@ -273,7 +277,7 @@ public class DataHandler
             if( playerId != null ) {
                 deleteStatsStatement.setString( 1, playerId.toString() );
             }
-            deleteStatsStatement.execute();
+            deleteStatsStatement.executeUpdate();
             deleteStatsStatement.close();
         }
         catch (SQLException sQLException) {
