@@ -1,38 +1,77 @@
 package nz.pmme.Boost.Commands;
 
 import nz.pmme.Boost.Config.Messages;
-import nz.pmme.Boost.Enums.StatsPeriod;
-import nz.pmme.Boost.Enums.Winner;
-import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
-import nz.pmme.Boost.Exceptions.GameDisplayNameMustMatchConfigurationException;
-import nz.pmme.Boost.Exceptions.GameDoesNotExistException;
-import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.bukkit.command.TabExecutor;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 /**
  * Created by paul on 24-Apr-16.
  */
-public class Commands implements CommandExecutor
+public class Commands implements TabExecutor
 {
     private Main plugin;
-    static final List<String> trueValues = java.util.Arrays.asList( "on", "true", "t", "1", "yes", "y" );
+    private final Map< String, SubCommand > commands = new HashMap<>();
 
-    public Commands( Main plugin ) {
+    public Commands( Main plugin )
+    {
         this.plugin = plugin;
+        this.registerSubCommand( new SubCommandOn( plugin, "on" ) );
+        this.registerSubCommand( new SubCommandOff( plugin, "off" ) );
+        this.registerSubCommand( new SubCommandReload( plugin, "reload" ) );
+        this.registerSubCommand( new SubCommandLanguage( plugin, "language" ) );
+        this.registerSubCommand( new SubCommandAddGameWorld( plugin, "addgameworld" ) );
+        this.registerSubCommand( new SubCommandRemoveGameWorld( plugin, "removegameworld" ) );
+        this.registerSubCommand( new SubCommandSetMainLobby( plugin, "setmainlobby" ) );
+        this.registerSubCommand( new SubCommandClearGames( plugin, "cleargames" ) );
+        this.registerSubCommand( new SubCommandCreateGame( plugin, "creategame" ) );
+        this.registerSubCommand( new SubCommandDeleteGame( plugin, "deletegame" ) );
+        this.registerSubCommand( new SubCommandShowGameConfig( plugin, "showgameconfig" ) );
+        this.registerSubCommand( new SubCommandSetDisplayName( plugin, "setdisplayname" ) );
+        this.registerSubCommand( new SubCommandSetGround( plugin, "setground" ) );
+        this.registerSubCommand( new SubCommandSetCeiling( plugin, "setceiling" ) );
+        this.registerSubCommand( new SubCommandSetStart( plugin, "setstart" ) );
+        this.registerSubCommand( new SubCommandSetLobby( plugin, "setlobby" ) );
+        this.registerSubCommand( new SubCommandSetLoss( plugin, "setloss" ) );
+        this.registerSubCommand( new SubCommandSetSpread( plugin, "setspread" ) );
+        this.registerSubCommand( new SubCommandSetBoostBlock( plugin, "setboostblock" ) );
+        this.registerSubCommand( new SubCommandSetMinPlayers( plugin, "setminplayers" ) );
+        this.registerSubCommand( new SubCommandSetMaxPlayers( plugin, "setmaxplayers" ) );
+        this.registerSubCommand( new SubCommandAutoQueue( plugin, "autoqueue" ) );
+        this.registerSubCommand( new SubCommandRequiresPermission( plugin, "requirespermission" ) );
+        this.registerSubCommand( new SubCommandSetCountDown( plugin, "setcountdown" ) );
+        this.registerSubCommand( new SubCommandSetAnnouncement( plugin, "setannouncement" ) );
+        this.registerSubCommand( new SubCommandAddWinCommand( plugin, "addwincommand" ) );
+        this.registerSubCommand( new SubCommandRemoveWinCommand( plugin, "removewincommand" ) );
+        this.registerSubCommand( new SubCommandShowWinCommands( plugin, "showwincommands" ) );
+        this.registerSubCommand( new SubCommandTestWinCommands( plugin, "testwincommands" ) );
+        this.registerSubCommand( new SubCommandToggleLobbyBoost( plugin, "togglelobbyboost" ) );
+        this.registerSubCommand( new SubCommandSetCoolDown( plugin, "setcooldown" ) );
+        this.registerSubCommand( new SubCommandQueue( plugin, "queue" ) );
+        this.registerSubCommand( new SubCommandStart( plugin, "start" ) );
+        this.registerSubCommand( new SubCommandEnd( plugin, "end" ) );
+        this.registerSubCommand( new SubCommandStop( plugin, "stop" ) );
+        this.registerSubCommand( new SubCommandJoin( plugin, "join" ) );
+        this.registerSubCommand( new SubCommandLeave( plugin, "leave" ) );
+        this.registerSubCommand( new SubCommandTop( plugin, "top" ) );
+        this.registerSubCommand( new SubCommandStats( plugin, "stats" ) );
+        this.registerSubCommand( new SubCommandDelStats( plugin, "delstats" ) );
+        this.registerSubCommand( new SubCommandStatus( plugin, "status" ) );
+        this.registerSubCommand( new SubCommandSetSign( plugin, "setsign") );
+        this.registerSubCommand( new SubCommandBuild( plugin, "build" ) );
+        this.registerSubCommand( new SubCommandNoBuild( plugin, "nobuild" ) );
+    }
+
+    private void registerSubCommand( SubCommand subCommand ) {
+        this.commands.put( subCommand.getSubCommandString(), subCommand );
     }
 
     @Override
@@ -47,1019 +86,40 @@ public class Commands implements CommandExecutor
         else
         {
             String boostCommand = args[0].toLowerCase();
-            switch( boostCommand )
-            {
-                case "on":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    plugin.messageSender( sender, Messages.BOOST_ENABLED );
-                    plugin.enableBoost();
-                    return true;
-
-                case "off":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    plugin.messageSender( sender, Messages.BOOST_DISABLED );
-                    plugin.disableBoost();
-                    return true;
-
-                case "reload":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    plugin.reload();
-                    plugin.messageSender( sender, Messages.CONFIG_RELOADED );
-                    return true;
-
-                case "language":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        plugin.getConfig().set( "language", args[1].toLowerCase() );
-                        plugin.saveConfig();
-                        plugin.reload();
-                        plugin.messageSender( sender, Messages.CONFIG_RELOADED );
-                        return true;
-                    }
-                    break;
-
-                case "addgameworld":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        World world = plugin.getServer().getWorld( args[1] );
-                        if( world != null ) {
-                            plugin.getLoadedConfig().addGameWorld( world.getName() );
-                            plugin.messageSender( sender, Messages.ADDED_GAME_WORLD, "%world%", world.getName() );
-                        } else {
-                            plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, "%world%", args[1] );
-                        }
-                        return true;
-                    }
-                    if ( args.length == 1 ) {
-                        if( sender instanceof Player ) {
-                            World world = ((Player)sender).getLocation().getWorld();
-                            plugin.getLoadedConfig().addGameWorld( world.getName() );
-                            plugin.messageSender( sender, Messages.ADDED_GAME_WORLD, "%world%", world.getName() );
-                        } else {
-                            plugin.messageSender( sender, Messages.NO_CONSOLE );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "removegameworld":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        World world = plugin.getServer().getWorld( args[1] );
-                        if( world != null ) {
-                            if( plugin.getLoadedConfig().isGameWorld( world.getName() ) ) {
-                                plugin.getLoadedConfig().delGameWorld( world.getName() );
-                                plugin.messageSender( sender, Messages.REMOVED_GAME_WORLD, "%world%", world.getName() );
-                            } else {
-                                plugin.messageSender( sender, Messages.NOT_A_GAME_WORLD, "%world%", world.getName() );
-                            }
-                        } else {
-                            plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, "%world%", args[1] );
-                        }
-                        return true;
-                    }
-                    if ( args.length == 1 ) {
-                        if( sender instanceof Player ) {
-                            World world = ((Player)sender).getLocation().getWorld();
-                            if( plugin.getLoadedConfig().isGameWorld( world.getName() ) ) {
-                                plugin.getLoadedConfig().delGameWorld( world.getName() );
-                                plugin.messageSender( sender, Messages.REMOVED_GAME_WORLD, "%world%", world.getName() );
-                            } else {
-                                plugin.messageSender( sender, Messages.NOT_A_GAME_WORLD, "%world%", world.getName() );
-                            }
-                        } else {
-                            plugin.messageSender( sender, Messages.NO_CONSOLE );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "setmainlobby":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 5 ) {
-                        World world = plugin.getServer().getWorld( args[1] );
-                        if( world != null ) {
-                            try {
-                                Location spawn = new Location( world, Double.parseDouble( args[2] ), Double.parseDouble( args[3] ), Double.parseDouble( args[4] ) );
-                                plugin.getLoadedConfig().setMainLobbySpawn( spawn );
-                                plugin.messageSender( sender, Messages.MAIN_SPAWN_SET );
-                            } catch( NumberFormatException e ) {
-                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last three parameters must be numbers." ) );
-                            }
-                        } else {
-                            plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, "%world%", args[1] );
-                        }
-                        return true;
-                    }
-                    if( args.length == 1 ) {
-                        if( sender instanceof Player ) {
-                            if( !plugin.isInGameWorld(sender) ) {
-                                plugin.messageSender( sender, Messages.NOT_IN_GAME_WORLD );
-                                return true;
-                            }
-                            plugin.getLoadedConfig().setMainLobbySpawn( ( (Player)sender ).getLocation() );
-                            plugin.messageSender( sender, Messages.MAIN_SPAWN_SET );
-                        } else {
-                            plugin.messageSender( sender, Messages.NO_CONSOLE );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "cleargames":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    plugin.getGameManager().clearAllGames();
-                    plugin.messageSender( sender, Messages.GAMES_CLEARED );
-                    return true;
-
-                case "creategame":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        try {
-                            plugin.getGameManager().createNewGame( args[1] );
-                            plugin.messageSender( sender, Messages.GAME_CREATED, args[1] );
-                        } catch( GameAlreadyExistsException e ) {
-                            plugin.messageSender( sender, Messages.GAME_ALREADY_EXISTS, args[1] );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "deletegame":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 || ( args.length == 3 && !args[2].equalsIgnoreCase( "confirm" ) ) ) {
-                        plugin.messageSender( sender, Messages.MUST_TYPE_CONFIRM, args[1] );
-                        return true;
-                    }
-                    if( args.length == 3 ) {
-                        try {
-                            plugin.getGameManager().deleteGame( args[1] );
-                            plugin.messageSender( sender, Messages.GAME_DELETED, args[1] );
-                        } catch( GameDoesNotExistException e ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "showgameconfig":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        game.getGameConfig().displayConfig( sender );
-                        return true;
-                    }
-                    break;
-
-                case "setdisplayname":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 3 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        try {
-                            game.getGameConfig().setDisplayName( args[2] );
-                            plugin.messageSender( sender, Messages.DISPLAY_NAME_SET, game.getGameConfig().getDisplayName(), "%gameconfig%", game.getGameConfig().getName() );
-                        } catch( GameDisplayNameMustMatchConfigurationException e ) {
-                            plugin.messageSender( sender, Messages.DISPLAY_NAME_MISMATCH, "%gameconfig%", game.getGameConfig().getName() );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "setground":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length > 1 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        if( args.length == 3 ) {
-                            try {
-                                int y = Integer.parseInt( args[2] );
-                                game.getGameConfig().setGroundLevel(y);
-                                plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
-
-                                Location spawn = game.getGameConfig().getStartSpawn();
-                                if( spawn != null && spawn.getBlockY() <= y && y != -1 ) {
-                                    String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                                    plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
-                                }
-                            } catch( NumberFormatException e ) {
-                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be an integer number." ) );
-                            }
-                            return true;
-                        }
-                        if ( args.length == 2 ) {
-                            if( sender instanceof Player ) {
-                                if( !plugin.isInGameWorld(sender) ) {
-                                    plugin.messageSender( sender, Messages.NOT_IN_GAME_WORLD );
-                                    return true;
-                                }
-                                int y = ((Player)sender).getLocation().getBlockY();
-                                game.getGameConfig().setGroundLevel(y);
-                                plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
-
-                                Location spawn = game.getGameConfig().getStartSpawn();
-                                if( spawn != null && spawn.getBlockY() <= y && y != -1 ) {
-                                    String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                                    plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
-                                }
-                            } else {
-                                plugin.messageSender( sender, Messages.NO_CONSOLE );
-                            }
-                            return true;
-                        }
-                    }
-                    break;
-
-                case "setceiling":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length > 1 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        if( args.length == 3 ) {
-                            try {
-                                int y = Integer.parseInt( args[2] );
-                                game.getGameConfig().setCeilingLevel(y);
-                                plugin.messageSender( sender, Messages.CEILING_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
-
-                                Location spawn = game.getGameConfig().getStartSpawn();
-                                if( spawn != null && spawn.getBlockY() >= y && y != -1 ) {
-                                    String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                                    plugin.messageSender( sender, message.replaceAll( "%ceiling%", String.valueOf( y ) ) );
-                                }
-                            } catch( NumberFormatException e ) {
-                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be an integer number." ) );
-                            }
-                            return true;
-                        }
-                        if ( args.length == 2 ) {
-                            if( sender instanceof Player ) {
-                                if( !plugin.isInGameWorld(sender) ) {
-                                    plugin.messageSender( sender, Messages.NOT_IN_GAME_WORLD );
-                                    return true;
-                                }
-                                int y = ((Player)sender).getLocation().getBlockY();
-                                game.getGameConfig().setCeilingLevel(y);
-                                plugin.messageSender( sender, Messages.CEILING_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
-
-                                Location spawn = game.getGameConfig().getStartSpawn();
-                                if( spawn != null && spawn.getBlockY() >= y && y != -1 ) {
-                                    String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                                    plugin.messageSender( sender, message.replaceAll( "%ceiling%", String.valueOf( y ) ) );
-                                }
-                            } else {
-                                plugin.messageSender( sender, Messages.NO_CONSOLE );
-                            }
-                            return true;
-                        }
-                    }
-                    break;
-
-                case "setstart":
-                case "setlobby":
-                case "setloss":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length > 1 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        Location spawn = null;
-                        if( args.length == 6 ) {
-                            World world = plugin.getServer().getWorld( args[2] );
-                            if( world != null ) {
-                                try {
-                                    spawn = new Location( world, Double.parseDouble( args[3] ), Double.parseDouble( args[4] ), Double.parseDouble( args[5] ) );
-                                } catch( NumberFormatException e ) {
-                                    plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last three parameters must be numbers." ) );
-                                    return true;
-                                }
-                            } else {
-                                plugin.messageSender( sender, Messages.FAILED_TO_FIND_WORLD, "%world%", args[2] );
-                                return true;
-                            }
-                        }
-                        if( args.length == 2 ) {
-                            if( sender instanceof Player ) {
-                                if( !plugin.isInGameWorld(sender) ) {
-                                    plugin.messageSender( sender, Messages.NOT_IN_GAME_WORLD );
-                                    return true;
-                                }
-                                spawn = ((Player)sender).getLocation();
-                            } else {
-                                plugin.messageSender( sender, Messages.NO_CONSOLE );
-                                return true;
-                            }
-                        }
-                        if( spawn != null ) {
-                            switch( boostCommand ) {
-                                case "setstart":
-                                    game.getGameConfig().setStartSpawn( spawn );
-                                    plugin.messageSender( sender, Messages.START_SPAWN_SET, game.getGameConfig().getDisplayName() );
-
-                                    if( spawn.getBlockY() <= game.getGameConfig().getGroundLevel() && game.getGameConfig().getGroundLevel() != -1 ) {
-                                        String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                                        plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( game.getGameConfig().getGroundLevel() ) ) );
-                                    }
-                                    if( spawn.getBlockY() >= game.getGameConfig().getCeilingLevel() && game.getGameConfig().getCeilingLevel() != -1 ) {
-                                        String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                                        plugin.messageSender( sender, message.replaceAll( "%ceiling%", String.valueOf( game.getGameConfig().getCeilingLevel() ) ) );
-                                    }
-                                    break;
-                                case "setlobby":
-                                    game.getGameConfig().setLobbySpawn( spawn );
-                                    plugin.messageSender( sender, Messages.LOBBY_SPAWN_SET, game.getGameConfig().getDisplayName() );
-                                    break;
-                                case "setloss":
-                                    game.getGameConfig().setLossSpawn( spawn );
-                                    plugin.messageSender( sender, Messages.LOSS_SPAWN_SET, game.getGameConfig().getDisplayName() );
-                                    break;
-                            }
-                            return true;
-                        }
-                    }
-                    break;
-
-                case "setspread":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 3 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        try {
-                            int spread = Integer.parseUnsignedInt( args[2] );
-                            game.getGameConfig().setSpawnSpread( spread );
-                            plugin.messageSender( sender, Messages.SPREAD_SET, game.getGameConfig().getDisplayName(), "%spread%", String.valueOf( spread ) );
-                        } catch( NumberFormatException e ) {
-                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "setboostblock":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        if( sender instanceof Player ) {
-                            Material material = ((Player)sender).getInventory().getItemInMainHand().getType();
-                            game.getGameConfig().setBoostBlock( material );
-                            if( game.getGameConfig().getBoostBlock() != null ) {
-                                plugin.messageSender( sender, Messages.BOOST_BLOCK_SET, game.getGameConfig().getDisplayName(), "%block%", game.getGameConfig().getBoostBlock().toString() );
-                            } else {
-                                plugin.messageSender( sender, Messages.BOOST_BLOCK_DISABLED, game.getGameConfig().getDisplayName() );
-                            }
-                        } else {
-                            plugin.messageSender( sender, Messages.NO_CONSOLE );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "setminplayers":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 3 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        try {
-                            int minPlayers = Integer.parseUnsignedInt( args[2] );
-                            game.getGameConfig().setMinPlayers( minPlayers );
-                            plugin.messageSender( sender, Messages.MIN_PLAYERS_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( minPlayers ) );
-                        } catch( NumberFormatException e ) {
-                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "setmaxplayers":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 3 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        try {
-                            int maxPlayers = Integer.parseUnsignedInt( args[2] );
-                            game.getGameConfig().setMaxPlayers( maxPlayers );
-                            plugin.messageSender( sender, Messages.MAX_PLAYERS_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( maxPlayers ) );
-                        } catch( NumberFormatException e ) {
-                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "autoqueue":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 3 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        boolean autoQueue = trueValues.contains( args[2].toLowerCase() );
-                        game.getGameConfig().setAutoQueue( autoQueue );
-                        plugin.messageSender( sender, autoQueue ? Messages.AUTO_QUEUE_ENABLED : Messages.AUTO_QUEUE_DISABLED, game.getGameConfig().getDisplayName() );
-                        return true;
-                    }
-                    break;
-
-                case "requirespermission":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 3 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        boolean requiresPermission = trueValues.contains( args[2].toLowerCase() );
-                        game.getGameConfig().setRequiresPermission( requiresPermission );
-                        plugin.messageSender( sender, requiresPermission ? Messages.GAME_PERM_ENABLED : Messages.GAME_PERM_DISABLED, game.getGameConfig().getDisplayName() );
-                        return true;
-                    }
-                    break;
-
-                case "setcountdown":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 3 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        try {
-                            int countdown = Integer.parseUnsignedInt( args[2] );
-                            game.getGameConfig().setCountdown( countdown );
-                            plugin.messageSender( sender, Messages.COUNTDOWN_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( countdown ) );
-                        } catch( NumberFormatException e ) {
-                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "setannouncement":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 3 ) {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        try {
-                            int countdownAnnouncementTime = Integer.parseUnsignedInt( args[2] );
-                            game.getGameConfig().setCountdownAnnounceTime( countdownAnnouncementTime );
-                            plugin.messageSender( sender, Messages.COUNTDOWN_ANNOUNCEMENT_SET, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( countdownAnnouncementTime ) );
-                        } catch( NumberFormatException e ) {
-                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "addwincommand":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length >= 3 )
-                    {
-                        StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
-                        if( statsPeriod != null )
-                        {
-                            if( args.length >= 4 ) {
-                                Winner winner = Winner.fromString( args[2] );
-                                if( winner != null ) {
-                                    StringBuilder winCommand = new StringBuilder();
-                                    winCommand.append( args[3] );
-                                    for( int i = 4; i < args.length; ++i ) {
-                                        winCommand.append( " " );
-                                        winCommand.append( args[i] );
-                                    }
-                                    plugin.getLoadedConfig().addWinCommand( statsPeriod, winner, winCommand.toString() );
-                                    String message = plugin.formatMessage( Messages.PERIODIC_COMMANDS_UPDATED, "", "%period%", statsPeriod.toString() )
-                                            .replaceAll( "%winner%", winner.toString() )
-                                            .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ).size() ) );
-                                    plugin.messageSender( sender, message );
-                                    return true;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Game game = plugin.getGameManager().getGame( args[1] );
-                            if( game == null ) {
-                                plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                                return true;
-                            }
-                            StringBuilder winCommand = new StringBuilder();
-                            winCommand.append( args[2] );
-                            for( int i = 3; i < args.length; ++i ) {
-                                winCommand.append( " " );
-                                winCommand.append( args[i] );
-                            }
-                            game.getGameConfig().addWinCommand( winCommand.toString() );
-                            plugin.messageSender( sender, Messages.GAME_COMMANDS_UPDATED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
-                            return true;
-                        }
-                    }
-                    break;
-
-                case "removewincommand":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length >= 3 )
-                    {
-                        StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
-                        if( statsPeriod != null )
-                        {
-                            if( args.length == 4 ) {
-                                Winner winner = Winner.fromString( args[2] );
-                                if( winner != null ) {
-                                    try {
-                                        plugin.getLoadedConfig().removeWinCommand( statsPeriod, winner, Integer.parseUnsignedInt( args[3], 10 ) - 1 );
-                                        String message = plugin.formatMessage( Messages.PERIODIC_COMMANDS_UPDATED, "", "%period%", statsPeriod.toString() )
-                                                .replaceAll( "%winner%", winner.toString() )
-                                                .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ).size() ) );
-                                        plugin.messageSender( sender, message );
-                                    } catch( NumberFormatException e ) {
-                                        plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a integer number 1 or more." ) );
-                                    } catch( IndexOutOfBoundsException e ) {
-                                        plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be the number of the command to remove." ) );
-                                    }
-                                    return true;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Game game = plugin.getGameManager().getGame( args[1] );
-                            if( game == null ) {
-                                plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                                return true;
-                            }
-                            try {
-                                game.getGameConfig().removeWinCommand( Integer.parseUnsignedInt( args[2], 10 ) - 1 );
-                                plugin.messageSender( sender, Messages.GAME_COMMANDS_UPDATED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
-                            } catch( NumberFormatException e ) {
-                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a integer number 1 or more." ) );
-                            } catch( IndexOutOfBoundsException e ) {
-                                plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be the number of the command to remove." ) );
-                            }
-                            return true;
-                        }
-                    }
-                    break;
-
-                case "showwincommands":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 1 )
-                    {
-                        for( StatsPeriod statsPeriod : StatsPeriod.values() )
-                        {
-                            if( statsPeriod == StatsPeriod.TOTAL ) break;
-                            for( Winner winner : Winner.values() )
-                            {
-                                List<String> winCommands = plugin.getLoadedConfig().getWinCommands( statsPeriod, winner );
-                                if( winCommands == null || winCommands.isEmpty() ) {
-                                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + statsPeriod.toString() + " " + winner.toString() + "&r : &3None configured" ) );
-                                } else {
-                                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + statsPeriod.toString() + " " + winner.toString() + "&r :" ) );
-                                    for( String winCommand : winCommands ) {
-                                        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|   &3- '" ) + winCommand + ChatColor.translateAlternateColorCodes( '&',"&3'." ) );
-                                    }
-                                }
-                            }
-                        }
-                        return true;
-                    }
-                    else if( args.length == 2 )
-                    {
-                        Game game = plugin.getGameManager().getGame( args[1] );
-                        if( game == null ) {
-                            plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                            return true;
-                        }
-                        List<String> winCommands = game.getGameConfig().getWinCommands();
-                        if( winCommands == null || winCommands.isEmpty() ) {
-                            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + game.getGameConfig().getDisplayName() + "&r : &3None configured" ) );
-                        } else {
-                            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + game.getGameConfig().getDisplayName() + "&r :" ) );
-                            for( String winCommand : winCommands ) {
-                                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|   &3- '" ) + winCommand + ChatColor.translateAlternateColorCodes( '&',"&3'." ) );
-                            }
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "testwincommands":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length >= 2 )
-                    {
-                        StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
-                        if( statsPeriod != null )
-                        {
-                            if( args.length >= 3 ) {
-                                Winner winner = Winner.fromString( args[2] );
-                                if( winner != null ) {
-                                    UUID playerUuid = null;
-                                    if( args.length == 4 ) {
-                                        playerUuid = plugin.findPlayerByName( args[3] );
-                                        if( playerUuid == null ) {
-                                            plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[3] );
-                                            return true;
-                                        }
-                                    } else {
-                                        if( sender instanceof Player ) {
-                                            playerUuid = ((Player)sender).getUniqueId();
-                                        } else {
-                                            plugin.messageSender( sender, Messages.NO_CONSOLE );
-                                            return true;
-                                        }
-                                    }
-                                    plugin.getLoadedConfig().runWinCommands( playerUuid, null, plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ) );
-                                    String message = plugin.formatMessage( Messages.PERIODIC_COMMANDS_TESTED, "", "%period%", statsPeriod.toString() )
-                                            .replaceAll( "%winner%", winner.toString() )
-                                            .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ).size() ) );
-                                    plugin.messageSender( sender, message );
-                                    return true;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Game game = plugin.getGameManager().getGame( args[1] );
-                            if( game == null ) {
-                                plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
-                                return true;
-                            }
-                            UUID playerUuid = null;
-                            if( args.length == 3 ) {
-                                playerUuid = plugin.findPlayerByName( args[2] );
-                                if( playerUuid == null ) {
-                                    plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[2] );
-                                    return true;
-                                }
-                            } else {
-                                if( sender instanceof Player ) {
-                                    playerUuid = ((Player)sender).getUniqueId();
-                                } else {
-                                    plugin.messageSender( sender, Messages.NO_CONSOLE );
-                                    return true;
-                                }
-                            }
-                            plugin.getLoadedConfig().runWinCommands( playerUuid, game.getGameConfig().getDisplayName(), game.getGameConfig().getWinCommands() );
-                            plugin.messageSender( sender, Messages.GAME_COMMANDS_TESTED, game.getGameConfig().getDisplayName(), "%count%", String.valueOf( game.getGameConfig().getWinCommands().size() ) );
-                            return true;
-                        }
-                    }
-                    break;
-
-                case "togglelobbyboost":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    plugin.getLoadedConfig().setBoostWhileQueuing( plugin.getLoadedConfig().canBoostWhileQueuing() ? false : true );
-                    plugin.messageSender( sender, plugin.getLoadedConfig().canBoostWhileQueuing() ? Messages.BOOST_WHILE_QUEUING : Messages.NO_BOOST_WHILE_QUEUING );
-                    return true;
-
-                case "setcooldown":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        try {
-                            plugin.getLoadedConfig().setCoolDown( Long.parseUnsignedLong( args[1] ) );
-                            plugin.messageSender( sender, Messages.COOL_DOWN_SET, "%count%", String.valueOf( plugin.getLoadedConfig().getCoolDown() ) );
-                        } catch( NumberFormatException e ) {
-                            plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "join":
-                    if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( !plugin.hasPermission( sender, "boost.join", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( !plugin.isBoostEnabled() ) {
-                        plugin.messageSender( sender, Messages.BOOST_DISABLED );
-                        return true;
-                    }
-                    if( sender instanceof Player ) {
-                        if( !plugin.isInGameWorld(sender) ) {
-                            plugin.messageSender( sender, Messages.NOT_IN_GAME_WORLD );
-                            return true;
-                        }
-                        if( args.length == 2 ) {
-                            plugin.getGameManager().joinGame( (Player)sender, args[1] );
-                            return true;
-                        }
-                    } else {
-                        plugin.messageSender( sender, Messages.NO_CONSOLE );
-                        return true;
-                    }
-                    break;
-
-                case "leave":
-                    if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( sender instanceof Player ) {
-                        if( args.length == 1 ) {
-                            plugin.getGameManager().leaveGame( (Player)sender );
-                            return true;
-                        }
-                    } else {
-                        plugin.messageSender( sender, Messages.NO_CONSOLE );
-                        return true;
-                    }
-                    break;
-
-                case "queue":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( !plugin.isBoostEnabled() ) {
-                        plugin.messageSender( sender, Messages.BOOST_DISABLED );
-                        return true;
-                    }
-                    if( args.length == 2 ) {
-                        if( args[1].equals( "*" ) ) {
-                            for( Game game : plugin.getGameManager().getGames() ) {
-                                plugin.getGameManager().queueGame( game, sender );
-                            }
-                        } else {
-                            plugin.getGameManager().queueGame( args[1], sender );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "start":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( !plugin.isBoostEnabled() ) {
-                        plugin.messageSender( sender, Messages.BOOST_DISABLED );
-                        return true;
-                    }
-                    if( args.length == 1 ) {
-                        if( sender instanceof Player ) {
-                            Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
-                            if( game == null ) break;
-                            plugin.getGameManager().startGame( game, sender );
-                            return true;
-                        }
-                    }
-                    if( args.length == 2 ) {
-                        plugin.getGameManager().startGame( args[1], sender );
-                        return true;
-                    }
-                    break;
-
-                case "end":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 1 ) {
-                        if( sender instanceof Player ) {
-                            Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
-                            if( game == null ) break;
-                            plugin.getGameManager().endGame( game, sender );
-                            return true;
-                        }
-                    }
-                    if( args.length == 2 ) {
-                        if( args[1].equals( "*" ) ) {
-                            for( Game game : plugin.getGameManager().getGames() ) {
-                                plugin.getGameManager().endGame( game, sender );
-                            }
-                        } else {
-                            plugin.getGameManager().endGame( args[1], sender );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "stop":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 1 ) {
-                        if( sender instanceof Player ) {
-                            Game game = plugin.getGameManager().getPlayersGame( (Player)sender );
-                            if( game == null ) break;
-                            plugin.getGameManager().stopGame( game, sender );
-                            return true;
-                        }
-                    }
-                    if( args.length == 2 ) {
-                        if( args[1].equals( "*" ) ) {
-                            for( Game game : plugin.getGameManager().getGames() ) {
-                                plugin.getGameManager().stopGame( game, sender );
-                            }
-                        } else {
-                            plugin.getGameManager().stopGame( args[1], sender );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "top":
-                    if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        String period = args[1].toLowerCase();
-                        if( period.equalsIgnoreCase( "daily" ) ) {
-                            plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.DAILY );
-                        } else if( period.equalsIgnoreCase( "weekly" ) ) {
-                            plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.WEEKLY );
-                        } else if( period.equalsIgnoreCase( "monthly" ) ) {
-                            plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.MONTHLY );
-                        } else break;
-                        return true;
-                    } else if( args.length == 1 ) {
-                        plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.TOTAL );
-                        return true;
-                    }
-                    break;
-
-                case "stats":
-                    if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        UUID playerUuid = plugin.findPlayerByName( args[1] );
-                        if( playerUuid != null ) {
-                            OfflinePlayer player = plugin.getServer().getOfflinePlayer( playerUuid );
-                            if( player != null ) {
-                                plugin.getGameManager().displayPlayerStats( sender, player );
-                                return true;
-                            }
-                        }
-                        plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
-                        return true;
-                    } else if( sender instanceof Player ) {
-                        plugin.getGameManager().displayPlayerStats( sender, (Player)sender );
-                        return true;
-                    } else {
-                        plugin.messageSender( sender, Messages.NO_CONSOLE );
-                        return true;
-                    }
-
-                case "delstats":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        if( args[1].equals( "*" ) ) {
-                            plugin.getGameManager().deletePlayerStats( sender, null );
-                        } else {
-                            UUID playerUuid = plugin.findPlayerByName( args[1] );
-                            if( playerUuid != null ) {
-                                OfflinePlayer player = plugin.getServer().getOfflinePlayer( playerUuid );
-                                if( player != null ) {
-                                    plugin.getGameManager().deletePlayerStats( sender, player );
-                                    return true;
-                                }
-                            }
-                            plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
-                        }
-                        return true;
-                    }
-                    break;
-
-                case "status":
-                    if( !plugin.hasPermission( sender, "boost.cmd", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( !plugin.hasPermission( sender, "boost.status", Messages.NO_PERMISSION_CMD ) ) return true;
-                    plugin.getGameManager().displayStatus( sender );
-                    return true;
-
-                case "setsign":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( sender instanceof Player ) {
-                        Player player = (Player)sender;
-                        Block targetBlock = player.getTargetBlock( null,5 );
-                        if( targetBlock == null || !(targetBlock.getState() instanceof Sign ) ) {
-                            plugin.messageSender( sender, Messages.NOT_FACING_A_SIGN );
-                            return true;
-                        }
-                        if( args.length > 1 ) {
-                            String args1lower = args[1].toLowerCase();
-                            if( args.length != 3 && args1lower.equals( "join" ) ) break;
-                            Sign sign = (Sign)( targetBlock.getState() );
-                            int line = 0;
-                            sign.setLine( line++, plugin.getLoadedConfig().getSignTitle() );
-                            switch( args1lower ) {
-                                case "join":
-                                    sign.setLine( line++, plugin.getLoadedConfig().getSignJoin() );
-                                    String gameNameForSign = null;
-                                    if( args[2].contains( "&" ) ) {
-                                        gameNameForSign = ChatColor.translateAlternateColorCodes( '&', args[2] );
-                                    } else {
-                                        for( String game : plugin.getGameManager().getGameNames() ) {
-                                            if( ChatColor.stripColor( game ).equalsIgnoreCase( args[2] ) ) {
-                                                gameNameForSign = game;
-                                            }
-                                        }
-                                        if( gameNameForSign == null ) gameNameForSign = args[2];
-                                    }
-                                    sign.setLine( line++, gameNameForSign );
-                                    break;
-                                case "leave":
-                                    sign.setLine( line++, plugin.getLoadedConfig().getSignLeave() );
-                                    break;
-                                case "status":
-                                    sign.setLine( line++, plugin.getLoadedConfig().getSignStatus() );
-                                    break;
-                                case "stats":
-                                    sign.setLine( line++, plugin.getLoadedConfig().getSignStats() );
-                                    break;
-                                case "top":
-                                    sign.setLine( line++, plugin.getLoadedConfig().getSignTop() );
-                                    if( args.length == 3 ) {
-                                        switch( args[2].toLowerCase() ) {
-                                            case "daily":
-                                                sign.setLine( line++, plugin.getLoadedConfig().getSignDaily() );
-                                                break;
-                                            case "weekly":
-                                                sign.setLine( line++, plugin.getLoadedConfig().getSignWeekly() );
-                                                break;
-                                            case "monthly":
-                                                sign.setLine( line++, plugin.getLoadedConfig().getSignMonthly() );
-                                                break;
-                                        }
-                                    }
-                                    break;
-                                default:
-                                    String arg1Coloured = ChatColor.translateAlternateColorCodes( '&', args[1] );
-                                    sign.setLine( line++, arg1Coloured );
-                                    plugin.messageSender( sender, Messages.SIGN_COMMAND_NOT_RECOGNISED, "%command%", arg1Coloured );
-                                    break;
-                            }
-                            for( ; line < 4; ++line ) sign.setLine( line, "" );
-                            sign.update();
-                            plugin.messageSender( sender, Messages.SIGN_SET );
-                            return true;
-                        }
-                    } else {
-                        plugin.messageSender( sender, Messages.NO_CONSOLE );
-                        return true;
-                    }
-                    break;
-
-                case "build":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        for( Player player : plugin.getServer().getOnlinePlayers() ) {
-                            if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
-                                plugin.setBuilder( player.getUniqueId() );
-                                player.setGameMode( plugin.getLoadedConfig().getBuildGameMode() );
-                                plugin.messageSender( player, Messages.BUILD_ENABLED, "", "%player%", player.getName() );
-                                plugin.messageSender( sender, Messages.BUILD_ENABLED, "", "%player%", player.getName() );
-                                return true;
-                            }
-                        }
-                        plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
-                        return true;
-                    } else if( sender instanceof Player ) {
-                        plugin.setBuilder( ((Player)sender).getUniqueId() );
-                        ((Player)sender).setGameMode( plugin.getLoadedConfig().getBuildGameMode() );
-                        plugin.messageSender( sender, Messages.BUILD_ENABLED, "", "%player%", sender.getName() );
-                        return true;
-                    } else {
-                        plugin.messageSender( sender, Messages.NO_CONSOLE );
-                        return true;
-                    }
-
-                case "nobuild":
-                    if( !plugin.hasPermission( sender, "boost.admin", Messages.NO_PERMISSION_CMD ) ) return true;
-                    if( args.length == 2 ) {
-                        for( Player player : plugin.getServer().getOnlinePlayers() ) {
-                            if( player.getDisplayName().equalsIgnoreCase( args[1] ) || ChatColor.stripColor( player.getDisplayName() ).equalsIgnoreCase( args[1] ) || player.getName().equalsIgnoreCase( args[1] ) ) {
-                                plugin.setNotBuilder( player.getUniqueId() );
-                                player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
-                                plugin.messageSender( player, Messages.BUILD_DISABLED, "", "%player%", player.getName() );
-                                plugin.messageSender( sender, Messages.BUILD_DISABLED, "", "%player%", player.getName() );
-                                return true;
-                            }
-                        }
-                        plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
-                        return true;
-                    } else if( sender instanceof Player ) {
-                        plugin.setNotBuilder( ((Player)sender).getUniqueId() );
-                        ((Player)sender).setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
-                        plugin.messageSender( sender, Messages.BUILD_DISABLED, "", "%player%", sender.getName() );
-                        return true;
-                    } else {
-                        plugin.messageSender( sender, Messages.NO_CONSOLE );
-                        return true;
-                    }
-            }
+            SubCommand subCommand = commands.get( boostCommand );
+            if( subCommand != null && subCommand.onSubCommand( sender, args ) ) return true;
             sender.sendMessage( plugin.getLoadedConfig().getCommandUsage( sender.hasPermission( "boost.admin" ), boostCommand ) );
         }
         return true;
+    }
+
+    private List<String> getMatchingStrings( List<String> possibles, String textEnteredThusFar )
+    {
+        if( possibles == null ) return Collections.emptyList();
+        List<String> returnList = new ArrayList<>();
+        for( String possible : possibles ) {
+            String possibleStripped = ChatColor.stripColor( possible );
+            if( textEnteredThusFar.isEmpty() || possibleStripped.toLowerCase().startsWith( textEnteredThusFar ) ) {
+                returnList.add( possibleStripped );
+            }
+        }
+        return returnList;
+    }
+
+    @Override
+    public List<String> onTabComplete( CommandSender sender, Command command, String alias, String[] args )
+    {
+        if( !sender.hasPermission( "boost.cmd" ) ) return Collections.emptyList();
+        if( args.length == 0 ) return Collections.emptyList();
+
+        String[] argsLower = new String[ args.length ];
+        for( int i = 0; i < args.length; ++i ) argsLower[i] = args[i].toLowerCase();
+
+        List< String > matchingStrings = new ArrayList<>();
+        String nextArgToComplete = argsLower[argsLower.length-1];
+        for( SubCommand subCommand : commands.values() ) {
+            matchingStrings.addAll( this.getMatchingStrings( subCommand.tabComplete( sender, argsLower ), nextArgToComplete ) );
+        }
+        return matchingStrings;
     }
 }
