@@ -1,7 +1,6 @@
 package nz.pmme.Boost;
 
 import nz.pmme.Boost.Commands.Commands;
-import nz.pmme.Boost.Commands.TabComplete;
 import nz.pmme.Boost.Config.Config;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Game.GameManager;
@@ -31,6 +30,7 @@ public class Main extends JavaPlugin
     private DataHandler dataHandler = new DataHandler( this, this.database );
     private Map< UUID, Boolean > builders = new HashMap<>();
     private StatsResetTask statsResetTask = new StatsResetTask( this );
+    private Commands commands = new Commands(this);
 
     @Override
     public void onEnable() {
@@ -38,8 +38,8 @@ public class Main extends JavaPlugin
         this.getDataHandler().generateTables();
         this.getDataHandler().checkVersion();
         this.getGameManager().createConfiguredGames();
-        this.getCommand( "boost" ).setExecutor( new Commands(this) );
-        this.getCommand( "boost" ).setTabCompleter( new TabComplete(this) );
+        this.getCommand( "boost" ).setExecutor( this.commands );
+        this.getCommand( "boost" ).setTabCompleter( this.commands );
         this.getServer().getPluginManager().registerEvents( new EventsListener(this), this );
         this.statsResetTask.startTask();
 
@@ -50,7 +50,7 @@ public class Main extends JavaPlugin
 
     @Override
     public void onDisable() {
-        try { this.statsResetTask.cancel(); } catch( IllegalStateException ignored ) {};
+        try { this.statsResetTask.cancel(); } catch( IllegalStateException ignored ) {}
         this.getGameManager().clearAllGames();
         this.disableBoost();
         this.getDatabase().closeConnection();
@@ -140,7 +140,7 @@ public class Main extends JavaPlugin
         return this.getLoadedConfig().getMessage( message ).replaceAll( "%game%", gameNameColoured ).replaceAll( placeHolder, replacementValueColoured );
     }
 
-    public boolean hasPermission( CommandSender sender, String permission, Messages message ) {
+    public boolean checkPermission( CommandSender sender, String permission, Messages message ) {
         if( !sender.hasPermission( permission ) ) {
             messageSender( sender, message );
             return false;

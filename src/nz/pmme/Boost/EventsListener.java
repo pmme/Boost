@@ -100,14 +100,14 @@ public class EventsListener implements Listener
             {
                 String strippedLine1 = ChatColor.stripColor( lines[1] );
                 if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignJoinStripped() ) && lines.length >= 3 ) {
-                    if( !plugin.hasPermission( player, "boost.join", Messages.NO_PERMISSION_USE ) ) return true;
+                    if( !plugin.checkPermission( player, "boost.join", Messages.NO_PERMISSION_USE ) ) return true;
                     plugin.getGameManager().joinGame( player, ChatColor.stripColor( lines[2] ) );
                     return true;
                 } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignLeaveStripped() ) ) {
                     plugin.getGameManager().leaveGame( player );
                     return true;
                 } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatusStripped() ) ) {
-                    if( !plugin.hasPermission( player, "boost.status", Messages.NO_PERMISSION_USE ) ) return true;
+                    if( !plugin.checkPermission( player, "boost.status", Messages.NO_PERMISSION_USE ) ) return true;
                     plugin.getGameManager().displayStatus( player );
                     return true;
                 } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatsStripped() ) ) {

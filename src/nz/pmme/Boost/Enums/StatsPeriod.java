@@ -1,5 +1,8 @@
 package nz.pmme.Boost.Enums;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum StatsPeriod
 {
     DAILY( "player_stats_daily", "Daily", "day", true ),
@@ -31,5 +34,15 @@ public enum StatsPeriod
         } catch( IllegalArgumentException e ) {
             return null;
         }
+    }
+
+    public static List<String> getStatsPeriods()
+    {
+        List<String> statsPeriods = new ArrayList<>();
+        for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
+            if( statsPeriod == StatsPeriod.TOTAL ) break;
+            statsPeriods.add( statsPeriod.toString().toLowerCase() );
+        }
+        return statsPeriods;
     }
 }
