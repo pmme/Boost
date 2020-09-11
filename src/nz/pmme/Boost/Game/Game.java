@@ -20,6 +20,7 @@ public class Game implements Comparable<Game>
     private GameConfig gameConfig;
     private GameState gameState;
     private Map< UUID, PlayerInfo > players = new HashMap<>();
+    private boolean aPlayerHasLost;
 
     private int remainingQueueTime;
     private BukkitTask queueTask;
@@ -31,6 +32,7 @@ public class Game implements Comparable<Game>
         this.plugin = plugin;
         this.gameConfig = gameConfig;
         this.gameState = GameState.STOPPED;
+        this.aPlayerHasLost = false;
 
         if( this.gameConfig.isAutoQueue() ) this.startQueuing();
     }
@@ -155,11 +157,12 @@ public class Game implements Comparable<Game>
             if( activePlayers.size() <= 1 )
             {
                 gameState = GameState.STOPPED;
-                if( activePlayers.size() == 1 )
-                {
-                    this.playerWon( activePlayers.get(0) );
+                if( activePlayers.size() == 0 ) {
+                    this.end( false );
+                } else if( this.getGameConfig().getGroundLevel() != -1 ) {
+                    if( this.aPlayerHasLost ) this.playerWon( activePlayers.get(0) ); // Can only win if at least one player has lost. If everyone else quits the game just ends.
+                    this.end( false );
                 }
-                this.end( false );
                 return;
             }
         }
@@ -193,6 +196,7 @@ public class Game implements Comparable<Game>
     {
         if( gameState == GameState.RUNNING )
         {
+            this.aPlayerHasLost = true;
             PlayerInfo payerInfoLost = players.get( player.getUniqueId() );
             player.getWorld().playSound( player.getLocation(), plugin.getLoadedConfig().getLoseSound(), plugin.getLoadedConfig().getWorldSoundRange() / 16f, 1 );
             if( payerInfoLost != null ) payerInfoLost.setLost();
@@ -311,6 +315,7 @@ public class Game implements Comparable<Game>
     {
         if( queueTask != null && !queueTask.isCancelled() ) queueTask.cancel();
         gameState = GameState.RUNNING;
+        this.aPlayerHasLost = false;
         for( PlayerInfo playerInfo : players.values() )
         {
             playerInfo.resetCoolDown();
@@ -348,6 +353,7 @@ public class Game implements Comparable<Game>
             plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
         }
         players.clear();
+        this.aPlayerHasLost = false;
         if( gameConfig.isAutoQueue() /*&& !wasQueuing*/ && !noAutoQueue ) this.startQueuing();
         return true;
     }
