@@ -284,7 +284,7 @@ public class GameConfig
 
     public boolean isProperlyConfigured(){
         if( this.getLobbySpawn() == null ) return false;
-        if( this.getLossSpawn() == null ) return false;
+        if( this.getGroundLevel() != -1 && this.getLossSpawn() == null ) return false;
         if( this.getStartSpawn() == null ) return false;
         return true;
     }
