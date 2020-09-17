@@ -28,6 +28,7 @@ import java.util.List;
 public class EventsListener implements Listener
 {
     private static final Vector VECTOR_UP = new Vector( 0, 1, 0 );
+    private static final Vector VECTOR_0 = new Vector();
     private Main plugin;
 
     public EventsListener(Main plugin) {
@@ -243,7 +244,13 @@ public class EventsListener implements Listener
             if( game.isActiveInGame( event.getPlayer() ) ) {
                 if( event.getTo() != null ) {
                     if( event.getTo().getBlockY() <= game.getGameConfig().getGroundLevel() && game.getGameConfig().getGroundLevel() != -1 ) {
-                        game.setPlayerLost( event.getPlayer() );
+                        if( game.getGameConfig().isReturnToStartAtGround() ) {
+                            event.getPlayer().setVelocity( EventsListener.VECTOR_0 );
+                            event.getPlayer().setFlying( false );
+                            event.getPlayer().teleport( game.getGameConfig().getStartSpawn() );
+                        } else {
+                            game.setPlayerLost( event.getPlayer() );
+                        }
                     }
                     else if( event.getTo().getBlockY() >= game.getGameConfig().getCeilingLevel() && game.getGameConfig().getCeilingLevel() != -1 ) {
                         game.setPlayerWon( event.getPlayer() );

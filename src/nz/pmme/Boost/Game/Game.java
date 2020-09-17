@@ -154,15 +154,14 @@ public class Game implements Comparable<Game>
         if( gameState == GameState.RUNNING )
         {
             List<Player> activePlayers = getActivePlayerList();
-            if( activePlayers.size() <= 1 )
-            {
+            if( activePlayers.size() == 0 ) {
                 gameState = GameState.STOPPED;
-                if( activePlayers.size() == 0 ) {
-                    this.end( false );
-                } else if( this.getGameConfig().getGroundLevel() != -1 ) {
-                    if( this.aPlayerHasLost ) this.playerWon( activePlayers.get(0) ); // Can only win if at least one player has lost. If everyone else quits the game just ends.
-                    this.end( false );
-                }
+                this.end( false );
+                return;
+            } else if( activePlayers.size() == 1 && !this.getGameConfig().isReturnToStartAtGround() ) {
+                gameState = GameState.STOPPED;
+                if( this.aPlayerHasLost ) this.playerWon( activePlayers.get(0) ); // Can only win if at least one player has lost. If everyone else quits the game just ends.
+                this.end( false );
                 return;
             }
         }

@@ -80,6 +80,8 @@ public enum Messages
     COOL_DOWN_SET("cool_down_set"),
     BOOST_BLOCK_SET("boost_block_set"),
     BOOST_BLOCK_DISABLED("boost_block_disabled"),
+    RETURN_TO_START_ENABLED( "return_to_start_enabled" ),
+    RETURN_TO_START_DISABLED( "return_to_start_disabled" ),
 
     END("end");
 

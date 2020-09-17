@@ -68,6 +68,7 @@ win_commands:
 #      name: '&aArena1'
 #      ground: 64
 #      ceiling: -1
+#      return_to_start_at_ground: false
 #      target_dist: 150
 #      countdown: 30
 #      min_players: 2

@@ -20,6 +20,7 @@ public class GameConfig
 
     private int groundLevel;
     private int ceilingLevel;
+    private boolean returnToStartAtGround;
     private int targetDist;
     private int countdown;
     private int minPlayers;
@@ -45,6 +46,7 @@ public class GameConfig
         this.displayName = plugin.getConfig().getString( configPath + "name", this.name );
         this.groundLevel = plugin.getConfig().getInt( configPath + "ground", 64 );
         this.ceilingLevel = plugin.getConfig().getInt( configPath + "ceiling", -1 );
+        this.returnToStartAtGround = plugin.getConfig().getBoolean( configPath + "return_to_start_at_ground", false );
         this.targetDist = plugin.getConfig().getInt( configPath + "target_dist", 150 );
 
         this.countdown = plugin.getConfig().getInt( configPath + "countdown", 30 );
@@ -78,9 +80,16 @@ public class GameConfig
                 plugin.getLogger().warning( "Start spawn Y " + spawn.getBlockY() + " should be lower than ceiling " + this.ceilingLevel + " for game " + this.name );
             }
         }
+        if( this.groundLevel == -1 && this.returnToStartAtGround ) {
+            plugin.getLogger().warning( "Ground is required since Return to Start is true for game " + this.name );
+        }
         if( this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 ) {
             plugin.getLogger().warning( "Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel + " for game " + this.name );
         }
+        if( this.ceilingLevel == -1 && ( this.groundLevel == -1 || this.returnToStartAtGround ) ) {
+            plugin.getLogger().warning( "There is no way to win in game " + this.name );
+        }
+
     }
 
     public void setConfig()
@@ -88,6 +97,7 @@ public class GameConfig
         plugin.getConfig().set( configPath + "name", this.displayName );
         plugin.getConfig().set( configPath + "ground", this.groundLevel );
         plugin.getConfig().set( configPath + "ceiling", this.ceilingLevel );
+        plugin.getConfig().set( configPath + "return_to_start_at_ground", this.returnToStartAtGround );
         plugin.getConfig().set( configPath + "target_dist", this.targetDist );
 
         plugin.getConfig().set( configPath + "countdown", this.countdown );
@@ -214,6 +224,18 @@ public class GameConfig
         plugin.saveConfig();
     }
 
+    public boolean isReturnToStartAtGround()
+    {
+        return returnToStartAtGround;
+    }
+
+    public void setReturnToStartAtGround( boolean newReturnToStartAtGround )
+    {
+        returnToStartAtGround = newReturnToStartAtGround;
+        this.setConfig();
+        plugin.saveConfig();
+    }
+
     public int getTargetDist()
     {
         return targetDist;
@@ -284,7 +306,7 @@ public class GameConfig
 
     public boolean isProperlyConfigured(){
         if( this.getLobbySpawn() == null ) return false;
-        if( this.getGroundLevel() != -1 && this.getLossSpawn() == null ) return false;
+        if( ( this.getGroundLevel() != -1 && !this.isReturnToStartAtGround() ) && this.getLossSpawn() == null ) return false;
         if( this.getStartSpawn() == null ) return false;
         return true;
     }
@@ -294,15 +316,21 @@ public class GameConfig
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost game config:" ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Config name: &3" + this.name ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Display name: &3" + this.displayName ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: &3" + this.groundLevel + ( this.groundLevel == -1 ? " disabled" : "" ) ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: &3" + this.ceilingLevel + ( this.ceilingLevel == -1 ? " disabled" : "" ) ) );
+        boolean errorRequired = ( this.groundLevel == -1 && this.returnToStartAtGround );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: " + (errorRequired?"&c":"&3") + this.groundLevel + ( this.groundLevel == -1 && !this.returnToStartAtGround ? " disabled" : "" ) ) );
+        if( errorRequired ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Ground is required since Return to Start is true" ) );
+        boolean errorCeilingLow = ( this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: " + (errorCeilingLow?"&c":"&3") + this.ceilingLevel + ( this.ceilingLevel == -1 ? " disabled" : "" ) ) );
+        if( errorCeilingLow ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel ) );
+        if( this.ceilingLevel == -1 && ( this.groundLevel == -1 || this.returnToStartAtGround ) ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c There is no way to win" ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Return to start at ground: &3" + ( this.returnToStartAtGround ? "true" : "false" ) ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Target distance: &3" + this.targetDist ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start countdown: &3" + this.countdown ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Countdown announcement period: &3" + this.countdownAnnounceTime ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Minimum players to start: &3" + this.minPlayers ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Maximum players: &3" + this.maxPlayers ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Auto queue: &3" + ( this.autoQueue ? "&aon" : "&coff" ) ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Requires permission: &3" + ( this.requiresPermission ? "&atrue" : "&cfalse" ) ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Requires permission: &3" + ( this.requiresPermission ? "true" : "false" ) ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Boost block: &3" + ( this.boostBlock != null ? this.boostBlock.toString() : "-" ) ) );
         if( this.lobbySpawn.getConfiguredSpawn() == null ) {
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Lobby spawn: &cNot configured" ) );
@@ -314,20 +342,19 @@ public class GameConfig
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn: &cNot configured" ) );
         } else {
             Location spawn = this.startSpawn.getConfiguredSpawn();
-            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn: &3" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
+            boolean errorStartToGround = ( spawn.getBlockY() <= this.groundLevel && this.groundLevel != -1 );
+            boolean errorStartToCeiling = ( spawn.getBlockY() >= this.ceilingLevel && this.ceilingLevel != -1 );
+            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn: " + (errorStartToGround||errorStartToCeiling?"&c":"&3") + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn spread: &3" + this.startSpawn.getSpread() ) );
-            if( spawn.getBlockY() <= this.groundLevel && this.groundLevel != -1 ) {
-                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Start spawn Y " + spawn.getBlockY() + " should be higher than ground " + this.groundLevel ) );
-            }
-            if( spawn.getBlockY() >= this.ceilingLevel && this.ceilingLevel != -1 ) {
-                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Start spawn Y " + spawn.getBlockY() + " should be lower than ceiling " + this.ceilingLevel ) );
-            }
-            if( this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 ) {
-                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel ) );
-            }
+            if( errorStartToGround ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Start spawn Y " + spawn.getBlockY() + " should be higher than ground " + this.groundLevel ) );
+            if( errorStartToCeiling ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Start spawn Y " + spawn.getBlockY() + " should be lower than ceiling " + this.ceilingLevel ) );
         }
         if( this.lossSpawn.getConfiguredSpawn() == null ) {
-            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &cNot configured" ) );
+            if( this.groundLevel == -1 || this.returnToStartAtGround ) {
+                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &3Not required" ) );
+            } else {
+                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &cNot configured" ) );
+            }
         } else {
             Location spawn = this.lossSpawn.getConfiguredSpawn();
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &3" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
