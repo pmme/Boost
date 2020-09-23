@@ -258,7 +258,7 @@ public class EventsListener implements Listener
                     else if( game.getGameConfig().getBoostBlock() != null ) {
                         Block block = event.getPlayer().getWorld().getBlockAt( event.getTo().getBlockX(), event.getTo().getBlockY()-1, event.getTo().getBlockZ() );
                         if( block.getType() == game.getGameConfig().getBoostBlock() ) {
-                            this.boostPlayer( event.getPlayer(), event.getFrom(), event.getTo() );
+                            this.boostPlayer( event.getPlayer(), event.getTo(), event.getTo() ); // Uses same location, which will end up taking players current facing direction.
                         }
                     }
                 }
