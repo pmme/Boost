@@ -308,6 +308,10 @@ public class GameConfig
         if( this.getLobbySpawn() == null ) return false;
         if( ( this.getGroundLevel() != -1 && !this.isReturnToStartAtGround() ) && this.getLossSpawn() == null ) return false;
         if( this.getStartSpawn() == null ) return false;
+        if( this.getGroundLevel() == -1 && this.isReturnToStartAtGround() ) return false;
+        if( this.getGroundLevel() >= this.getCeilingLevel() && this.getGroundLevel() != -1 && this.getCeilingLevel() != -1 ) return false;
+        if( this.getStartSpawn().getBlockY() <= this.getGroundLevel() && this.getGroundLevel() != -1 ) return false;
+        if( this.getStartSpawn().getBlockY() >= this.getCeilingLevel() && this.getCeilingLevel() != -1 ) return false;
         return true;
     }
 
