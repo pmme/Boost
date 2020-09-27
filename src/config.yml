@@ -77,6 +77,7 @@ win_commands:
 #      countdown_announce_time: 10
 #      requires_permission: false
 #      boost_block: REDSTONE_ORE
+#      gui_item: GLASS
 #      game_start:
 #        world: world
 #        x: 100

@@ -28,6 +28,7 @@ public class GameConfig
     private boolean autoQueue;
     private boolean requiresPermission;
     private Material boostBlock = null;
+    private Material guiItem = null;
 
     private SpawnLocation lobbySpawn;
     private SpawnLocation startSpawn;
@@ -57,10 +58,17 @@ public class GameConfig
 
         String boostBlockName = plugin.getConfig().getString( configPath + "boost_block", "" ).toUpperCase();
         if( !boostBlockName.isEmpty() ) {
-            try {
-                this.boostBlock = Material.valueOf( boostBlockName );
-            } catch( IllegalArgumentException e ) {
+            this.boostBlock = Material.getMaterial( boostBlockName );
+            if( this.boostBlock == null ) {
                 plugin.getLogger().warning( "Boost block " + boostBlockName + " is not a recognised material name." );
+            }
+        }
+
+        String guiItemName = plugin.getConfig().getString( configPath + "gui_item", "" ).toUpperCase();
+        if( !guiItemName.isEmpty() ) {
+            this.guiItem = Material.getMaterial( guiItemName );
+            if( this.guiItem == null ) {
+                plugin.getLogger().warning( "GUI item " + guiItemName + " is not a recognised material name." );
             }
         }
 
@@ -106,6 +114,7 @@ public class GameConfig
         plugin.getConfig().set( configPath + "auto_queue", this.autoQueue );
         plugin.getConfig().set( configPath + "requires_permission", this.requiresPermission );
         plugin.getConfig().set( configPath + "boost_block", this.boostBlock != null ? this.boostBlock.toString() : "" );
+        plugin.getConfig().set( configPath + "gui_item", this.guiItem != null ? this.guiItem.toString() : "" );
 
         this.lobbySpawn.setConfig();
         this.startSpawn.setConfig();
@@ -196,6 +205,17 @@ public class GameConfig
     public void setBoostBlock( Material material )
     {
         boostBlock = material != Material.AIR ? material : null;
+        this.setConfig();
+        plugin.saveConfig();
+    }
+
+    public Material getGuiItem() {
+        return guiItem;
+    }
+
+    public void setGuiItem( Material material )
+    {
+        guiItem = material != Material.AIR ? material : null;
         this.setConfig();
         plugin.saveConfig();
     }
@@ -336,6 +356,7 @@ public class GameConfig
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Auto queue: &3" + ( this.autoQueue ? "&aon" : "&coff" ) ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Requires permission: &3" + ( this.requiresPermission ? "true" : "false" ) ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Boost block: &3" + ( this.boostBlock != null ? this.boostBlock.toString() : "-" ) ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f GUI item: &3" + ( this.guiItem != null ? this.guiItem.toString() : "-" ) ) );
         if( this.lobbySpawn.getConfiguredSpawn() == null ) {
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Lobby spawn: &cNot configured" ) );
         } else {
