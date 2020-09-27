@@ -82,6 +82,8 @@ public enum Messages
     BOOST_BLOCK_DISABLED("boost_block_disabled"),
     RETURN_TO_START_ENABLED( "return_to_start_enabled" ),
     RETURN_TO_START_DISABLED( "return_to_start_disabled" ),
+    GUI_ITEM_SET( "gui_item_set" ),
+    GUI_ITEM_DISABLED( "gui_item_disabled" ),
 
     END("end");
 

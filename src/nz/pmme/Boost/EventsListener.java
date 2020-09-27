@@ -1,8 +1,10 @@
 package nz.pmme.Boost;
 
+import nz.pmme.Boost.Config.GUIButtonConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Game.Game;
+import nz.pmme.Boost.Gui.GUI;
 import nz.pmme.Utils.VectorToOtherPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -91,6 +93,18 @@ public class EventsListener implements Listener
         this.boostPlayer( otherPlayer, vectorToOtherPlayer );
     }
 
+    private boolean handleMainGuiItemClickEvent( Player player )
+    {
+        GUIButtonConfig guiButtonConfig = plugin.getLoadedConfig().getGuiButtonConfig( "main" );
+        if( guiButtonConfig.isEnabled() && player.getInventory().getItemInMainHand().getType() == guiButtonConfig.getMaterial() )
+        {
+            GUI gui = new GUI( this.plugin, player );
+            gui.openInventory();
+            return true;
+        }
+        return false;
+    }
+
     private boolean handleSignClickEvent( Block clickedBlock, Player player)
     {
         if( clickedBlock.getState() instanceof Sign )
@@ -153,6 +167,7 @@ public class EventsListener implements Listener
             switch( event.getAction() ) {
                 case LEFT_CLICK_BLOCK:
                 case RIGHT_CLICK_BLOCK:
+                    if( handleMainGuiItemClickEvent( event.getPlayer() ) ) return;
                     if( handleSignClickEvent( event.getClickedBlock(), event.getPlayer() ) ) return;
                     if( playersGame == null ) return;
                     if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
@@ -161,6 +176,7 @@ public class EventsListener implements Listener
                     break;
                 case LEFT_CLICK_AIR:
                 case RIGHT_CLICK_AIR:
+                    if( handleMainGuiItemClickEvent( event.getPlayer() ) ) return;
                     if( playersGame == null ) return;
                     if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
                     if( playersGame.isOnCoolDown( thisPlayer ) ) return;
@@ -283,7 +299,9 @@ public class EventsListener implements Listener
             event.getPlayer().getInventory().clear();
             ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
             event.getPlayer().getInventory().setItem( 8, instructionBook );
-            event.getPlayer().getInventory().setHeldItemSlot( 8 );
+            ItemStack mainGuiItem = plugin.getLoadedConfig().getGuiButtonConfig( "main" ).create();
+            event.getPlayer().getInventory().setItem( 0, mainGuiItem );
+            event.getPlayer().getInventory().setHeldItemSlot( 0 );
         }
     }
 
@@ -307,7 +325,9 @@ public class EventsListener implements Listener
                 event.getPlayer().getInventory().clear();
                 ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
                 event.getPlayer().getInventory().setItem( 8, instructionBook );
-                event.getPlayer().getInventory().setHeldItemSlot( 8 );
+                ItemStack mainGuiItem = plugin.getLoadedConfig().getGuiButtonConfig( "main" ).create();
+                event.getPlayer().getInventory().setItem( 0, mainGuiItem );
+                event.getPlayer().getInventory().setHeldItemSlot( 0 );
             }
         }
     }

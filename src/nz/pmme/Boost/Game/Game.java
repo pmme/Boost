@@ -149,7 +149,9 @@ public class Game implements Comparable<Game>
             player.getInventory().clear();
             ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
             player.getInventory().setItem( 8, instructionBook );
-            player.getInventory().setHeldItemSlot( 8 );
+            ItemStack mainGuiItem = plugin.getLoadedConfig().getGuiButtonConfig( "main" ).create();
+            player.getInventory().setItem( 0, mainGuiItem );
+            player.getInventory().setHeldItemSlot( 0 );
         }
         if( gameState == GameState.RUNNING )
         {
@@ -347,7 +349,9 @@ public class Game implements Comparable<Game>
             playerInfo.getPlayer().getInventory().clear();
             ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
             playerInfo.getPlayer().getInventory().setItem( 8, instructionBook );
-            playerInfo.getPlayer().getInventory().setHeldItemSlot( 8 );
+            ItemStack mainGuiItem = plugin.getLoadedConfig().getGuiButtonConfig( "main" ).create();
+            playerInfo.getPlayer().getInventory().setItem( 0, mainGuiItem );
+            playerInfo.getPlayer().getInventory().setHeldItemSlot( 0 );
 
             plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
         }

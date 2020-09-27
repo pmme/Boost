@@ -1,0 +1,50 @@
+gui:
+  buttons:
+    main:
+      enabled: true
+      item: "CLOCK"
+      name: "&5&l平台争霸"
+      lore:
+        - "点击显示菜单"
+    join:
+      enabled: true
+      item: "GLASS"
+      name: "加入游戏 %game%"
+      lore:
+        - "点击加入"
+    leave:
+      enabled: true
+      item: "IRON_DOOR"
+      name: "离开当前游戏"
+      lore:
+        - "点击离开"
+    stats:
+      enabled: true
+      item: "PAPER"
+      name: "玩家的统计信息"
+      lore:
+        - "查询玩家的统计信息"
+    top_total:
+      enabled: true
+      item: "MAP"
+      name: "&a行榜"
+      lore:
+        - "查询排行榜"
+    top_monthly:
+      enabled: true
+      item: "FILLED_MAP"
+      name: "&a月行榜"
+      lore:
+        - "查询排行榜"
+    top_weekly:
+      enabled: true
+      item: "FILLED_MAP"
+      name: "&a周行榜"
+      lore:
+        - "查询排行榜"
+    top_daily:
+      enabled: false
+      item: "FILLED_MAP"
+      name: "&a天行榜"
+      lore:
+        - "查询排行榜"

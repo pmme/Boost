@@ -78,6 +78,8 @@ boost_block_set: "Boost block for %game%&r set to %block%."
 boost_block_disabled: "%game%&r set to have no Boost block."
 return_to_start_enabled: "%game%&r set to return to start on falling."
 return_to_start_disabled: "%game%&r set that players lose on falling."
+gui_item_set: "GUI item for %game%&r set to %item%."
+gui_item_disabled: "%game%&r does not override the GUI item."
 
 player_stats:
   - "&5[平台争霸] &f玩家统计信息: %player%"
@@ -109,6 +111,7 @@ command_usage_admin:
   - "&f/boost setspread Arena1 [spread] &3- 设置玩家传送时的分散距离"
   - "&f/boost setreturn Arena1 [on/off] &3- Set players return to start on falling."
   - "&f/boost setboostblock Arena1 &3- Set a block that boosts you when stepped on."
+  - "&f/boost setguiitem Arena1 &3- Set the item to click in the GUI to join a game."
   - "&f/boost setminplayers Arena1 [min] &3- 设置游戏开始的最小玩家数"
   - "&f/boost setmaxplayers Arena1 [max] &3- 设置加入游戏的最大玩家数"
   - "&f/boost autoqueue Arena1 [on/off] &3- 是否打开排队"

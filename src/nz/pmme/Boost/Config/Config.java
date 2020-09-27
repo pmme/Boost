@@ -2,6 +2,7 @@ package nz.pmme.Boost.Config;
 
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Enums.Winner;
+import nz.pmme.Boost.Gui.GUIButton;
 import nz.pmme.Boost.Main;
 import org.bukkit.*;
 import org.bukkit.command.CommandException;
@@ -85,6 +86,11 @@ public class Config
     private boolean giveOnlyBestBoostStick;
     private List<BoostStick> boostSticks = new ArrayList<>();
     private Map< String, BoostStick > boostSticksByName = new HashMap<>();
+
+    private File guiConfigFile = null;
+    private FileConfiguration guiConfig = null;
+    private Map< String, GUIButtonConfig > guiButtons = new HashMap<>();
+
     private List<GameConfig> gameConfigList = new ArrayList<>();
     private Map< String, Boolean > gameWorlds = new HashMap<>();
 
@@ -114,6 +120,7 @@ public class Config
         this.commandUsageAdmin.clear();
         this.boostSticks.clear();
         this.boostSticksByName.clear();
+        this.guiButtons.clear();
         this.gameConfigList.clear();
         this.gameWorlds.clear();
         this.load();
@@ -183,6 +190,24 @@ public class Config
         }
     }
 
+    private void loadGuiConfig()
+    {
+        final String guiConfigFileName = this.languagePrefix + "gui.yml";
+        this.guiConfigFile = new File( plugin.getDataFolder(), guiConfigFileName );
+        if( !this.guiConfigFile.exists() ) {
+            try {
+                plugin.saveResource( guiConfigFileName, false );
+            } catch( IllegalArgumentException e ) {
+                plugin.getLogger().severe( "There is no resource named " + guiConfigFileName + " to create in the plugins folder. " + ( !this.languagePrefix.isEmpty() ? "Check the 'language' setting in the config." : "" ) );
+            }
+        }
+        this.guiConfig = YamlConfiguration.loadConfiguration( this.guiConfigFile );
+        InputStream defConfigStream = plugin.getResource( guiConfigFileName );
+        if( defConfigStream != null ) {
+            this.guiConfig.setDefaults( YamlConfiguration.loadConfiguration( new InputStreamReader( defConfigStream, StandardCharsets.UTF_8 ) ) );
+        }
+    }
+
     private void loadStatsResetConfig()
     {
         this.statsResetConfigFile = new File( plugin.getDataFolder(), "statsReset.yml" );
@@ -215,6 +240,7 @@ public class Config
 
         this.loadMessagesConfig();
         this.loadSticksConfig();
+        this.loadGuiConfig();
         this.loadStatsResetConfig();
 
         // targetDistance is the radius from the centre block, so a box of 3 blocks is (3-1)/2 = 1 block bigger than the main block. 1 block is (1-1)/2 = 0 blocks bigger, or just the main block.
@@ -278,6 +304,15 @@ public class Config
                 boostSticksByName.put( boostStick.getName().toLowerCase(), boostStick );
             }
         }
+
+        ConfigurationSection guiButtonsSection = guiConfig.getConfigurationSection( "gui.buttons" );
+        if( guiButtonsSection != null ) {
+            for( String guiButtonName : guiButtonsSection.getKeys( false ) ) {
+                GUIButtonConfig guiButtonConfig = new GUIButtonConfig( plugin, guiButtonName.toLowerCase(), guiConfig );
+                guiButtons.put( guiButtonConfig.getName(), guiButtonConfig );
+            }
+        }
+
         ConfigurationSection gamesSection = plugin.getConfig().getConfigurationSection( "games" );
         if( gamesSection != null ) {
             for( String gameName : gamesSection.getKeys( false ) ) {
@@ -430,6 +465,19 @@ public class Config
             }
             return sticks;
         }
+    }
+
+    public GUIButtonConfig getGuiButtonConfig( String name ) {
+        GUIButtonConfig guiButtonConfig = guiButtons.get( name.toLowerCase() );
+        if( guiButtonConfig == null ) {
+            guiButtonConfig = new GUIButtonConfig( plugin, name.toLowerCase(), null );
+            guiButtons.put( name, guiButtonConfig );
+        }
+        return guiButtonConfig;
+    }
+
+    public boolean isGuiButtonEnabled( String name ) {
+        return this.getGuiButtonConfig( name ).isEnabled();
     }
 
     public List<GameConfig> getGameList() { return gameConfigList; }

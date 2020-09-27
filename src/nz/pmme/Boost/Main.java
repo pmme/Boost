@@ -4,6 +4,7 @@ import nz.pmme.Boost.Commands.Commands;
 import nz.pmme.Boost.Config.Config;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Game.GameManager;
+import nz.pmme.Boost.Gui.GUIListener;
 import nz.pmme.Boost.Tasks.StatsResetTask;
 import nz.pmme.Boost.Data.Database;
 import nz.pmme.Boost.Data.DataHandler;
@@ -41,6 +42,7 @@ public class Main extends JavaPlugin
         this.getCommand( "boost" ).setExecutor( this.commands );
         this.getCommand( "boost" ).setTabCompleter( this.commands );
         this.getServer().getPluginManager().registerEvents( new EventsListener(this), this );
+        this.getServer().getPluginManager().registerEvents( new GUIListener(), this );
         this.statsResetTask.startTask();
 
         if( this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
