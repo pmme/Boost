@@ -2,7 +2,6 @@ package nz.pmme.Boost.Config;
 
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Enums.Winner;
-import nz.pmme.Boost.Gui.GUIButton;
 import nz.pmme.Boost.Main;
 import org.bukkit.*;
 import org.bukkit.command.CommandException;
@@ -89,6 +88,8 @@ public class Config
 
     private File guiConfigFile = null;
     private FileConfiguration guiConfig = null;
+    private String guiName;
+    private int guiRows;
     private Map< String, GUIButtonConfig > guiButtons = new HashMap<>();
 
     private List<GameConfig> gameConfigList = new ArrayList<>();
@@ -147,13 +148,18 @@ public class Config
         Object oldSignsConfigSection = plugin.getConfig().get( "signs", null );
         if( oldSignsConfigSection != null ) {
             this.messagesConfig.set( "signs", oldSignsConfigSection );
-            try {
-                this.messagesConfig.save( this.messagesConfigFile );
-            } catch (IOException var2) {
-                plugin.getLogger().severe( "Could not save to file '" + this.messagesConfigFile.getPath() + "'" );
-            }
+            this.saveMessagesConfig();
             plugin.getConfig().set( "signs", null );
             plugin.saveConfig();
+        }
+    }
+
+    private void saveMessagesConfig()
+    {
+        try {
+            this.messagesConfig.save( this.messagesConfigFile );
+        } catch (IOException var2) {
+            plugin.getLogger().severe( "Could not save to file '" + this.messagesConfigFile.getPath() + "'" );
         }
     }
 
@@ -168,11 +174,7 @@ public class Config
             if( oldBoostSticksConfigSection != null ) {
                 this.sticksConfig = new YamlConfiguration();
                 this.sticksConfig.set( "boost_sticks", oldBoostSticksConfigSection );
-                try {
-                    this.sticksConfig.save( this.sticksConfigFile );
-                } catch (IOException var2) {
-                    plugin.getLogger().severe( "Could not save to file '" + this.sticksConfigFile.getPath() + "'" );
-                }
+                this.saveSticksConfig();
                 plugin.getConfig().set( "boost_sticks", null );
                 plugin.saveConfig();
             } else {
@@ -187,6 +189,15 @@ public class Config
         InputStream defConfigStream = plugin.getResource( sticksConfigFileName );
         if( defConfigStream != null ) {
             this.sticksConfig.setDefaults( YamlConfiguration.loadConfiguration( new InputStreamReader( defConfigStream, StandardCharsets.UTF_8 ) ) );
+        }
+    }
+
+    private void saveSticksConfig()
+    {
+        try {
+            this.sticksConfig.save( this.sticksConfigFile );
+        } catch (IOException var2) {
+            plugin.getLogger().severe( "Could not save to file '" + this.sticksConfigFile.getPath() + "'" );
         }
     }
 
@@ -205,6 +216,15 @@ public class Config
         InputStream defConfigStream = plugin.getResource( guiConfigFileName );
         if( defConfigStream != null ) {
             this.guiConfig.setDefaults( YamlConfiguration.loadConfiguration( new InputStreamReader( defConfigStream, StandardCharsets.UTF_8 ) ) );
+        }
+    }
+
+    public void saveGuiConfig()
+    {
+        try {
+            this.guiConfig.save( this.guiConfigFile );
+        } catch (IOException var2) {
+            plugin.getLogger().severe( "Could not save to file '" + this.guiConfigFile.getPath() + "'" );
         }
     }
 
@@ -305,6 +325,8 @@ public class Config
             }
         }
 
+        guiName = guiConfig.getString( "gui.name", "Boost menu" );
+        guiRows = guiConfig.getInt( "gui.rows", 4 );
         ConfigurationSection guiButtonsSection = guiConfig.getConfigurationSection( "gui.buttons" );
         if( guiButtonsSection != null ) {
             for( String guiButtonName : guiButtonsSection.getKeys( false ) ) {
@@ -466,6 +488,9 @@ public class Config
             return sticks;
         }
     }
+
+    public String getGuiName() { return guiName; }
+    public int getGuiRows() { return guiRows; }
 
     public GUIButtonConfig getGuiButtonConfig( String name ) {
         GUIButtonConfig guiButtonConfig = guiButtons.get( name.toLowerCase() );
