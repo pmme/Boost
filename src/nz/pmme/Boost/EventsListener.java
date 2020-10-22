@@ -218,6 +218,7 @@ public class EventsListener implements Listener
             {
                 final Player thisPlayer = event.getPlayer();
                 final Game playersGame = plugin.getGameManager().getPlayersGame( thisPlayer );
+                if( playersGame == null ) return;
                 if( playersGame.isOnCoolDown( thisPlayer ) ) return;
                 final Player otherPlayer = (Player)event.getRightClicked();
                 if( plugin.getGameManager().activeInSameGame( thisPlayer, otherPlayer ) )
