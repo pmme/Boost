@@ -40,7 +40,11 @@ public class PlayerInfo
     }
 
     public void setCoolDown( long coolDownMillis ) {
-        this.coolDownEndMillis = System.currentTimeMillis() + coolDownMillis;
+        this.coolDownEndMillis = ( coolDownMillis > 0L ) ? System.currentTimeMillis() + coolDownMillis : 0L;
+    }
+
+    public void setCoolDownEnd( long coolDownEndMillis ) {
+        if( coolDownEndMillis > 0L ) this.coolDownEndMillis = coolDownEndMillis;
     }
 
     public void resetCoolDown() {

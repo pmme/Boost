@@ -43,6 +43,7 @@ public class Config
     private double min_horizontal_velocity;
     private double block_hit_horizontal_velocity;
     private long coolDown;
+    private long gameStartBoostDelay;
 
     private String signTitle;
     private String signJoin;
@@ -324,6 +325,7 @@ public class Config
         min_horizontal_velocity = plugin.getConfig().getDouble( "physics.min_horizontal_velocity", 0.1 );
         block_hit_horizontal_velocity = plugin.getConfig().getDouble( "physics.block_hit_horizontal_velocity", 2.5 );
         coolDown = plugin.getConfig().getLong( "physics.cooldown", 500L );
+        gameStartBoostDelay = plugin.getConfig().getLong( "physics.game_start_boost_delay", 5L );
 
         signTitle = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.title", "[Boost]" ) );
         signJoin = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.join", "Click to join" ) );
@@ -436,6 +438,13 @@ public class Config
     public void setCoolDown( long coolDown ) {
         this.coolDown = coolDown;
         plugin.getConfig().set( "physics.cooldown", this.coolDown );
+        plugin.saveConfig();
+    }
+
+    public long getGameStartBoostDelay() { return gameStartBoostDelay; }
+    public void setGameStartBoostDelay( long gameStartBoostDelay ) {
+        this.gameStartBoostDelay = gameStartBoostDelay;
+        plugin.getConfig().set( "physics.game_start_boost_delay", this.gameStartBoostDelay );
         plugin.saveConfig();
     }
 

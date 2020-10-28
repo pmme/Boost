@@ -9,6 +9,7 @@ physics:
   target_box_width: 3
   target_box_height: 2
   cooldown: 500
+  game_start_boost_delay: 5
 
 SQLite: true
 sql:

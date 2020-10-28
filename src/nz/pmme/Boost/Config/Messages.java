@@ -78,6 +78,7 @@ public enum Messages
     GAME_PERM_DISABLED("game_perm_disabled"),
     GAME_NOT_AVAILABLE("game_not_available"),
     COOL_DOWN_SET("cool_down_set"),
+    START_DELAY_SET("start_delay_set"),
     BOOST_BLOCK_SET("boost_block_set"),
     BOOST_BLOCK_DISABLED("boost_block_disabled"),
     RETURN_TO_START_ENABLED( "return_to_start_enabled" ),
@@ -89,6 +90,7 @@ public enum Messages
     COMMAND_BLOCKED( "command_blocked" ),
     COMMAND_NOW_ALLOWED( "command_now_allowed" ),
     COMMAND_NOW_BLOCKED( "command_now_blocked" ),
+    START_DELAY_TITLE( "start_delay_title" ),
 
     END("end");
 

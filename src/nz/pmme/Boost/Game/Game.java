@@ -6,6 +6,9 @@ import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
 import nz.pmme.Boost.Main;
 import org.bukkit.Material;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -317,9 +320,37 @@ public class Game implements Comparable<Game>
         if( queueTask != null && !queueTask.isCancelled() ) queueTask.cancel();
         gameState = GameState.RUNNING;
         this.aPlayerHasLost = false;
+
+        long coolDownEndMillis;
+        if( plugin.getLoadedConfig().getGameStartBoostDelay() > 0L )
+        {
+            coolDownEndMillis = System.currentTimeMillis() + plugin.getLoadedConfig().getGameStartBoostDelay() * 1000L;
+            String barTitle = plugin.formatMessage( Messages.START_DELAY_TITLE, "", "%time%", Long.toString( plugin.getLoadedConfig().getGameStartBoostDelay() ) );
+            BossBar bossBar = plugin.getServer().createBossBar( barTitle, BarColor.BLUE, BarStyle.SEGMENTED_10 );
+            bossBar.setProgress( 1.0 );
+            for( PlayerInfo playerInfo : players.values() ) bossBar.addPlayer( playerInfo.getPlayer() );
+            bossBar.setVisible( true );
+            new BukkitRunnable()
+            {
+                long boostDelayCountdown = plugin.getLoadedConfig().getGameStartBoostDelay();
+                @Override
+                public void run() {
+                    --boostDelayCountdown;
+                    if( boostDelayCountdown >= 0L ) {
+                        bossBar.setProgress( boostDelayCountdown / (double)plugin.getLoadedConfig().getGameStartBoostDelay() );
+                    } else {
+                        this.cancel();
+                        bossBar.removeAll();
+                        bossBar.setVisible( false );
+                    }
+                }
+            }.runTaskTimer( plugin, 0L, 20L/*ticksPerSecond*/ );
+        }
+        else coolDownEndMillis = 0L;
+
         for( PlayerInfo playerInfo : players.values() )
         {
-            playerInfo.resetCoolDown();
+            playerInfo.setCoolDownEnd( coolDownEndMillis );
             playerInfo.getPlayer().setVelocity( Game.VECTOR0 );
             playerInfo.getPlayer().setFlying( false );
             playerInfo.getPlayer().teleport( gameConfig.getStartSpawn() );

@@ -58,6 +58,7 @@ public class Commands implements TabExecutor
         this.registerSubCommand( new SubCommandTestWinCommands( plugin, "testwincommands" ) );
         this.registerSubCommand( new SubCommandToggleLobbyBoost( plugin, "togglelobbyboost" ) );
         this.registerSubCommand( new SubCommandSetCoolDown( plugin, "setcooldown" ) );
+        this.registerSubCommand( new SubCommandSetStartDelay( plugin, "setstartdelay" ) );
         this.registerSubCommand( new SubCommandQueue( plugin, "queue" ) );
         this.registerSubCommand( new SubCommandStart( plugin, "start" ) );
         this.registerSubCommand( new SubCommandEnd( plugin, "end" ) );
