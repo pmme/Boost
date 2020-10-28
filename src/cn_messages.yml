@@ -80,6 +80,8 @@ return_to_start_enabled: "%game%&r set to return to start on falling."
 return_to_start_disabled: "%game%&r set that players lose on falling."
 gui_item_set: "GUI item for %game%&r set to %item%."
 gui_item_disabled: "%game%&r does not override the GUI item."
+config_up_to_date: "Configuration files already up to date."
+config_updated: "Configuration files updated to contain latest content."
 
 player_stats:
   - "&5[平台争霸] &f玩家统计信息: %player%"
@@ -138,6 +140,7 @@ command_usage_admin:
   - "&f/boost delstats * &3- 删除所有玩家的游戏统计信息"
   - "&f/boost delstats [player] &3- 删除指定玩家的游戏统计信息"
   - "&f/boost reload &3- 结束所有游戏，重新加载配置文件"
+  - "&f/boost updateconfig &3- Update config files to latest content."
   - "&f/boost addgameworld <world> &3- 添加平台争霸游戏世界"
   - "&f/boost removegameworld <world> &3- 删除平台争霸游戏世界"
   - "&f/boost setmainlobby <world x y z> &3- 设置主大厅传送的位置"

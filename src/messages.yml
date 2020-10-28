@@ -80,6 +80,8 @@ return_to_start_enabled: "%game%&r set to return to start on falling."
 return_to_start_disabled: "%game%&r set that players lose on falling."
 gui_item_set: "GUI item for %game%&r set to %item%."
 gui_item_disabled: "%game%&r does not override the GUI item."
+config_up_to_date: "Configuration files already up to date."
+config_updated: "Configuration files updated to contain latest content."
 
 player_stats:
   - "&5[Boost] &fPlayer stats: %player%"
@@ -138,6 +140,7 @@ command_usage_admin:
   - "&f/boost delstats * &3- Delete all game stats for all players."
   - "&f/boost delstats [player] &3- Delete game stats for player."
   - "&f/boost reload &3- End all games, reload config, and re-initialise."
+  - "&f/boost updateconfig &3- Update config files to latest content."
   - "&f/boost addgameworld <world> &3- Add a world to be managed by Boost."
   - "&f/boost removegameworld <world> &3- Stop world being managed by Boost."
   - "&f/boost setmainlobby <world x y z> &3- Set the spawn for the main lobby."

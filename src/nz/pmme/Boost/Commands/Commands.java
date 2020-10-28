@@ -27,6 +27,7 @@ public class Commands implements TabExecutor
         this.registerSubCommand( new SubCommandOn( plugin, "on" ) );
         this.registerSubCommand( new SubCommandOff( plugin, "off" ) );
         this.registerSubCommand( new SubCommandReload( plugin, "reload" ) );
+        this.registerSubCommand( new SubCommandUpdateConfig( plugin, "updateconfig" ) );
         this.registerSubCommand( new SubCommandLanguage( plugin, "language" ) );
         this.registerSubCommand( new SubCommandAddGameWorld( plugin, "addgameworld" ) );
         this.registerSubCommand( new SubCommandRemoveGameWorld( plugin, "removegameworld" ) );

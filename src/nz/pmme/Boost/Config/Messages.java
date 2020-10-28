@@ -84,6 +84,8 @@ public enum Messages
     RETURN_TO_START_DISABLED( "return_to_start_disabled" ),
     GUI_ITEM_SET( "gui_item_set" ),
     GUI_ITEM_DISABLED( "gui_item_disabled" ),
+    CONFIG_UP_TO_DATE( "config_up_to_date" ),
+    CONFIG_UPDATED( "config_updated" ),
 
     END("end");
 

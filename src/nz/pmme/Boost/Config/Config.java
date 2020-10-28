@@ -126,6 +126,41 @@ public class Config
         this.load();
     }
 
+    public boolean updateConfigFiles()
+    {
+        boolean somethingWasAdded = false;
+        if( this.updateConfig( plugin.getConfig(), "config.yml" ) ) {
+            plugin.saveConfig();
+            somethingWasAdded = true;
+        }
+        if( this.updateConfig( this.messagesConfig, this.languagePrefix + "messages.yml" ) ) {
+            try {
+                this.messagesConfig.save( this.messagesConfigFile );
+            } catch( IOException e ) {
+                plugin.getLogger().severe( "Could not save to file '" + this.messagesConfigFile.getPath() + "'" );
+            }
+            somethingWasAdded = true;
+        }
+        if( this.updateConfig( this.sticksConfig, this.languagePrefix + "boostSticks.yml" ) ) {
+            try {
+                this.sticksConfig.save( this.sticksConfigFile );
+            } catch( IOException e ) {
+                plugin.getLogger().severe( "Could not save to file '" + this.sticksConfigFile.getPath() + "'" );
+            }
+            somethingWasAdded = true;
+        }
+        if( this.updateConfig( this.guiConfig, this.languagePrefix + "gui.yml" ) ) {
+            try {
+                this.guiConfig.save( this.guiConfigFile );
+            } catch( IOException e ) {
+                plugin.getLogger().severe( "Could not save to file '" + this.guiConfigFile.getPath() + "'" );
+            }
+            somethingWasAdded = true;
+        }
+        plugin.getLogger().info( somethingWasAdded ? "Configuration files updated to contain latest content." : "Configuration files already up to date." );
+        return somethingWasAdded;
+    }
+
     private void loadMessagesConfig()
     {
         final String messagesConfigFileName = this.languagePrefix + "messages.yml";
@@ -219,6 +254,22 @@ public class Config
             }
         }
         this.statsResetConfig = YamlConfiguration.loadConfiguration( this.statsResetConfigFile );
+    }
+
+    private boolean updateConfig( ConfigurationSection config, String configFileName )
+    {
+        boolean somethingWasAdded = false;
+        InputStream defConfigStream = plugin.getResource( configFileName );
+        if( defConfigStream != null ) {
+            ConfigurationSection defConfig = YamlConfiguration.loadConfiguration( new InputStreamReader( defConfigStream, StandardCharsets.UTF_8 ) );
+            for( String key : defConfig.getKeys( true ) ) {
+                if( !config.contains( key, true ) ) {
+                    config.set( key, defConfig.get( key ) );
+                    somethingWasAdded = true;
+                }
+            }
+        }
+        return somethingWasAdded;
     }
 
     private Sound tryGetSoundFromConfig( String path, String def )
