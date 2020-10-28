@@ -1,50 +1,71 @@
 gui:
+  name: "&5&lBoost menu"
+  rows: 4
   buttons:
     main:
       enabled: true
       item: "CLOCK"
       name: "&5&lBoost menu"
       lore:
-        - "Click for Boost menu"
+        - "&7Click for Boost menu"
     join:
       enabled: true
       item: "GLASS"
       name: "Join game %game%"
       lore:
-        - "Click to join game"
+        - "&7Click to join game"
+      row: 2
+      col: 5
     leave:
       enabled: true
       item: "IRON_DOOR"
       name: "Leave game"
       lore:
-        - "Click to leave your current game"
+        - "&7Click to leave your current game"
+      row: 2
+      col: 5
     stats:
       enabled: true
       item: "PAPER"
       name: "Your stats"
       lore:
-        - "Click to show your game stats"
+        - "&7Click to show your game stats"
+      row: 4
+      col: 1
     top_total:
       enabled: true
       item: "MAP"
       name: "&aLeaderboard"
       lore:
-        - "Click to show the overall leaderboard"
+        - "&7Click to show the overall leaderboard"
+      row: 4
+      col: 9
     top_monthly:
       enabled: true
       item: "FILLED_MAP"
       name: "&aMonthly leaderboard"
       lore:
-        - "Click to show the monthly leaderboard"
+        - "&7Click to show the monthly leaderboard"
+      row: 4
+      col: 8
     top_weekly:
       enabled: true
       item: "FILLED_MAP"
       name: "&aWeekly leaderboard"
       lore:
-        - "Click to show the weekly leaderboard"
+        - "&7Click to show the weekly leaderboard"
+      row: 4
+      col: 7
     top_daily:
       enabled: false
       item: "FILLED_MAP"
       name: "&aDaily leaderboard"
       lore:
-        - "Click to show the daily leaderboard"
+        - "&7Click to show the daily leaderboard"
+      row: 4
+      col: 6
+    fill:
+      enabled: false
+      item: "BLACK_STAINED_GLASS_PANE"
+      name: ""
+      lore: []
