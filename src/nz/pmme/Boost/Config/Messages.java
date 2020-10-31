@@ -86,6 +86,9 @@ public enum Messages
     GUI_ITEM_DISABLED( "gui_item_disabled" ),
     CONFIG_UP_TO_DATE( "config_up_to_date" ),
     CONFIG_UPDATED( "config_updated" ),
+    COMMAND_BLOCKED( "command_blocked" ),
+    COMMAND_NOW_ALLOWED( "command_now_allowed" ),
+    COMMAND_NOW_BLOCKED( "command_now_blocked" ),
 
     END("end");
 

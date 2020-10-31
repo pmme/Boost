@@ -340,4 +340,21 @@ public class EventsListener implements Listener
             event.setCancelled( true );
         }
     }
+
+    @EventHandler
+    public void onCommand( PlayerCommandPreprocessEvent event )
+    {
+        Player player = event.getPlayer();
+        if( plugin.getLoadedConfig().areCommandsBlockedWhilePlaying() && plugin.getGameManager().isPlaying( player ) && !player.hasPermission( "boost.bypassblocking" ) && !player.isOp() )
+        {
+            int commandSeparator = event.getMessage().indexOf(' ');
+            int end = ( commandSeparator >= 0 ) ? commandSeparator : event.getMessage().length();
+            int start = ( event.getMessage().charAt(0) == '/' ) ? 1 : 0;
+            String command = event.getMessage().substring( start, end );
+            if( !plugin.getLoadedConfig().isCommandAllowed( command ) ) {
+                plugin.messageSender( player, Messages.COMMAND_BLOCKED );
+                event.setCancelled( true );
+            }
+        }
+    }
 }

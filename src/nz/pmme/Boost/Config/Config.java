@@ -75,6 +75,8 @@ public class Config
     private GameMode buildGameMode;
 
     private boolean boostWhileQueuing;
+    private boolean commandsBlockedWhilePlaying;
+    private Set<String> commandsAllowedWhilePlaying = new HashSet<>();
 
     private Map< StatsPeriod, EnumMap< Winner, List<String> > > winCommands = new EnumMap<>(StatsPeriod.class);
 
@@ -354,6 +356,10 @@ public class Config
         buildGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.build", "CREATIVE" ) );
 
         boostWhileQueuing = plugin.getConfig().getBoolean( "boost_while_queuing", false );
+        commandsBlockedWhilePlaying = plugin.getConfig().getBoolean( "other_commands.block_while_playing", true );
+        for( String command : plugin.getConfig().getStringList( "other_commands.allowed_commands" ) ) {
+            commandsAllowedWhilePlaying.add( command.toLowerCase() );
+        }
 
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             if( statsPeriod == StatsPeriod.TOTAL ) break;
@@ -482,6 +488,32 @@ public class Config
         this.boostWhileQueuing = boostWhileQueuing;
         plugin.getConfig().set( "boost_while_queuing", this.boostWhileQueuing );
         plugin.saveConfig();
+    }
+
+    public boolean areCommandsBlockedWhilePlaying() { return commandsBlockedWhilePlaying; }
+
+    public boolean isCommandAllowed( String command ) {
+        if( !this.areCommandsBlockedWhilePlaying() ) return true;
+        String cmdLower = command.toLowerCase();
+        return this.commandsAllowedWhilePlaying.contains( cmdLower ) || cmdLower.equals( "boost" ) || cmdLower.equals( "bst" );
+    }
+
+    public void allowCommandWhilePlaying( String command ) {
+        String cmdLower = command.toLowerCase();
+        if( !this.commandsAllowedWhilePlaying.contains( cmdLower ) ) {
+            this.commandsAllowedWhilePlaying.add( cmdLower );
+            plugin.getConfig().set( "other_commands.allowed_commands", new ArrayList<>( this.commandsAllowedWhilePlaying ) );
+            plugin.saveConfig();
+        }
+    }
+
+    public void blockCommandWhilePlaying( String command ) {
+        String cmdLower = command.toLowerCase();
+        if( this.commandsAllowedWhilePlaying.contains( cmdLower ) ) {
+            this.commandsAllowedWhilePlaying.remove( cmdLower );
+            plugin.getConfig().set( "other_commands.allowed_commands", new ArrayList<>( this.commandsAllowedWhilePlaying ) );
+            plugin.saveConfig();
+        }
     }
 
     public boolean isBoostStickRandom() { return boostStickRandom; }

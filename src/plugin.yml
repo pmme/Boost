@@ -30,6 +30,9 @@ permissions:
   boost.status:
     description: 'Permission to fetch Boost game status'
     default: true
+  boost.bypassblocking:
+    description: 'Permission to bypass command blocking while playing'
+    default: op
   boost.*:
     description: 'Grant all Boost permissions'
     default: op
@@ -38,3 +41,4 @@ permissions:
       boost.cmd: true
       boost.admin: true
       boost.status: true
+      boost.bypassblocking: true

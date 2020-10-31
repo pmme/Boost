@@ -48,6 +48,17 @@ gamemode:
 
 boost_while_queuing: false
 
+other_commands:
+  block_while_playing: true;
+  allowed_commands:
+    - 'boost'
+    - 'msg'
+    - 'help'
+    - 'mail'
+    - 'memo'
+    - 'list'
+    - 'seen'
+
 win_commands:
   daily:
     first: []

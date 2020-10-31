@@ -82,6 +82,9 @@ gui_item_set: "GUI item for %game%&r set to %item%."
 gui_item_disabled: "%game%&r does not override the GUI item."
 config_up_to_date: "Configuration files already up to date."
 config_updated: "Configuration files updated to contain latest content."
+command_blocked: "&cThat command is blocked while playing."
+command_now_allowed: "Command '%cmd%' is now allowed while playing."
+command_now_blocked: "Command '%cmd%' is now blocked while playing."
 
 player_stats:
   - "&5[平台争霸] &f玩家统计信息: %player%"
@@ -145,6 +148,8 @@ command_usage_admin:
   - "&f/boost removegameworld <world> &3- 删除平台争霸游戏世界"
   - "&f/boost setmainlobby <world x y z> &3- 设置主大厅传送的位置"
   - "&f/boost setsign [cmd] <option/game> &3- Set the text on a sign for the command."
+  - "&f/boost allowcommand [cmd] &3- Allow players to use the command while playing."
+  - "&f/boost blockcommand [cmd] &3- Stop players using the command while playing."
   - "&f/boost build <player> &3- 开启指定玩家的建造权限"
   - "&f/boost nobuild <player> &3- 关闭指定玩家的建造权限"
   - "&f/boost on &3- 开启平台争霸游戏"
