@@ -1,5 +1,6 @@
 package nz.pmme.Boost.Config;
 
+import nz.pmme.Boost.Data.PlayerStats;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Enums.Winner;
 import nz.pmme.Boost.Main;
@@ -721,11 +722,11 @@ public class Config
         }
     }
 
-    public void runPeriodicWinCommandsForTop3( StatsPeriod statsPeriod, List<UUID> top3 )
+    public void runPeriodicWinCommandsForTop3( StatsPeriod statsPeriod, List<PlayerStats> top3 )
     {
         for( Winner winner : Winner.values() ) {
             try {
-                UUID uuid = top3.get( winner.getTop3Listing() );
+                UUID uuid = top3.get( winner.getTop3Listing() ).getUuid();
                 if( uuid == null ) break;
                 this.runWinCommands( uuid, null, this.getWinCommands( statsPeriod, winner ) );
             } catch( IndexOutOfBoundsException e ) {

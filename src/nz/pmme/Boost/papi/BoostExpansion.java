@@ -9,7 +9,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.UUID;
 
 public class BoostExpansion extends PlaceholderExpansion {
     private Main plugin;
@@ -43,27 +42,18 @@ public class BoostExpansion extends PlaceholderExpansion {
         return plugin.getDescription().getVersion();
     }
 
-    private String getStatsValue( OfflinePlayer player, String params, StatsPeriod period, String param )
+    private String getStatsValue( PlayerStats playerStats, String params, StatsPeriod period, String param )
     {
-        PlayerStats playerStats;
         switch( param ) {
             case "player":
-                return ( player != null ) ? player.getName() : "-";
+                return ( playerStats != null ) ? String.valueOf( playerStats.getName() ) : "-";
             case "wins":
-                if( player == null ) return "0";
-                playerStats = plugin.getDataHandler().queryPlayerStats( period, player.getUniqueId() );
                 return ( playerStats != null ) ? String.valueOf( playerStats.getWins() ) : "0";
             case "losses":
-                if( player == null ) return "0";
-                playerStats = plugin.getDataHandler().queryPlayerStats( period, player.getUniqueId() );
                 return ( playerStats != null ) ? String.valueOf( playerStats.getLosses() ) : "0";
             case "games":
-                if( player == null ) return "0";
-                playerStats = plugin.getDataHandler().queryPlayerStats( period, player.getUniqueId() );
                 return ( playerStats != null ) ? String.valueOf( playerStats.getGames() ) : "0";
             case "rank":
-                if( player == null ) return "0";
-                playerStats = plugin.getDataHandler().queryPlayerStats( period, player.getUniqueId() );
                 return ( playerStats != null ) ? String.valueOf( playerStats.getRank() ) : "0";
             default:
                 plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
@@ -74,7 +64,6 @@ public class BoostExpansion extends PlaceholderExpansion {
     @Override
     public String onRequest( OfflinePlayer player, String params )
     {
-        PlayerStats playerStats = null;
         String paramsLower = params.toLowerCase();
         int firstUnderscore = paramsLower.indexOf( '_' );
         int secondUnderscore = ( firstUnderscore != -1 ) ? paramsLower.indexOf( '_', firstUnderscore + 1 ) : -1;
@@ -100,8 +89,8 @@ public class BoostExpansion extends PlaceholderExpansion {
                     return "";
                 }
 
-                List< UUID > top3 = plugin.getDataHandler().queryTop3( period );
-                OfflinePlayer topPlayer = winner.getTop3Listing() < top3.size() ? plugin.getServer().getOfflinePlayer( top3.get( winner.getTop3Listing() ) ) : null;
+                List< PlayerStats > top3 = plugin.getDataHandler().queryLeaderBoard( period, 3, true );
+                PlayerStats topPlayer = winner.getTop3Listing() < top3.size() ? top3.get( winner.getTop3Listing() ) : null;
 
                 String param = paramsLower.substring( thirdUnderscore+1 );
                 return getStatsValue( topPlayer, params, period, param );
@@ -125,7 +114,8 @@ public class BoostExpansion extends PlaceholderExpansion {
                     return "";
                 }
                 String param = paramsLower.substring( secondUnderscore+1 );
-                return getStatsValue( player, params, period, param );
+                PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( period, player.getUniqueId() );
+                return getStatsValue( playerStats, params, period, param );
             } catch( NumberFormatException | StringIndexOutOfBoundsException e ) {
                 plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
                 return "";

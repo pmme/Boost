@@ -181,7 +181,7 @@ public class DataHandler
                 resultSetRank.close();
                 queryRankStatement.close();
 
-                playerStats = new PlayerStats( resultSetStats.getString( "player_name" ), resultSetStats.getInt( "games" ), resultSetStats.getInt( "wins" ), resultSetStats.getInt( "losses" ), rank );
+                playerStats = new PlayerStats( resultSetStats.getString( "player_name" ), playerId, resultSetStats.getInt( "games" ), resultSetStats.getInt( "wins" ), resultSetStats.getInt( "losses" ), rank );
             }
             resultSetStats.close();
             queryStatsStatement.close();
@@ -215,42 +215,20 @@ public class DataHandler
         return results;
     }
 
-    public List<PlayerStats> queryLeaderBoard( StatsPeriod statsPeriod )
+    public List<PlayerStats> queryLeaderBoard( StatsPeriod statsPeriod, int numberToFetch, boolean mustHaveWon )
     {
         List<PlayerStats> leaderBoard = new ArrayList<>();
         Connection connection = this.database.getConnection();
         if( connection == null ) return leaderBoard;
         try {
-            String queryLeaderBoardSql = "SELECT * FROM " + statsPeriod.getTable() + " ORDER BY wins DESC, losses ASC, games DESC LIMIT 10";
-            PreparedStatement queryLeaderBoardStatement = connection.prepareStatement( queryLeaderBoardSql );
-            ResultSet resultSet = queryLeaderBoardStatement.executeQuery();
-            while( resultSet.next() ) {
-                leaderBoard.add( new PlayerStats( resultSet.getString( "player_name" ), resultSet.getInt( "games" ), resultSet.getInt( "wins" ), resultSet.getInt( "losses" ), 0 ) );
-            }
-            resultSet.close();
-            queryLeaderBoardStatement.close();
-        }
-        catch (SQLException sQLException) {
-            plugin.getLogger().severe( "Failed to query " + statsPeriod.getTable() + " leader board" );
-            sQLException.printStackTrace();
-        }
-        return leaderBoard;
-    }
-
-    public List<UUID> queryTop3( StatsPeriod statsPeriod )
-    {
-        List<UUID> top3 = new ArrayList<>();
-        Connection connection = this.database.getConnection();
-        if( connection == null ) return top3;
-        try {
-            String queryLeaderBoardSql = "SELECT player_id FROM " + statsPeriod.getTable() + " WHERE wins>0 ORDER BY wins DESC, losses ASC, games ASC LIMIT 3";
+            String queryLeaderBoardSql = "SELECT * FROM " + statsPeriod.getTable() + ( mustHaveWon ? " WHERE wins>0" : "" ) + " ORDER BY wins DESC, losses ASC, games DESC LIMIT " + numberToFetch;
             PreparedStatement queryLeaderBoardStatement = connection.prepareStatement( queryLeaderBoardSql );
             ResultSet resultSet = queryLeaderBoardStatement.executeQuery();
             while( resultSet.next() ) {
                 try {
-                    top3.add( UUID.fromString( resultSet.getString( "player_id" ) ) );
+                    leaderBoard.add( new PlayerStats( resultSet.getString( "player_name" ), UUID.fromString( resultSet.getString( "player_id" ) ), resultSet.getInt( "games" ), resultSet.getInt( "wins" ), resultSet.getInt( "losses" ), 0 ) );
                 } catch( IllegalArgumentException e ) {
-                    plugin.getLogger().warning( "Failed to convert player_id '" + resultSet.getString( "player_id" ) + "' to UUID when issuing rewards." );
+                    plugin.getLogger().warning( "Failed to convert player_id '" + resultSet.getString( "player_id" ) + "' to UUID when querying leader board." );
                 }
             }
             resultSet.close();
@@ -260,7 +238,7 @@ public class DataHandler
             plugin.getLogger().severe( "Failed to query " + statsPeriod.getTable() + " leader board" );
             sQLException.printStackTrace();
         }
-        return top3;
+        return leaderBoard;
     }
 
     public void deleteStats( StatsPeriod statsPeriod, UUID playerId )

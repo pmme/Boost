@@ -1,12 +1,12 @@
 package nz.pmme.Boost.Tasks;
 
+import nz.pmme.Boost.Data.PlayerStats;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Main;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Calendar;
 import java.util.List;
-import java.util.UUID;
 
 public class StatsResetTask extends BukkitRunnable
 {
@@ -47,7 +47,7 @@ public class StatsResetTask extends BukkitRunnable
                 }
                 if( periodCounter != plugin.getLoadedConfig().getPeriodTracker( statsPeriod ) )
                 {
-                    List<UUID> top3 = plugin.getDataHandler().queryTop3( statsPeriod );
+                    List<PlayerStats> top3 = plugin.getDataHandler().queryLeaderBoard( statsPeriod, 3, true );
                     new BukkitRunnable() {
                         @Override
                         public void run() { plugin.getLoadedConfig().runPeriodicWinCommandsForTop3( statsPeriod, top3 ); }

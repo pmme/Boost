@@ -289,7 +289,7 @@ public class GameManager
     {
         List<String> leaderBoardMessage = new ArrayList<>();
         leaderBoardMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_TITLE ) ) );
-        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard( statsPeriod );
+        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard( statsPeriod, 10, false );
         if( playerStatsList != null ) {
             int index = 1;
             for( PlayerStats playerStats : playerStatsList ) {
