@@ -8,6 +8,7 @@ import nz.pmme.Boost.Gui.GUIListener;
 import nz.pmme.Boost.Tasks.StatsResetTask;
 import nz.pmme.Boost.Data.Database;
 import nz.pmme.Boost.Data.DataHandler;
+import nz.pmme.Boost.inventory.InventoryManager;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -32,6 +33,7 @@ public class Main extends JavaPlugin
     private Map< UUID, Boolean > builders = new HashMap<>();
     private StatsResetTask statsResetTask = new StatsResetTask( this );
     private Commands commands = new Commands(this);
+    private InventoryManager inventoryManager = new InventoryManager( this );
 
     @Override
     public void onEnable() {
@@ -95,6 +97,8 @@ public class Main extends JavaPlugin
     public DataHandler getDataHandler() {
         return dataHandler;
     }
+
+    public InventoryManager getInventoryManager() { return inventoryManager; }
 
     public UUID findPlayerByName( String name )
     {

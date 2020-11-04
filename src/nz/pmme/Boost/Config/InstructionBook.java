@@ -40,10 +40,19 @@ public class InstructionBook
     {
         ItemStack book = new ItemStack( Material.WRITTEN_BOOK, 1 );
         BookMeta bookMeta = (BookMeta)book.getItemMeta();
-        bookMeta.setTitle( instructionsTitle );
-        bookMeta.setAuthor( instructionsAuthor );
-        bookMeta.setPages( instructionsPages );
+        bookMeta.setTitle( this.instructionsTitle );
+        bookMeta.setAuthor( this.instructionsAuthor );
+        bookMeta.setPages( this.instructionsPages );
         book.setItemMeta( bookMeta );
         return book;
+    }
+
+    public boolean isInstructionBook( ItemStack item )
+    {
+        if( item != null && item.getType() == Material.WRITTEN_BOOK ) {
+            BookMeta bookMeta = (BookMeta)item.getItemMeta();
+            if( bookMeta != null && bookMeta.getTitle().equals( this.instructionsTitle ) ) return true;
+        }
+        return false;
     }
 }

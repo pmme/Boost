@@ -133,7 +133,7 @@ public class Game implements Comparable<Game>
         plugin.getDataHandler().addPlayer( player.getUniqueId(), player.getDisplayName() );
         player.playSound( player.getLocation(), plugin.getLoadedConfig().getJoinSound(), 1, 1 );
 
-        this.giveBoostSticks( player );
+        plugin.getInventoryManager().giveBoostSticks( player );
 
         return true;
     }
@@ -149,12 +149,9 @@ public class Game implements Comparable<Game>
         if( plugin.isInGameWorld( player ) ) {
             player.teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
             player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
-            player.getInventory().clear();
-            ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
-            player.getInventory().setItem( 8, instructionBook );
-            ItemStack mainGuiItem = plugin.getLoadedConfig().getGuiButtonConfig( "main" ).create();
-            player.getInventory().setItem( 0, mainGuiItem );
-            player.getInventory().setHeldItemSlot( 0 );
+            plugin.getInventoryManager().removeBoostItems( player );
+            plugin.getInventoryManager().giveInstructionBook( player );
+            plugin.getInventoryManager().giveMainGuiItem( player, true );
         }
         if( gameState == GameState.RUNNING )
         {
@@ -209,7 +206,7 @@ public class Game implements Comparable<Game>
             player.teleport( gameConfig.getLossSpawn() );
             player.setGameMode( plugin.getLoadedConfig().getLostGameMode() );
             plugin.messageSender( player, Messages.LOST, gameConfig.getDisplayName() );
-            player.getInventory().clear();
+            plugin.getInventoryManager().removeBoostItems( player );
             plugin.getDataHandler().logLoss( player.getUniqueId() );
             player.playSound( player.getLocation(), plugin.getLoadedConfig().getLoseSound(), 1, 1 );
 
@@ -296,25 +293,6 @@ public class Game implements Comparable<Game>
         return gameState.toString();
     }
 
-    private void giveBoostSticks( Player player )
-    {
-        List<BoostStick> sticks = plugin.getLoadedConfig().getBoostSticksAllowedForPlayer( player );
-        if( sticks != null && !sticks.isEmpty() ) {
-            int firstStickSlot = -1;
-            int slot = 0;
-            for( BoostStick stick : sticks ) {
-                for( ; slot < 36; ++slot ) {
-                    if( player.getInventory().getItem( slot ) == null || player.getInventory().getItem( slot ).getType() == Material.AIR ) {
-                        player.getInventory().setItem( slot, stick.create() );
-                        if( firstStickSlot == -1 ) firstStickSlot = slot;
-                        break;
-                    }
-                }
-            }
-            if( firstStickSlot >= 0 && firstStickSlot <= 8 ) player.getInventory().setHeldItemSlot( firstStickSlot );
-        }
-    }
-
     public boolean start()
     {
         if( queueTask != null && !queueTask.isCancelled() ) queueTask.cancel();
@@ -377,12 +355,9 @@ public class Game implements Comparable<Game>
             playerInfo.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
             playerInfo.getPlayer().setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_ENDED, gameConfig.getDisplayName() );
-            playerInfo.getPlayer().getInventory().clear();
-            ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
-            playerInfo.getPlayer().getInventory().setItem( 8, instructionBook );
-            ItemStack mainGuiItem = plugin.getLoadedConfig().getGuiButtonConfig( "main" ).create();
-            playerInfo.getPlayer().getInventory().setItem( 0, mainGuiItem );
-            playerInfo.getPlayer().getInventory().setHeldItemSlot( 0 );
+            plugin.getInventoryManager().removeBoostItems( playerInfo.getPlayer() );
+            plugin.getInventoryManager().giveInstructionBook( playerInfo.getPlayer() );
+            plugin.getInventoryManager().giveMainGuiItem( playerInfo.getPlayer(), true );
 
             plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
         }

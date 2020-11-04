@@ -96,7 +96,7 @@ public class EventsListener implements Listener
     private boolean handleMainGuiItemClickEvent( Player player )
     {
         GUIButtonConfig guiButtonConfig = plugin.getLoadedConfig().getGuiButtonConfig( "main" );
-        if( guiButtonConfig.isEnabled() && player.getInventory().getItemInMainHand().getType() == guiButtonConfig.getMaterial() )
+        if( guiButtonConfig.isEnabled() && guiButtonConfig.isGUIItem( player.getInventory().getItemInMainHand() ) )
         {
             GUI gui = new GUI( this.plugin, player );
             gui.openInventory();
@@ -297,12 +297,9 @@ public class EventsListener implements Listener
     {
         if( plugin.isBoostEnabled() && plugin.isInGameWorld( event.getPlayer() ) ) {
             event.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
-            event.getPlayer().getInventory().clear();
-            ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
-            event.getPlayer().getInventory().setItem( 8, instructionBook );
-            ItemStack mainGuiItem = plugin.getLoadedConfig().getGuiButtonConfig( "main" ).create();
-            event.getPlayer().getInventory().setItem( 0, mainGuiItem );
-            event.getPlayer().getInventory().setHeldItemSlot( 0 );
+            plugin.getInventoryManager().removeBoostItems( event.getPlayer() );
+            plugin.getInventoryManager().giveInstructionBook( event.getPlayer() );
+            plugin.getInventoryManager().giveMainGuiItem( event.getPlayer(), true );
         }
     }
 
@@ -323,12 +320,9 @@ public class EventsListener implements Listener
             {
                 // Player arrived in the boost spawn world AND not from a boost arena world or other.
                 event.getPlayer().teleport( mainLobbySpawn );
-                event.getPlayer().getInventory().clear();
-                ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
-                event.getPlayer().getInventory().setItem( 8, instructionBook );
-                ItemStack mainGuiItem = plugin.getLoadedConfig().getGuiButtonConfig( "main" ).create();
-                event.getPlayer().getInventory().setItem( 0, mainGuiItem );
-                event.getPlayer().getInventory().setHeldItemSlot( 0 );
+                plugin.getInventoryManager().removeBoostItems( event.getPlayer() );
+                plugin.getInventoryManager().giveInstructionBook( event.getPlayer() );
+                plugin.getInventoryManager().giveMainGuiItem( event.getPlayer(), true );
             }
         }
     }

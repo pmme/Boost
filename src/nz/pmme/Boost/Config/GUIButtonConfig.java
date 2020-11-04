@@ -142,4 +142,10 @@ public class GUIButtonConfig
     public Material getMaterial() { return this.material; }
     public int getRow() { return this.row; }
     public int getCol() { return this.col; }
+
+    public boolean isGUIItem( ItemStack item )
+    {
+        if( item != null && item.getType() == this.material ) return true;
+        return false;
+    }
 }

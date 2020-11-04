@@ -640,6 +640,7 @@ public class Config
     public String getPrefix() { return messagePrefix; }
     public List<String> getPlayerStatsTemplate() { return playerStatsTemplate; }
     public ItemStack createInstructionBook() { return instructionBook.create(); }
+    public InstructionBook getInstructionBookConfig() { return instructionBook; }
 
     public String[] getCommandUsage( boolean isAdmin )
     {

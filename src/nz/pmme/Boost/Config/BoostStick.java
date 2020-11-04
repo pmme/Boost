@@ -58,4 +58,13 @@ public class BoostStick
     }
 
     public String getName() { return this.name; }
+
+    public boolean isBoostStick( ItemStack item )
+    {
+        if( item != null && item.getType() == this.material ) {
+            ItemMeta itemMeta = item.getItemMeta();
+            if( itemMeta != null && itemMeta.getDisplayName().equals( this.displayName ) ) return true;
+        }
+        return false;
+    }
 }
