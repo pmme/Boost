@@ -299,7 +299,9 @@ public class Config
     private Sound tryGetSoundFromConfig( String path, String def )
     {
         try {
-            return Sound.valueOf( plugin.getConfig().getString( path, def ) );
+            String soundName = plugin.getConfig().getString( path, def );
+            if( soundName == null || soundName.equals( "" ) ) return null;
+            return Sound.valueOf( soundName.toUpperCase() );
         } catch( IllegalArgumentException e ) {
             plugin.getLogger().warning( "Sound " + plugin.getConfig().getString( path, def ) + " not recognised." );
             return null;
@@ -353,10 +355,10 @@ public class Config
         statsSound = this.tryGetSoundFromConfig( "sounds.stats", "ENTITY_ENDER_EYE_DEATH" );
         leaderSound = this.tryGetSoundFromConfig( "sound.leader", "ENTITY_ENDER_EYE_DEATH" );
 
-        playingGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.playing", "ADVENTURE" ) );
-        lostGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lost", "SPECTATOR" ) );
-        lobbyGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lobby", "ADVENTURE" ) );
-        buildGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.build", "CREATIVE" ) );
+        playingGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.playing", "ADVENTURE" ).toUpperCase() );
+        lostGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lost", "SPECTATOR" ).toUpperCase() );
+        lobbyGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lobby", "ADVENTURE" ).toUpperCase() );
+        buildGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.build", "CREATIVE" ).toUpperCase() );
 
         boostWhileQueuing = plugin.getConfig().getBoolean( "boost_while_queuing", false );
         commandsBlockedWhilePlaying = plugin.getConfig().getBoolean( "other_commands.block_while_playing", true );
