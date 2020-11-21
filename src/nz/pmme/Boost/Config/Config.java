@@ -7,6 +7,7 @@ import nz.pmme.Boost.Main;
 import org.bukkit.*;
 import org.bukkit.command.CommandException;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -190,6 +191,19 @@ public class Config
             this.saveMessagesConfig();
             plugin.getConfig().set( "signs", null );
             plugin.saveConfig();
+        }
+
+        // Check for previous structure with messages at root level. These are now under "messages".
+        if( this.messagesConfig.contains( "title" ) ) {
+            ConfigurationSection oldMessagesConfigSection = new MemoryConfiguration();
+            for( String messageKey : this.messagesConfig.getKeys( false ) ) {
+                if( !messageKey.equals( "player_stats" ) && !messageKey.equals( "command_usage_user" ) && !messageKey.equals( "command_usage_admin" ) && !messageKey.equals( "instructions" ) && !messageKey.equals( "signs" ) ) {
+                    oldMessagesConfigSection.set( messageKey, this.messagesConfig.get( messageKey ) );
+                    this.messagesConfig.set( messageKey, null );
+                }
+                this.messagesConfig.set( "messages", oldMessagesConfigSection );
+            }
+            this.saveMessagesConfig();
         }
     }
 

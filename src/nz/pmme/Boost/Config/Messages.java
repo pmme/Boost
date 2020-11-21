@@ -98,7 +98,7 @@ public enum Messages
 
     Messages( String path )
     {
-        this.path = path;
+        this.path = "messages." + path;
     }
 
     public String getPath() { return this.path; }
