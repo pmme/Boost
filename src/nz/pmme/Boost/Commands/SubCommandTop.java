@@ -4,7 +4,6 @@ import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Main;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SubCommandTop extends AbstractSubCommand

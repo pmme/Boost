@@ -1,11 +1,16 @@
 package nz.pmme.Boost.Data;
 
 
-import java.sql.*;
-import java.util.*;
-
 import nz.pmme.Boost.Enums.StatsPeriod;
 import org.bukkit.plugin.Plugin;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class DataHandler
 {
