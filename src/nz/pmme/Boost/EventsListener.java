@@ -1,10 +1,12 @@
 package nz.pmme.Boost;
 
+import nz.pmme.Boost.Config.BoostParticle;
 import nz.pmme.Boost.Config.GUIButtonConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Gui.GUI;
+import nz.pmme.Utils.RayIterator;
 import nz.pmme.Utils.VectorToOtherPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -201,6 +203,7 @@ public class EventsListener implements Listener
                     List< Player > otherPlayers = playersGame.getActivePlayerList();
                     for( Player otherPlayer : otherPlayers ) {
                         if( this.inTargetBox( thisPlayer.getWorld(), targetPotentialPlayerPosition, otherPlayer.getLocation() ) && this.hasBlockUnder( otherPlayer.getLocation() ) ) {
+                            plugin.getLoadedConfig().getBoostedParticleForPlayer( thisPlayer ).spawn( otherPlayer.getWorld(), otherPlayer.getLocation() );
                             this.boostPlayer( otherPlayer, thisPlayer.getLocation(), otherPlayer.getLocation() );
                         }
                     }
@@ -211,7 +214,21 @@ public class EventsListener implements Listener
                         this.boostPlayer( thisPlayer, thisPlayer.getLocation(), thisPlayer.getLocation() );
                     }
                 }
+                BoostParticle boostParticle = plugin.getLoadedConfig().getBoostParticleForPlayer( thisPlayer );
+                if( boostParticle.isEnabled() ) {
+                    for( RayIterator rayIterator = new RayIterator( thisPlayer, targetBlock.getLocation(), boostParticle.getSpacing() ); !rayIterator.end(); rayIterator.step() ) {
+                        boostParticle.spawn( thisPlayer.getWorld(), rayIterator.toLocation( thisPlayer.getWorld() ) );
+                    }
+                }
+                plugin.getLoadedConfig().getBoostHitParticleForPlayer( thisPlayer ).spawn( thisPlayer.getWorld(), targetPotentialPlayerPosition.getBlockX() + 0.5, targetPotentialPlayerPosition.getBlockY() + 0.5, targetPotentialPlayerPosition.getBlockZ() + 0.5 );
                 playersGame.coolDown( thisPlayer );
+            } else {
+                BoostParticle boostParticle = plugin.getLoadedConfig().getBoostParticleForPlayer( thisPlayer );
+                if( boostParticle.isEnabled() ) {
+                    for( RayIterator rayIterator = new RayIterator( thisPlayer, playersGame.getGameConfig().getTargetDist(), boostParticle.getSpacing() ); !rayIterator.end(); rayIterator.step() ) {
+                        boostParticle.spawn( thisPlayer.getWorld(), rayIterator.toLocation( thisPlayer.getWorld() ) );
+                    }
+                }
             }
         }
     }
@@ -229,6 +246,7 @@ public class EventsListener implements Listener
                 final Player otherPlayer = (Player)event.getRightClicked();
                 if( plugin.getGameManager().activeInSameGame( thisPlayer, otherPlayer ) )
                 {
+                    plugin.getLoadedConfig().getBoostedParticleForPlayer( thisPlayer ).spawn( otherPlayer.getWorld(), otherPlayer.getLocation() );
                     this.boostPlayer( otherPlayer, thisPlayer );
                 }
                 playersGame.coolDown( thisPlayer );
