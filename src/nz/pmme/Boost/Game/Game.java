@@ -4,8 +4,6 @@ import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
 import nz.pmme.Boost.Main;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -305,7 +303,7 @@ public class Game implements Comparable<Game>
         {
             coolDownEndMillis = System.currentTimeMillis() + plugin.getLoadedConfig().getGameStartBoostDelay() * 1000L;
             String barTitle = plugin.formatMessage( Messages.START_DELAY_TITLE, "", "%time%", Long.toString( plugin.getLoadedConfig().getGameStartBoostDelay() ) );
-            BossBar bossBar = plugin.getServer().createBossBar( barTitle, BarColor.BLUE, BarStyle.SEGMENTED_10 );
+            BossBar bossBar = plugin.getServer().createBossBar( barTitle, plugin.getLoadedConfig().getGameStartBoostDelayBarColor(), plugin.getLoadedConfig().getGameStartBoostDelayBarStyle() );
             bossBar.setProgress( 1.0 );
             for( PlayerInfo playerInfo : players.values() ) bossBar.addPlayer( playerInfo.getPlayer() );
             bossBar.setVisible( true );

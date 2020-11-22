@@ -74,6 +74,11 @@ win_commands:
     second: []
     third: []
 
+bar:
+  game_start_boost_delay:
+    color: BLUE
+    segments: 0
+
 #  Sample game configuration
 #  games:
 #    Arena1:

@@ -8,6 +8,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.command.CommandException;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
@@ -92,6 +94,9 @@ public class Config
     private Set<String> commandsAllowedWhilePlaying = new HashSet<>();
 
     private Map< StatsPeriod, EnumMap< Winner, List<String> > > winCommands = new EnumMap<>(StatsPeriod.class);
+
+    private BarColor gameStartBoostDelayBarColor;
+    private BarStyle gameStartBoostDelayBarStyle;
 
     private File sticksConfigFile = null;
     private FileConfiguration sticksConfig = null;
@@ -320,14 +325,14 @@ public class Config
         return somethingWasAdded;
     }
 
-    private Sound tryGetSoundFromConfig( String path, String def )
+    private <T extends Enum<T>> T tryGetEnumValueFromConfig( Class<T> enumType, String path, String def )
     {
         try {
-            String soundName = plugin.getConfig().getString( path, def );
-            if( soundName == null || soundName.equals( "" ) ) return null;
-            return Sound.valueOf( soundName.toUpperCase() );
+            String value = plugin.getConfig().getString( path, def );
+            if( value == null || value.equals( "" ) ) return null;
+            return T.valueOf( enumType, value.toUpperCase() );
         } catch( IllegalArgumentException e ) {
-            plugin.getLogger().warning( "Sound " + plugin.getConfig().getString( path, def ) + " not recognised." );
+            plugin.getLogger().warning( "Enum " + enumType.getName() + " " + plugin.getConfig().getString( path, def ) + " not recognised." );
             return null;
         }
     }
@@ -368,16 +373,16 @@ public class Config
         mainLobbySpawn = new SpawnLocation( plugin, "main_lobby" );
 
         worldSoundRange = plugin.getConfig().getInt( "sounds.world_sound_range", 80 );
-        tickSound = this.tryGetSoundFromConfig( "sounds.tick", "ITEM_FLINTANDSTEEL_USE" );
-        joinSound = this.tryGetSoundFromConfig( "sounds.join", "UI_LOOM_SELECT_PATTERN" );
-        leaveSound = this.tryGetSoundFromConfig( "sounds.leave", "UI_LOOM_TAKE_RESULT" );
-        startSound = this.tryGetSoundFromConfig( "sounds.start", "ENTITY_EVOKER_PREPARE_SUMMON" );
-        winSound = this.tryGetSoundFromConfig( "sounds.win", "UI_TOAST_CHALLENGE_COMPLETE" );
-        loseSound = this.tryGetSoundFromConfig( "sounds.lose", "ENTITY_GHAST_HURT" );
-        boostSound = this.tryGetSoundFromConfig( "sounds.boost", "ITEM_TRIDENT_THROW" );
-        boostedSound = this.tryGetSoundFromConfig( "sounds.boosted", "ITEM_TRIDENT_RIPTIDE_3" );
-        statsSound = this.tryGetSoundFromConfig( "sounds.stats", "ENTITY_ENDER_EYE_DEATH" );
-        leaderSound = this.tryGetSoundFromConfig( "sound.leader", "ENTITY_ENDER_EYE_DEATH" );
+        tickSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.tick", "ITEM_FLINTANDSTEEL_USE" );
+        joinSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.join", "UI_LOOM_SELECT_PATTERN" );
+        leaveSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.leave", "UI_LOOM_TAKE_RESULT" );
+        startSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.start", "ENTITY_EVOKER_PREPARE_SUMMON" );
+        winSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.win", "UI_TOAST_CHALLENGE_COMPLETE" );
+        loseSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.lose", "ENTITY_GHAST_HURT" );
+        boostSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.boost", "ITEM_TRIDENT_THROW" );
+        boostedSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.boosted", "ITEM_TRIDENT_RIPTIDE_3" );
+        statsSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.stats", "ENTITY_ENDER_EYE_DEATH" );
+        leaderSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.leader", "ENTITY_ENDER_EYE_DEATH" );
 
         playingGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.playing", "ADVENTURE" ).toUpperCase() );
         lostGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lost", "SPECTATOR" ).toUpperCase() );
@@ -397,6 +402,20 @@ public class Config
                 periodicWinCommands.put( winner, plugin.getConfig().getStringList( "win_commands." + statsPeriod.toString().toLowerCase() + "." + winner.toString().toLowerCase() ) );
             }
             winCommands.put( statsPeriod, periodicWinCommands );
+        }
+
+        gameStartBoostDelayBarColor = this.tryGetEnumValueFromConfig( BarColor.class, "bar.game_start_boost_delay.color", "BLUE" );
+        int segments = plugin.getConfig().getInt( "bar.game_start_boost_delay.segments", 0 );
+        switch( segments ) {
+            case 0: gameStartBoostDelayBarStyle = BarStyle.SOLID; break;
+            case 6: gameStartBoostDelayBarStyle = BarStyle.SEGMENTED_6; break;
+            case 10: gameStartBoostDelayBarStyle = BarStyle.SEGMENTED_10; break;
+            case 12: gameStartBoostDelayBarStyle = BarStyle.SEGMENTED_12; break;
+            case 20: gameStartBoostDelayBarStyle = BarStyle.SEGMENTED_20; break;
+            default:
+                plugin.getLogger().severe( "bar.game_start_boost_delay.segments value may only be one of: 0, 6, 10, 12 or 20. Value " + segments + " not recognised." );
+                gameStartBoostDelayBarStyle = BarStyle.SOLID;
+                break;
         }
 
         boostStickRandom = sticksConfig.getBoolean( "boost_sticks.random", true );
@@ -783,4 +802,7 @@ public class Config
         plugin.getConfig().set( "win_commands." + statsPeriod.toString().toLowerCase() + "." + winner.toString().toLowerCase(), periodicWinCommandForWinner );
         plugin.saveConfig();
     }
+
+    public BarColor getGameStartBoostDelayBarColor() { return this.gameStartBoostDelayBarColor; }
+    public BarStyle getGameStartBoostDelayBarStyle() { return this.gameStartBoostDelayBarStyle; }
 }
