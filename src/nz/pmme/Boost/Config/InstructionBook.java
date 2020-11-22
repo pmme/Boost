@@ -3,7 +3,7 @@ package nz.pmme.Boost.Config;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
@@ -17,7 +17,7 @@ public class InstructionBook
     private String instructionsAuthor;
     private List<String> instructionsPages = new ArrayList<>();
 
-    InstructionBook( Main plugin, FileConfiguration messagesConfig )
+    InstructionBook( Main plugin, ConfigurationSection messagesConfig )
     {
         this.plugin = plugin;
 

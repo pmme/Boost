@@ -3,7 +3,7 @@ package nz.pmme.Boost.Config;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -13,7 +13,7 @@ import java.util.List;
 public class GUIButtonConfig
 {
     private Main plugin;
-    private FileConfiguration guiConfig;
+    private ConfigurationSection guiConfig;
     private String name;
     private boolean enabled;
     private String displayName;
@@ -22,7 +22,7 @@ public class GUIButtonConfig
     private int row;
     private int col;
 
-    public GUIButtonConfig( Main plugin, String name, FileConfiguration guiConfig )
+    public GUIButtonConfig( Main plugin, String name, ConfigurationSection guiConfig )
     {
         this.plugin = plugin;
         this.name = name;

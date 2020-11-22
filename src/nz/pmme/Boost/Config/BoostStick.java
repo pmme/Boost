@@ -3,7 +3,7 @@ package nz.pmme.Boost.Config;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -18,7 +18,7 @@ public class BoostStick
     private Material material;
     private List<String> lore = new ArrayList<>();
 
-    public BoostStick( Main plugin, String name, FileConfiguration boostSticksConfig )
+    public BoostStick( Main plugin, String name, ConfigurationSection boostSticksConfig )
     {
         this.plugin = plugin;
         this.name = name;
