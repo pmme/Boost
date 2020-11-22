@@ -75,7 +75,7 @@ messages:
   game_perm_disabled: "Require permission &cdisabled&r for game %game%&r."
   game_not_available: "%game%&r is not available to you."
   cool_down_set: "Cool down set to %count%ms."
-  start_delay_set: "Delay before boost after game start set to %count%ms."
+  start_delay_set: "Delay before boost after game start set to %count%s."
   boost_block_set: "Boost block for %game%&r set to %block%."
   boost_block_disabled: "%game%&r set to have no Boost block."
   return_to_start_enabled: "%game%&r set to return to start on falling."
