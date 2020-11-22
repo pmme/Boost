@@ -32,7 +32,7 @@ public class BoostStick
             this.material = Material.getMaterial( item );
             if( this.material == null ) {
                 this.material = Material.DIAMOND_HOE;
-                plugin.getLogger().severe( "Material " + item + " for boost stick " + this.name + " is invalid." );
+                plugin.getLogger().warning( "Material " + item + " for boost stick " + this.name + " is invalid." );
             }
             for( String string : boostSticksConfig.getStringList( configPath + "lore" ) ) {
                 lore.add( ChatColor.translateAlternateColorCodes( '&', string ) );
