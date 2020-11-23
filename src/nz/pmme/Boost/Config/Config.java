@@ -93,6 +93,10 @@ public class Config
     private boolean commandsBlockedWhilePlaying;
     private Set<String> commandsAllowedWhilePlaying = new HashSet<>();
 
+    private BoostParticle boostParticle;
+    private BoostParticle boostHitParticle;
+    private BoostParticle boostedParticle;
+
     private Map< StatsPeriod, EnumMap< Winner, List<String> > > winCommands = new EnumMap<>(StatsPeriod.class);
 
     private BarColor gameStartBoostDelayBarColor;
@@ -395,6 +399,10 @@ public class Config
             commandsAllowedWhilePlaying.add( command.toLowerCase() );
         }
 
+        boostParticle = new BoostParticle( this.plugin, this.plugin.getConfig(), "particles.boost", null );
+        boostHitParticle = new BoostParticle( this.plugin, this.plugin.getConfig(), "particles.hit", null );
+        boostedParticle = new BoostParticle( this.plugin, this.plugin.getConfig(), "particles.boosted", null );
+
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             if( statsPeriod == StatsPeriod.TOTAL ) break;
             EnumMap< Winner, List<String> > periodicWinCommands = new EnumMap<>(Winner.class);
@@ -571,6 +579,24 @@ public class Config
         }
     }
 
+    public BoostParticle getBoostParticleForPlayer( Player player )
+    {
+        BoostStick boostStick = plugin.getLoadedConfig().identifyBoostStick( player.getInventory().getItemInMainHand() );
+        return ( boostStick != null && boostStick.getBoostParticle().isEnabled() ) ? boostStick.getBoostParticle() : boostParticle;
+    }
+
+    public BoostParticle getBoostHitParticleForPlayer( Player player )
+    {
+        BoostStick boostStick = plugin.getLoadedConfig().identifyBoostStick( player.getInventory().getItemInMainHand() );
+        return ( boostStick != null && boostStick.getBoostHitParticle().isEnabled() ) ? boostStick.getBoostHitParticle() : boostHitParticle;
+    }
+
+    public BoostParticle getBoostedParticleForPlayer( Player player )
+    {
+        BoostStick boostStick = plugin.getLoadedConfig().identifyBoostStick( player.getInventory().getItemInMainHand() );
+        return ( boostStick != null && boostStick.getBoostedParticle().isEnabled() ) ? boostStick.getBoostedParticle() : boostedParticle;
+    }
+
     public boolean isBoostStickRandom() { return boostStickRandom; }
     public boolean isGiveOnlyBestBoostStick() { return giveOnlyBestBoostStick; }
 
@@ -625,6 +651,14 @@ public class Config
             }
             return sticks;
         }
+    }
+
+    public BoostStick identifyBoostStick( ItemStack itemStack )
+    {
+        for( BoostStick boostStick : boostSticks ) {
+            if( boostStick.isBoostStick( itemStack ) ) return boostStick;
+        }
+        return null;
     }
 
     public String getGuiName() { return guiName; }

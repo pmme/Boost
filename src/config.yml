@@ -60,6 +60,21 @@ other_commands:
     - 'list'
     - 'seen'
 
+particles:
+  hit:
+    particle: SPELL_WITCH
+    type: ''
+    number: 15
+  boost:
+    particle: DRIP_WATER
+    type: ''
+    number: 1
+    spacing: 1.0
+  boosted:
+    particle: EXPLOSION_LARGE
+    type: ''
+    number: 1
+
 win_commands:
   daily:
     first: []

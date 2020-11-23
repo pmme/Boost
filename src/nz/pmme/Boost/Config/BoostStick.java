@@ -18,6 +18,10 @@ public class BoostStick
     private Material material;
     private List<String> lore = new ArrayList<>();
 
+    private BoostParticle boostParticle;
+    private BoostParticle boostHitParticle;
+    private BoostParticle boostedParticle;
+
     public BoostStick( Main plugin, String name, ConfigurationSection boostSticksConfig )
     {
         this.plugin = plugin;
@@ -37,11 +41,19 @@ public class BoostStick
             for( String string : boostSticksConfig.getStringList( configPath + "lore" ) ) {
                 lore.add( ChatColor.translateAlternateColorCodes( '&', string ) );
             }
+
+            this.boostParticle = new BoostParticle( this.plugin, boostSticksConfig, configPath + "particles.boost", null );
+            this.boostHitParticle = new BoostParticle( this.plugin, boostSticksConfig, configPath + "particles.hit", null );
+            this.boostedParticle = new BoostParticle( this.plugin, boostSticksConfig, configPath + "particles.boosted", null );
         }
         else
         {
             this.displayName = this.name;
             this.material = Material.DIAMOND_HOE;
+
+            this.boostParticle = null;
+            this.boostHitParticle = null;
+            this.boostedParticle = null;
         }
     }
 
@@ -67,4 +79,8 @@ public class BoostStick
         }
         return false;
     }
+
+    public BoostParticle getBoostParticle() { return boostParticle; }
+    public BoostParticle getBoostHitParticle() { return boostHitParticle; }
+    public BoostParticle getBoostedParticle() { return boostedParticle; }
 }

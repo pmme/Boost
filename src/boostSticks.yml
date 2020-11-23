@@ -9,27 +9,82 @@ boost_sticks:
       lore:
       - '&5Boost Stick'
       - '&2Right click to boost players'
+      particles:
+        hit:
+          particle: CRIT
+          number: 15
+        boost:
+          particle: SPELL_MOB
+          number: 1
+          spacing: 1.0
+        boosted:
+          particle: EXPLOSION_LARGE
+          number: 1
     stone:
       name: '&7Stone Stomper'
       item: 'STONE_HOE'
       lore:
       - '&5Boost Stick'
       - '&7Right click to boost players'
+      particles:
+        hit:
+          particle: SPELL
+          number: 15
+        boost:
+          particle: TOWN_AURA
+          number: 1
+          spacing: 1.0
+        boosted:
+          particle: EXPLOSION_LARGE
+          number: 1
     iron:
       name: '&fSteel Smasher'
       item: 'IRON_HOE'
       lore:
       - '&5Boost Stick'
       - '&fRight click to boost players'
+      particles:
+        hit:
+          particle: SPELL_WITCH
+          number: 15
+        boost:
+          particle: SPELL_INSTANT
+          number: 1
+          spacing: 1.0
+        boosted:
+          particle: EXPLOSION_LARGE
+          number: 1
     gold:
       name: '&6Golden Glowstick'
       item: 'GOLDEN_HOE'
       lore:
       - '&5Boost Stick'
       - '&6Right click to boost players'
+      particles:
+        hit:
+          particle: LAVA
+          number: 8
+        boost:
+          particle: DRIP_LAVA
+          number: 1
+          spacing: 1.0
+        boosted:
+          particle: EXPLOSION_LARGE
+          number: 1
     diamond:
       name: '&bDiamond Destroyer'
       item: 'DIAMOND_HOE'
       lore:
       - '&5Boost Stick'
       - '&bRight click to boost players'
+      particles:
+        hit:
+          particle: CRIT_MAGIC
+          number: 15
+        boost:
+          particle: DRIP_WATER
+          number: 1
+          spacing: 1.0
+        boosted:
+          particle: EXPLOSION_LARGE
+          number: 1
