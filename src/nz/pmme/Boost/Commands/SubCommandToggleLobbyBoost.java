@@ -21,7 +21,7 @@ public class SubCommandToggleLobbyBoost extends AbstractSubCommand
     protected boolean executeSubCommand( CommandSender sender, String[] args ) {
         plugin.getLoadedConfig().setBoostWhileQueuing( !plugin.getLoadedConfig().canBoostWhileQueuing() );
         plugin.messageSender( sender, plugin.getLoadedConfig().canBoostWhileQueuing() ? Messages.BOOST_WHILE_QUEUING : Messages.NO_BOOST_WHILE_QUEUING );
-        return false;
+        return true;
     }
 
     @Override
