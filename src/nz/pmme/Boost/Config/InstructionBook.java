@@ -13,6 +13,7 @@ import java.util.List;
 public class InstructionBook
 {
     private Main plugin;
+    private boolean enabled;
     private String instructionsTitle;
     private String instructionsAuthor;
     private List<String> instructionsPages = new ArrayList<>();
@@ -20,6 +21,8 @@ public class InstructionBook
     InstructionBook( Main plugin, ConfigurationSection messagesConfig )
     {
         this.plugin = plugin;
+
+        this.enabled = messagesConfig.getBoolean( "instructions.enabled", true );
 
         this.instructionsTitle = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "instructions.title", "Boost Instructions" ) );
         this.instructionsAuthor = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "instructions.author", "Boost" ) );
@@ -35,6 +38,8 @@ public class InstructionBook
             instructionsPages.add( formattedPageText.toString() );
         }
     }
+
+    public boolean isEnabled() { return this.enabled; }
 
     public ItemStack create()
     {

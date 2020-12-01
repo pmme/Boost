@@ -160,6 +160,7 @@ command_usage_admin:
   - "&f/boost off &3- 关闭平台争霸游戏"
 
 instructions:
+  enabled: true
   title: "平台争霸介绍"
   author: "pmme"
   page1:

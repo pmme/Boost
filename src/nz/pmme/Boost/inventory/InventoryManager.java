@@ -1,6 +1,7 @@
 package nz.pmme.Boost.inventory;
 
 import nz.pmme.Boost.Config.BoostStick;
+import nz.pmme.Boost.Config.GUIButtonConfig;
 import nz.pmme.Boost.Main;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,6 +21,7 @@ public class InventoryManager
 
     public void giveInstructionBook( Player player )
     {
+        if( !plugin.getLoadedConfig().getInstructionBookConfig().isEnabled() ) return;
         ItemStack instructionBook = plugin.getLoadedConfig().createInstructionBook();
         for( int slot = 8; slot >= 0; --slot ) {
             if( player.getInventory().getItem( slot ) == null || player.getInventory().getItem( slot ).getType() == Material.AIR ) {
@@ -37,7 +39,9 @@ public class InventoryManager
 
     public void giveMainGuiItem( Player player, boolean holdItem )
     {
-        ItemStack mainGuiItem = plugin.getLoadedConfig().getGuiButtonConfig( "main" ).create();
+        GUIButtonConfig guiButtonConfig = plugin.getLoadedConfig().getGuiButtonConfig( "main" );
+        if( !guiButtonConfig.isEnabled() ) return;
+        ItemStack mainGuiItem = guiButtonConfig.create();
         for( int slot = 0; slot < 36; ++slot ) {
             if( player.getInventory().getItem( slot ) == null || player.getInventory().getItem( slot ).getType() == Material.AIR ) {
                 player.getInventory().setItem( slot, mainGuiItem );

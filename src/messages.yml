@@ -160,6 +160,7 @@ command_usage_admin:
   - "&f/boost off &3- Turn the Boost game and controls off."
 
 instructions:
+  enabled: true
   title: "Boost Instructions"
   author: "Boost"
   page1:
