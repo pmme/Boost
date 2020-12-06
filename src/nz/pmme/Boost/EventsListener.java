@@ -60,12 +60,20 @@ public class EventsListener implements Listener
 
     private boolean hasBlockUnder( Location playerPosition )
     {
+        // First check for a block directly under the player.
+        for( int y = playerPosition.getBlockY(); y >= playerPosition.getBlockY() - plugin.getLoadedConfig().getTargetBoxV(); --y ) {
+            Block blockUnder = playerPosition.getWorld().getBlockAt( playerPosition.getBlockX(), y - 1, playerPosition.getBlockZ() );
+            if( !blockUnder.isEmpty() ) {
+                return true;
+            }
+        }
+        // Check for a block under the position next to the player in case they're standing on an edge but prevent wall climbing by requiring empty space over a block.
         for( int y = playerPosition.getBlockY(); y >= playerPosition.getBlockY() - plugin.getLoadedConfig().getTargetBoxV(); --y ) {
             for( int x = playerPosition.getBlockX() - 1; x <= playerPosition.getBlockX() + 1; ++x ) {
                 for( int z = playerPosition.getBlockZ() - 1; z <= playerPosition.getBlockZ() + 1; ++z ) {
                     Block block = playerPosition.getWorld().getBlockAt( x, y, z );
                     Block blockUnder = playerPosition.getWorld().getBlockAt( x, y - 1, z );
-                    if( ( block.isEmpty() || !block.getType().isOccluding() ) && !blockUnder.isEmpty() ) {
+                    if( block.isEmpty() && !blockUnder.isEmpty() ) {
                         return true;
                     }
                 }
@@ -202,9 +210,11 @@ public class EventsListener implements Listener
                 if( !playersGame.isQueuing() ) {
                     List< Player > otherPlayers = playersGame.getActivePlayerList();
                     for( Player otherPlayer : otherPlayers ) {
-                        if( this.inTargetBox( thisPlayer.getWorld(), targetPotentialPlayerPosition, otherPlayer.getLocation() ) && this.hasBlockUnder( otherPlayer.getLocation() ) ) {
-                            plugin.getLoadedConfig().getBoostedParticleForPlayer( thisPlayer ).spawn( otherPlayer.getWorld(), otherPlayer.getLocation() );
-                            this.boostPlayer( otherPlayer, thisPlayer.getLocation(), otherPlayer.getLocation() );
+                        if( this.inTargetBox( thisPlayer.getWorld(), targetPotentialPlayerPosition, otherPlayer.getLocation() ) ) {
+                            if( thisPlayer != otherPlayer || hasBlockUnder( thisPlayer.getLocation() ) ) {
+                                plugin.getLoadedConfig().getBoostedParticleForPlayer( thisPlayer ).spawn( otherPlayer.getWorld(), otherPlayer.getLocation() );
+                                this.boostPlayer( otherPlayer, thisPlayer.getLocation(), otherPlayer.getLocation() );
+                            }
                         }
                     }
                 }
