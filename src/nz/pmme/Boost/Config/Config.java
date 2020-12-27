@@ -406,7 +406,7 @@ public class Config
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             if( statsPeriod == StatsPeriod.TOTAL ) break;
             EnumMap< Place, List<String> > periodicWinCommands = new EnumMap<>( Place.class);
-            for( Place place : Place.values() ) {
+            for( Place place : Place.getTop3places() ) {
                 periodicWinCommands.put( place, plugin.getConfig().getStringList( "win_commands." + statsPeriod.toString().toLowerCase() + "." + place.toString().toLowerCase() ) );
             }
             winCommands.put( statsPeriod, periodicWinCommands );
@@ -804,7 +804,7 @@ public class Config
 
     public void runPeriodicWinCommandsForTop3( StatsPeriod statsPeriod, List<PlayerStats> top3 )
     {
-        for( Place place : Place.values() ) {
+        for( Place place : Place.getTop3places() ) {
             try {
                 UUID uuid = top3.get( place.getAsIndex() ).getUuid();
                 if( uuid == null ) break;

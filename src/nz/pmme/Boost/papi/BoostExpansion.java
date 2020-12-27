@@ -89,8 +89,8 @@ public class BoostExpansion extends PlaceholderExpansion {
                     return "";
                 }
 
-                List< PlayerStats > top3 = plugin.getDataHandler().queryLeaderBoard( period, 3, true );
-                PlayerStats topPlayer = place.getAsIndex() < top3.size() ? top3.get( place.getAsIndex() ) : null;
+                List< PlayerStats > topPlayers = plugin.getDataHandler().queryLeaderBoard( period, 10, true );
+                PlayerStats topPlayer = place.getAsIndex() < topPlayers.size() ? topPlayers.get( place.getAsIndex() ) : null;
 
                 String param = paramsLower.substring( thirdUnderscore+1 );
                 return getStatsValue( topPlayer, params, period, param );

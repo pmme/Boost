@@ -81,7 +81,7 @@ public class SubCommandRemoveWinCommand extends AbstractSubCommand
             StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
             if( statsPeriod != null ) {
                 List<String> places = new ArrayList<>();
-                for( Place place : Place.values() ) {
+                for( Place place : Place.getTop3places() ) {
                     places.add( place.toString().toLowerCase() );
                 }
                 return places;

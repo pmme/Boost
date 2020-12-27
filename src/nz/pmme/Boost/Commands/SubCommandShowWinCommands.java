@@ -28,7 +28,7 @@ public class SubCommandShowWinCommands extends AbstractSubCommand
             for( StatsPeriod statsPeriod : StatsPeriod.values() )
             {
                 if( statsPeriod == StatsPeriod.TOTAL ) break;
-                for( Place place : Place.values() )
+                for( Place place : Place.getTop3places() )
                 {
                     List<String> winCommands = plugin.getLoadedConfig().getWinCommands( statsPeriod, place );
                     if( winCommands == null || winCommands.isEmpty() ) {
