@@ -27,6 +27,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -231,6 +233,7 @@ public class EventsListener implements Listener
                     }
                 }
                 plugin.getLoadedConfig().getBoostHitParticleForPlayer( thisPlayer ).spawn( thisPlayer.getWorld(), targetPotentialPlayerPosition.getBlockX() + 0.5, targetPotentialPlayerPosition.getBlockY() + 0.5, targetPotentialPlayerPosition.getBlockZ() + 0.5 );
+                if( plugin.getLoadedConfig().shouldGlowAfterBoost() ) thisPlayer.addPotionEffect( new PotionEffect( PotionEffectType.GLOWING, (int)plugin.getLoadedConfig().getCoolDown()/50, 0, false, false, true ) );
                 playersGame.coolDown( thisPlayer );
             } else {
                 BoostParticle boostParticle = plugin.getLoadedConfig().getBoostParticleForPlayer( thisPlayer );

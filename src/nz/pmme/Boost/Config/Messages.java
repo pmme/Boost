@@ -91,6 +91,8 @@ public enum Messages
     COMMAND_NOW_ALLOWED( "command_now_allowed" ),
     COMMAND_NOW_BLOCKED( "command_now_blocked" ),
     START_DELAY_TITLE( "start_delay_title" ),
+    GLOW_AFTER_BOOST_ENABLED( "glow_after_boost_enabled" ),
+    GLOW_AFTER_BOOST_DISABLED( "glow_after_boost_disabled" ),
 
     END("end");
 

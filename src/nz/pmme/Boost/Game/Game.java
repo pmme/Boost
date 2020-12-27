@@ -6,6 +6,7 @@ import nz.pmme.Boost.Enums.GameState;
 import nz.pmme.Boost.Main;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -330,6 +331,7 @@ public class Game implements Comparable<Game>
             playerInfo.setCoolDownEnd( coolDownEndMillis );
             playerInfo.getPlayer().setVelocity( Game.VECTOR0 );
             playerInfo.getPlayer().setFlying( false );
+            playerInfo.getPlayer().removePotionEffect( PotionEffectType.GLOWING );
             playerInfo.getPlayer().teleport( gameConfig.getStartSpawn() );
             playerInfo.getPlayer().setGameMode( plugin.getLoadedConfig().getPlayingGameMode() );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );

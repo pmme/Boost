@@ -90,6 +90,7 @@ public class Config
     private GameMode buildGameMode;
 
     private boolean boostWhileQueuing;
+    private boolean glowAfterBoost;
     private boolean commandsBlockedWhilePlaying;
     private Set<String> commandsAllowedWhilePlaying = new HashSet<>();
 
@@ -394,6 +395,7 @@ public class Config
         buildGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.build", "CREATIVE" ).toUpperCase() );
 
         boostWhileQueuing = plugin.getConfig().getBoolean( "boost_while_queuing", false );
+        glowAfterBoost = plugin.getConfig().getBoolean( "glow_after_boost", true );
         commandsBlockedWhilePlaying = plugin.getConfig().getBoolean( "other_commands.block_while_playing", true );
         for( String command : plugin.getConfig().getStringList( "other_commands.allowed_commands" ) ) {
             commandsAllowedWhilePlaying.add( command.toLowerCase() );
@@ -550,6 +552,13 @@ public class Config
     public void setBoostWhileQueuing( boolean boostWhileQueuing ) {
         this.boostWhileQueuing = boostWhileQueuing;
         plugin.getConfig().set( "boost_while_queuing", this.boostWhileQueuing );
+        plugin.saveConfig();
+    }
+
+    public boolean shouldGlowAfterBoost() { return glowAfterBoost; }
+    public void setGlowAfterBoost( boolean glowAfterBoost ) {
+        this.glowAfterBoost = glowAfterBoost;
+        plugin.getConfig().set( "glow_after_boost", this.glowAfterBoost );
         plugin.saveConfig();
     }
 

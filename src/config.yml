@@ -48,6 +48,7 @@ gamemode:
   build: 'CREATIVE'
 
 boost_while_queuing: false
+glow_after_boost: true
 
 other_commands:
   block_while_playing: true;

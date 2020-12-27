@@ -88,6 +88,8 @@ messages:
   command_now_allowed: "Command '%cmd%' is now allowed while playing."
   command_now_blocked: "Command '%cmd%' is now blocked while playing."
   start_delay_title: "&5Boosting begins in %time% seconds! Get ready..."
+  glow_after_boost_enabled: "Glowing &aenabled&r after boosting."
+  glow_after_boost_disabled: "Glowing &cdisabled&r after boosting."
 
 player_stats:
   - "&5[平台争霸] &f玩家统计信息: %player%"
@@ -134,6 +136,7 @@ command_usage_admin:
   - "&f/boost testwincommands Arena1 <player> &3- Test win commands executed for the winner."
   - "&f/boost testwincommands [daily|weekly|monthly] [first|second|third] <player>"
   - "&f/boost togglelobbyboost &3- Toggle boosting in game lobbies."
+  - "&f/boost toggleglow &3- Toggle glow effect on players after boosting."
   - "&f/boost setcooldown [milliseconds] &3- Set the cool down between boosts."
   - "&f/boost setstartdelay [milliseconds] &3- Set the delay before boosting after a game starts."
   - "&f/boost queue * &3- 开启游戏的排队所有游戏"
