@@ -2,7 +2,7 @@ package nz.pmme.Boost.Config;
 
 import nz.pmme.Boost.Data.PlayerStats;
 import nz.pmme.Boost.Enums.StatsPeriod;
-import nz.pmme.Boost.Enums.Winner;
+import nz.pmme.Boost.Enums.Place;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -97,7 +97,7 @@ public class Config
     private BoostParticle boostHitParticle;
     private BoostParticle boostedParticle;
 
-    private Map< StatsPeriod, EnumMap< Winner, List<String> > > winCommands = new EnumMap<>(StatsPeriod.class);
+    private Map< StatsPeriod, EnumMap< Place, List<String> > > winCommands = new EnumMap<>(StatsPeriod.class);
 
     private BarColor gameStartBoostDelayBarColor;
     private BarStyle gameStartBoostDelayBarStyle;
@@ -405,9 +405,9 @@ public class Config
 
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             if( statsPeriod == StatsPeriod.TOTAL ) break;
-            EnumMap< Winner, List<String> > periodicWinCommands = new EnumMap<>(Winner.class);
-            for( Winner winner : Winner.values() ) {
-                periodicWinCommands.put( winner, plugin.getConfig().getStringList( "win_commands." + statsPeriod.toString().toLowerCase() + "." + winner.toString().toLowerCase() ) );
+            EnumMap< Place, List<String> > periodicWinCommands = new EnumMap<>( Place.class);
+            for( Place place : Place.values() ) {
+                periodicWinCommands.put( place, plugin.getConfig().getStringList( "win_commands." + statsPeriod.toString().toLowerCase() + "." + place.toString().toLowerCase() ) );
             }
             winCommands.put( statsPeriod, periodicWinCommands );
         }
@@ -776,8 +776,8 @@ public class Config
         }
     }
 
-    public List<String> getWinCommands( StatsPeriod statsPeriod, Winner winner ) {
-        return winCommands.get( statsPeriod ).get( winner );
+    public List<String> getWinCommands( StatsPeriod statsPeriod, Place place ) {
+        return winCommands.get( statsPeriod ).get( place );
     }
 
     public void runWinCommands( UUID playerUuid, String gameName, List<String> winCommands )
@@ -804,36 +804,36 @@ public class Config
 
     public void runPeriodicWinCommandsForTop3( StatsPeriod statsPeriod, List<PlayerStats> top3 )
     {
-        for( Winner winner : Winner.values() ) {
+        for( Place place : Place.values() ) {
             try {
-                UUID uuid = top3.get( winner.getTop3Listing() ).getUuid();
+                UUID uuid = top3.get( place.getAsIndex() ).getUuid();
                 if( uuid == null ) break;
-                this.runWinCommands( uuid, null, this.getWinCommands( statsPeriod, winner ) );
+                this.runWinCommands( uuid, null, this.getWinCommands( statsPeriod, place ) );
             } catch( IndexOutOfBoundsException e ) {
                 break;
             }
         }
     }
 
-    public void addWinCommand( StatsPeriod statsPeriod, Winner winner, String winCommand )
+    public void addWinCommand( StatsPeriod statsPeriod, Place place, String winCommand )
     {
-        EnumMap< Winner, List<String> > periodicWinCommands = winCommands.get( statsPeriod );
-        List<String> periodicWinCommandForWinner = periodicWinCommands.get( winner );
+        EnumMap< Place, List<String> > periodicWinCommands = winCommands.get( statsPeriod );
+        List<String> periodicWinCommandForWinner = periodicWinCommands.get( place );
         periodicWinCommandForWinner.add( winCommand );
-        periodicWinCommands.put( winner, periodicWinCommandForWinner );
+        periodicWinCommands.put( place, periodicWinCommandForWinner );
         winCommands.put( statsPeriod, periodicWinCommands );
-        plugin.getConfig().set( "win_commands." + statsPeriod.toString().toLowerCase() + "." + winner.toString().toLowerCase(), periodicWinCommandForWinner );
+        plugin.getConfig().set( "win_commands." + statsPeriod.toString().toLowerCase() + "." + place.toString().toLowerCase(), periodicWinCommandForWinner );
         plugin.saveConfig();
     }
 
-    public void removeWinCommand( StatsPeriod statsPeriod, Winner winner, int index ) throws IndexOutOfBoundsException
+    public void removeWinCommand( StatsPeriod statsPeriod, Place place, int index ) throws IndexOutOfBoundsException
     {
-        EnumMap< Winner, List<String> > periodicWinCommands = winCommands.get( statsPeriod );
-        List<String> periodicWinCommandForWinner = periodicWinCommands.get( winner );
+        EnumMap< Place, List<String> > periodicWinCommands = winCommands.get( statsPeriod );
+        List<String> periodicWinCommandForWinner = periodicWinCommands.get( place );
         periodicWinCommandForWinner.remove( index );
-        periodicWinCommands.put( winner, periodicWinCommandForWinner );
+        periodicWinCommands.put( place, periodicWinCommandForWinner );
         winCommands.put( statsPeriod, periodicWinCommands );
-        plugin.getConfig().set( "win_commands." + statsPeriod.toString().toLowerCase() + "." + winner.toString().toLowerCase(), periodicWinCommandForWinner );
+        plugin.getConfig().set( "win_commands." + statsPeriod.toString().toLowerCase() + "." + place.toString().toLowerCase(), periodicWinCommandForWinner );
         plugin.saveConfig();
     }
 

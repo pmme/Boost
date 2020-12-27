@@ -3,7 +3,7 @@ package nz.pmme.Boost.papi;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import nz.pmme.Boost.Data.PlayerStats;
 import nz.pmme.Boost.Enums.StatsPeriod;
-import nz.pmme.Boost.Enums.Winner;
+import nz.pmme.Boost.Enums.Place;
 import nz.pmme.Boost.Main;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -83,14 +83,14 @@ public class BoostExpansion extends PlaceholderExpansion {
                     return "";
                 }
                 String positionParam = paramsLower.substring( secondUnderscore+1, thirdUnderscore );
-                Winner winner = Winner.fromString( positionParam );
-                if( winner == null ) {
+                Place place = Place.fromString( positionParam );
+                if( place == null ) {
                     plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
                     return "";
                 }
 
                 List< PlayerStats > top3 = plugin.getDataHandler().queryLeaderBoard( period, 3, true );
-                PlayerStats topPlayer = winner.getTop3Listing() < top3.size() ? top3.get( winner.getTop3Listing() ) : null;
+                PlayerStats topPlayer = place.getAsIndex() < top3.size() ? top3.get( place.getAsIndex() ) : null;
 
                 String param = paramsLower.substring( thirdUnderscore+1 );
                 return getStatsValue( topPlayer, params, period, param );

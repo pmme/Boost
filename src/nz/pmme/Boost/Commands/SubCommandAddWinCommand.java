@@ -2,7 +2,7 @@ package nz.pmme.Boost.Commands;
 
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.StatsPeriod;
-import nz.pmme.Boost.Enums.Winner;
+import nz.pmme.Boost.Enums.Place;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
 import org.bukkit.command.CommandSender;
@@ -29,18 +29,19 @@ public class SubCommandAddWinCommand extends AbstractSubCommand
             if( statsPeriod != null )
             {
                 if( args.length >= 4 ) {
-                    Winner winner = Winner.fromString( args[2] );
-                    if( winner != null ) {
+                    Place place = Place.fromString( args[2] );
+                    if( place != null ) {
                         StringBuilder winCommand = new StringBuilder();
                         winCommand.append( args[3] );
                         for( int i = 4; i < args.length; ++i ) {
                             winCommand.append( " " );
                             winCommand.append( args[i] );
                         }
-                        plugin.getLoadedConfig().addWinCommand( statsPeriod, winner, winCommand.toString() );
+                        plugin.getLoadedConfig().addWinCommand( statsPeriod, place, winCommand.toString() );
                         String message = plugin.formatMessage( Messages.PERIODIC_COMMANDS_UPDATED, "", "%period%", statsPeriod.toString() )
-                                .replaceAll( "%winner%", winner.toString() )
-                                .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ).size() ) );
+                                .replaceAll( "%winner%", place.toString() )
+                                .replaceAll( "%place%", place.toString() )
+                                .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, place ).size() ) );
                         plugin.messageSender( sender, message );
                         return true;
                     }
@@ -78,11 +79,11 @@ public class SubCommandAddWinCommand extends AbstractSubCommand
         if( args.length == 3 ) {
             StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
             if( statsPeriod != null ) {
-                List<String> winners = new ArrayList<>();
-                for( Winner winner : Winner.values() ) {
-                    winners.add( winner.toString().toLowerCase() );
+                List<String> places = new ArrayList<>();
+                for( Place place : Place.values() ) {
+                    places.add( place.toString().toLowerCase() );
                 }
-                return winners;
+                return places;
             }
         }
         return null;

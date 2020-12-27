@@ -2,7 +2,7 @@ package nz.pmme.Boost.Commands;
 
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.StatsPeriod;
-import nz.pmme.Boost.Enums.Winner;
+import nz.pmme.Boost.Enums.Place;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
@@ -30,13 +30,14 @@ public class SubCommandRemoveWinCommand extends AbstractSubCommand
             if( statsPeriod != null )
             {
                 if( args.length == 4 ) {
-                    Winner winner = Winner.fromString( args[2] );
-                    if( winner != null ) {
+                    Place place = Place.fromString( args[2] );
+                    if( place != null ) {
                         try {
-                            plugin.getLoadedConfig().removeWinCommand( statsPeriod, winner, Integer.parseUnsignedInt( args[3], 10 ) - 1 );
+                            plugin.getLoadedConfig().removeWinCommand( statsPeriod, place, Integer.parseUnsignedInt( args[3], 10 ) - 1 );
                             String message = plugin.formatMessage( Messages.PERIODIC_COMMANDS_UPDATED, "", "%period%", statsPeriod.toString() )
-                                    .replaceAll( "%winner%", winner.toString() )
-                                    .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, winner ).size() ) );
+                                    .replaceAll( "%winner%", place.toString() )
+                                    .replaceAll( "%place%", place.toString() )
+                                    .replaceAll( "%count%", String.valueOf( plugin.getLoadedConfig().getWinCommands( statsPeriod, place ).size() ) );
                             plugin.messageSender( sender, message );
                         } catch( NumberFormatException e ) {
                             plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a integer number 1 or more." ) );
@@ -79,11 +80,11 @@ public class SubCommandRemoveWinCommand extends AbstractSubCommand
         if( args.length == 3 ) {
             StatsPeriod statsPeriod = StatsPeriod.fromString( args[1] );
             if( statsPeriod != null ) {
-                List<String> winners = new ArrayList<>();
-                for( Winner winner : Winner.values() ) {
-                    winners.add( winner.toString().toLowerCase() );
+                List<String> places = new ArrayList<>();
+                for( Place place : Place.values() ) {
+                    places.add( place.toString().toLowerCase() );
                 }
-                return winners;
+                return places;
             }
         }
         return null;

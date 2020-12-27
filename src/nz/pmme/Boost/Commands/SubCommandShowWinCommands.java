@@ -2,7 +2,7 @@ package nz.pmme.Boost.Commands;
 
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.StatsPeriod;
-import nz.pmme.Boost.Enums.Winner;
+import nz.pmme.Boost.Enums.Place;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
@@ -28,13 +28,13 @@ public class SubCommandShowWinCommands extends AbstractSubCommand
             for( StatsPeriod statsPeriod : StatsPeriod.values() )
             {
                 if( statsPeriod == StatsPeriod.TOTAL ) break;
-                for( Winner winner : Winner.values() )
+                for( Place place : Place.values() )
                 {
-                    List<String> winCommands = plugin.getLoadedConfig().getWinCommands( statsPeriod, winner );
+                    List<String> winCommands = plugin.getLoadedConfig().getWinCommands( statsPeriod, place );
                     if( winCommands == null || winCommands.isEmpty() ) {
-                        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + statsPeriod.toString() + " " + winner.toString() + "&r : &3None configured" ) );
+                        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + statsPeriod.toString() + " " + place.toString() + "&r : &3None configured" ) );
                     } else {
-                        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + statsPeriod.toString() + " " + winner.toString() + "&r :" ) );
+                        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost&r win commands for " + statsPeriod.toString() + " " + place.toString() + "&r :" ) );
                         for( String winCommand : winCommands ) {
                             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|   &3- '" ) + winCommand + ChatColor.translateAlternateColorCodes( '&',"&3'." ) );
                         }
