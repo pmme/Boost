@@ -11,15 +11,17 @@ gui:
     join:
       enabled: true
       item: "GLASS"
-      name: "Join game %game%"
+      name: "&fJoin game %game%"
       lore:
         - "&7Click to join game"
+        - "&7%players% players queuing"
+        - "&7%min% players required"
       row: 2
       col: 5
     leave:
       enabled: true
       item: "IRON_DOOR"
-      name: "Leave game"
+      name: "&fLeave game"
       lore:
         - "&7Click to leave your current game"
       row: 2
@@ -27,7 +29,7 @@ gui:
     stats:
       enabled: true
       item: "PAPER"
-      name: "Your stats"
+      name: "&fYour stats"
       lore:
         - "&7Click to show your game stats"
       row: 4
