@@ -4,6 +4,7 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import nz.pmme.Boost.Data.PlayerStats;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Enums.Place;
+import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -56,71 +57,87 @@ public class BoostExpansion extends PlaceholderExpansion {
             case "rank":
                 return ( playerStats != null ) ? String.valueOf( playerStats.getRank() ) : "0";
             default:
-                plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
-                return "";
+                plugin.getLogger().severe( "Error in StatsValue syntax of place holder used with Boost, " + params );
+                return null;
+        }
+    }
+
+    private String getGameValue( Game game, String params, String param )
+    {
+        switch( param ) {
+            case "players":
+                return String.valueOf( game.getPlayerCount() );
+            case "playing":
+                return String.valueOf( game.getActivePlayerCount() );
+            case "max":
+                return String.valueOf( game.getGameConfig().getMaxPlayers() );
+            case "min":
+                return String.valueOf( game.getGameConfig().getMinPlayers() );
+            case "status":
+                return game.getGameStateText();
+            default:
+                plugin.getLogger().severe( "Error in GameValue syntax of place holder used with Boost, " + params );
+                return null;
         }
     }
 
     @Override
     public String onRequest( OfflinePlayer player, String params )
     {
-        String paramsLower = params.toLowerCase();
-        int firstUnderscore = paramsLower.indexOf( '_' );
-        int secondUnderscore = ( firstUnderscore != -1 ) ? paramsLower.indexOf( '_', firstUnderscore + 1 ) : -1;
-        int thirdUnderscore = ( secondUnderscore != -1 ) ? paramsLower.indexOf( '_', secondUnderscore + 1 ) : -1;
-        if( paramsLower.startsWith( "top" ) )
+        String[] paramsSplit = params.toLowerCase().split( "_" );
+        if( paramsSplit.length == 4 && paramsSplit[0].equals( "top" ) )
         {
             // top_daily_first_player
             // top_weekly_second_wins
             // top_monthly_third_losses
             // top_total_first_rank
             // top_daily_third_games
-            try {
-                String periodParam = paramsLower.substring( firstUnderscore+1, secondUnderscore );
-                StatsPeriod period = StatsPeriod.fromString( periodParam );
-                if( period == null ) {
-                    plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
-                    return "";
-                }
-                String positionParam = paramsLower.substring( secondUnderscore+1, thirdUnderscore );
-                Place place = Place.fromString( positionParam );
-                if( place == null ) {
-                    plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
-                    return "";
-                }
-
-                List< PlayerStats > topPlayers = plugin.getDataHandler().queryLeaderBoard( period, 10, true );
-                PlayerStats topPlayer = place.getAsIndex() < topPlayers.size() ? topPlayers.get( place.getAsIndex() ) : null;
-
-                String param = paramsLower.substring( thirdUnderscore+1 );
-                return getStatsValue( topPlayer, params, period, param );
-            } catch( NumberFormatException | StringIndexOutOfBoundsException e ) {
-                plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
-                return "";
+            StatsPeriod period = StatsPeriod.fromString( paramsSplit[1] );
+            if( period == null ) {
+                plugin.getLogger().severe( "Error in StatsPeriod syntax of place holder used with Boost, " + params );
+                return null;
             }
+            Place place = Place.fromString( paramsSplit[2] );
+            if( place == null ) {
+                plugin.getLogger().severe( "Error in Place syntax of place holder used with Boost, " + params );
+                return null;
+            }
+
+            List< PlayerStats > topPlayers = plugin.getDataHandler().queryLeaderBoard( period, 10, true );
+            PlayerStats topPlayer = place.getAsIndex() < topPlayers.size() ? topPlayers.get( place.getAsIndex() ) : null;
+
+            return this.getStatsValue( topPlayer, params, period, paramsSplit[3] );
         }
-        if( paramsLower.startsWith( "player" ) )
+        if( paramsSplit.length == 3 && paramsSplit[0].equals( "player" ) )
         {
             // player_daily_player
             // player_total_wins
             // player_monthly_losses
             // player_weekly_games
             // player_total_rank
-            try {
-                String periodParam = paramsLower.substring( firstUnderscore+1, secondUnderscore );
-                StatsPeriod period = StatsPeriod.fromString( periodParam );
-                if( period == null ) {
-                    plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
-                    return "";
-                }
-                String param = paramsLower.substring( secondUnderscore+1 );
-                PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( period, player.getUniqueId() );
-                return getStatsValue( playerStats, params, period, param );
-            } catch( NumberFormatException | StringIndexOutOfBoundsException e ) {
-                plugin.getLogger().severe( "Error in syntax of PlaceholdAPI used with Boost, " + params );
-                return "";
+            StatsPeriod period = StatsPeriod.fromString( paramsSplit[1] );
+            if( period == null ) {
+                plugin.getLogger().severe( "Error in StatsPeriod syntax of place holder used with Boost, " + params );
+                return null;
             }
+            PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( period, player.getUniqueId() );
+            return this.getStatsValue( playerStats, params, period, paramsSplit[2] );
         }
+        if( paramsSplit.length == 3 && paramsSplit[0].equals( "game" ) )
+        {
+            // game_arena1_players
+            // game_arena2_playing
+            // game_arena2_max
+            // game_arena1_min
+            // game_arena1_status
+            Game game = plugin.getGameManager().getGame( paramsSplit[1] );
+            if( game == null ) {
+                plugin.getLogger().severe( "Error in Game syntax of place holder used with Boost, " + params );
+                return null;
+            }
+            return this.getGameValue( game, params, paramsSplit[2] );
+        }
+        plugin.getLogger().severe( "Error in syntax of place holder used with Boost, " + params );
         return null;
     }
 

@@ -11,15 +11,17 @@ gui:
     join:
       enabled: true
       item: "GLASS"
-      name: "加入游戏 %game%"
+      name: "&f加入游戏 %game%"
       lore:
         - "&7点击加入"
+        - "&7%players% players queuing"
+        - "&7%min% players required"
       row: 2
       col: 5
     leave:
       enabled: true
       item: "IRON_DOOR"
-      name: "离开当前游戏"
+      name: "&f离开当前游戏"
       lore:
         - "&7点击离开"
       row: 2
@@ -27,7 +29,7 @@ gui:
     stats:
       enabled: true
       item: "PAPER"
-      name: "玩家的统计信息"
+      name: "&f玩家的统计信息"
       lore:
         - "&7查询玩家的统计信息"
       row: 4

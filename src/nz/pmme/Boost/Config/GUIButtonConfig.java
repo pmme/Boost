@@ -1,6 +1,7 @@
 package nz.pmme.Boost.Config;
 
 import nz.pmme.Boost.Main;
+import nz.pmme.Utils.PairedValue;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -111,12 +112,17 @@ public class GUIButtonConfig
 
     public ItemStack create()
     {
-        return this.create( null, null, null );
+        return this.create( null, null );
     }
 
-    public ItemStack create( String placeHolder, String gameDisplayName, Material guiItemOverride )
+    public ItemStack create( List< PairedValue<String,String> > placeHolders, Material guiItemOverride )
     {
-        String displayName = placeHolder != null && gameDisplayName != null ? this.displayName.replaceAll( placeHolder, gameDisplayName ) : this.displayName;
+        String displayName = this.displayName;
+        if( placeHolders != null ) {
+            for( PairedValue<String,String> placeHolder : placeHolders ) {
+                displayName = displayName.replaceAll( placeHolder.getV1(), placeHolder.getV2() );
+            }
+        }
         ItemStack item = new ItemStack( guiItemOverride != null ? guiItemOverride : this.material );
         ItemMeta itemMeta = item.getItemMeta();
         if( itemMeta != null ) {
@@ -124,6 +130,11 @@ public class GUIButtonConfig
             if( !this.lore.isEmpty() ) {
                 List<String> translatedLore = new ArrayList<>();
                 for( String string : this.lore ) {
+                    if( placeHolders != null ) {
+                        for( PairedValue<String,String> placeHolder : placeHolders ) {
+                            string = string.replaceAll( placeHolder.getV1(), placeHolder.getV2() );
+                        }
+                    }
                     translatedLore.add( ChatColor.translateAlternateColorCodes( '&', string ) );
                 }
                 itemMeta.setLore( translatedLore );
