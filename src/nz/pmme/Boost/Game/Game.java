@@ -53,6 +53,15 @@ public class Game implements Comparable<Game>
         return players.size();
     }
 
+    public int getActivePlayerCount()
+    {
+        int activePlayers = 0;
+        for( PlayerInfo playerInfo : players.values() ) {
+            if( playerInfo.isActive() ) ++activePlayers;
+        }
+        return activePlayers;
+    }
+
     public int getRemainingQueueTime() {
         return remainingQueueTime;
     }
