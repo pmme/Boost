@@ -75,6 +75,9 @@ public class BoostExpansion extends PlaceholderExpansion {
                 return String.valueOf( game.getGameConfig().getMinPlayers() );
             case "status":
                 return game.getGameStateText();
+            case "time":
+                if( !game.isQueuing() || game.getPlayerCount() < game.getGameConfig().getMinPlayers() ) return "";
+                return String.valueOf( game.getRemainingQueueTime() );
             default:
                 plugin.getLogger().severe( "Error in GameValue syntax of place holder used with Boost, " + params );
                 return null;
@@ -130,6 +133,7 @@ public class BoostExpansion extends PlaceholderExpansion {
             // game_arena2_max
             // game_arena1_min
             // game_arena1_status
+            // game_arena2_time
             Game game = plugin.getGameManager().getGame( paramsSplit[1] );
             if( game == null ) {
                 plugin.getLogger().severe( "Error in Game syntax of place holder used with Boost, " + params );
