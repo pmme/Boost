@@ -45,7 +45,7 @@ public class InventoryManager
         for( int slot = 0; slot < 36; ++slot ) {
             if( player.getInventory().getItem( slot ) == null || player.getInventory().getItem( slot ).getType() == Material.AIR ) {
                 player.getInventory().setItem( slot, mainGuiItem );
-                if( holdItem ) player.getInventory().setHeldItemSlot( slot );
+                if( holdItem && slot <= 8 ) player.getInventory().setHeldItemSlot( slot );
                 break;
             }
         }
