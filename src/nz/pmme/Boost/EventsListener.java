@@ -144,25 +144,26 @@ public class EventsListener implements Listener
                     plugin.getGameManager().displayStatus( player );
                     return true;
                 } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignStatsStripped() ) ) {
-                    if( lines.length > 2 ) {
-
-                    }
-                    plugin.getGameManager().displayPlayerStats( player, player );
+                    String gameName = lines.length > 2 ? ChatColor.stripColor( lines[2] ) : null;
+                    plugin.getGameManager().displayPlayerStats( player, player, gameName );
                     return true;
                 } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignTopStripped() ) ) {
                     if( lines.length > 2 ) {
                         String strippedLine2 = ChatColor.stripColor( lines[2] );
+                        String gameName = lines.length > 3 ? ChatColor.stripColor( lines[3] ) : null;
                         if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignDailyStripped() ) ) {
-                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.DAILY );
+                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.DAILY, gameName );
                         } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignWeeklyStripped() ) ) {
-                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.WEEKLY );
+                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.WEEKLY, gameName );
                         } else if( strippedLine2.equalsIgnoreCase( plugin.getLoadedConfig().getSignMonthlyStripped() ) ) {
-                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.MONTHLY );
+                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.MONTHLY, gameName );
+                        } else if( lines.length == 3 ) {
+                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.TOTAL, strippedLine2 ); // Assume the third line was a game name.
                         } else {
-                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.TOTAL );
+                            plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.TOTAL, gameName );
                         }
                     } else {
-                        plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.TOTAL );
+                        plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.TOTAL, null );
                     }
                     return true;
                 }

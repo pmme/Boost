@@ -25,19 +25,20 @@ public class SubCommandStats extends AbstractSubCommand
 
     @Override
     protected boolean executeSubCommand( CommandSender sender, String[] args ) {
-        if( args.length == 2 ) {
+        if( args.length >= 2 ) {
+            String gameName = args.length == 3 ? args[2] : null;
             UUID playerUuid = plugin.findPlayerByName( args[1] );
             if( playerUuid != null ) {
                 OfflinePlayer player = plugin.getServer().getOfflinePlayer( playerUuid );
                 if( player != null ) {
-                    plugin.getGameManager().displayPlayerStats( sender, player );
+                    plugin.getGameManager().displayPlayerStats( sender, player, gameName );
                     return true;
                 }
             }
             plugin.messageSender( sender, Messages.PLAYER_NOT_FOUND, "", "%player%", args[1] );
             return true;
         } else if( sender instanceof Player ) {
-            plugin.getGameManager().displayPlayerStats( sender, (Player)sender );
+            plugin.getGameManager().displayPlayerStats( sender, (Player)sender, null );
             return true;
         } else {
             plugin.messageSender( sender, Messages.NO_CONSOLE );
@@ -48,6 +49,7 @@ public class SubCommandStats extends AbstractSubCommand
     @Override
     protected List< String > tabCompleteArgs( CommandSender sender, String[] args ) {
         if( args.length == 2 ) return plugin.getDataHandler().queryListOfPlayers( StatsPeriod.TOTAL );
+        if( args.length == 3 ) return plugin.getGameManager().getGameNames();
         return null;
     }
 }

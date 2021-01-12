@@ -20,6 +20,6 @@ public class GUIButtonStats implements GUIButton
 
     @Override
     public void onClick( InventoryClickEvent e, Player player ) {
-        plugin.getGameManager().displayPlayerStats( player, player );
+        plugin.getGameManager().displayPlayerStats( player, player, null );
     }
 }

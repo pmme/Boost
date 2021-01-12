@@ -22,15 +22,16 @@ public class SubCommandDelStats extends AbstractSubCommand
 
     @Override
     protected boolean executeSubCommand( CommandSender sender, String[] args ) {
-        if( args.length == 2 ) {
+        if( args.length == 2 || args.length == 3 ) {
+            String gameName = args.length == 3 ? args[2] : null;
             if( args[1].equals( "*" ) ) {
-                plugin.getGameManager().deletePlayerStats( sender, null );
+                plugin.getGameManager().deletePlayerStats( sender, null, gameName );
             } else {
                 UUID playerUuid = plugin.findPlayerByName( args[1] );
                 if( playerUuid != null ) {
                     OfflinePlayer player = plugin.getServer().getOfflinePlayer( playerUuid );
                     if( player != null ) {
-                        plugin.getGameManager().deletePlayerStats( sender, player );
+                        plugin.getGameManager().deletePlayerStats( sender, player, gameName );
                         return true;
                     }
                 }
@@ -44,6 +45,7 @@ public class SubCommandDelStats extends AbstractSubCommand
     @Override
     protected List< String > tabCompleteArgs( CommandSender sender, String[] args ) {
         if( args.length == 2 ) return plugin.getDataHandler().queryListOfPlayers( StatsPeriod.TOTAL );
+        if( args.length == 3 ) return plugin.getGameManager().getGameNames();
         return null;
     }
 }
