@@ -30,6 +30,19 @@ public class SubCommandSetSign extends AbstractSubCommand
         return adminPermission;
     }
 
+    private String getGameNameForSign( String arg )
+    {
+        if( arg.contains( "&" ) ) {
+            return ChatColor.translateAlternateColorCodes( '&', arg );
+        }
+        for( String game : plugin.getGameManager().getGameNames() ) {
+            if( ChatColor.stripColor( game ).equalsIgnoreCase( arg ) ) {
+                return game;
+            }
+        }
+        return arg;
+    }
+
     @Override
     protected boolean executeSubCommand( CommandSender sender, String[] args ) {
         if( sender instanceof Player ) {
@@ -48,18 +61,7 @@ public class SubCommandSetSign extends AbstractSubCommand
                 switch( args1lower ) {
                     case "join":
                         sign.setLine( line++, plugin.getLoadedConfig().getSignJoin() );
-                        String gameNameForSign = null;
-                        if( args[2].contains( "&" ) ) {
-                            gameNameForSign = ChatColor.translateAlternateColorCodes( '&', args[2] );
-                        } else {
-                            for( String game : plugin.getGameManager().getGameNames() ) {
-                                if( ChatColor.stripColor( game ).equalsIgnoreCase( args[2] ) ) {
-                                    gameNameForSign = game;
-                                }
-                            }
-                            if( gameNameForSign == null ) gameNameForSign = args[2];
-                        }
-                        sign.setLine( line++, gameNameForSign );
+                        sign.setLine( line++, this.getGameNameForSign( args[2] ) );
                         break;
                     case "leave":
                         sign.setLine( line++, plugin.getLoadedConfig().getSignLeave() );
@@ -69,10 +71,11 @@ public class SubCommandSetSign extends AbstractSubCommand
                         break;
                     case "stats":
                         sign.setLine( line++, plugin.getLoadedConfig().getSignStats() );
+                        if( args.length == 3 ) sign.setLine( line++, this.getGameNameForSign( args[2] ) );
                         break;
                     case "top":
                         sign.setLine( line++, plugin.getLoadedConfig().getSignTop() );
-                        if( args.length == 3 ) {
+                        if( args.length >= 3 ) {
                             switch( args[2].toLowerCase() ) {
                                 case "daily":
                                     sign.setLine( line++, plugin.getLoadedConfig().getSignDaily() );
@@ -83,8 +86,12 @@ public class SubCommandSetSign extends AbstractSubCommand
                                 case "monthly":
                                     sign.setLine( line++, plugin.getLoadedConfig().getSignMonthly() );
                                     break;
+                                default:
+                                    if( args.length == 3 ) sign.setLine( line++, this.getGameNameForSign( args[2] ) );
+                                    break;
                             }
                         }
+                        if( args.length == 4 ) sign.setLine( line++, this.getGameNameForSign( args[3] ) );
                         break;
                     default:
                         String arg1Coloured = ChatColor.translateAlternateColorCodes( '&', args[1] );
@@ -109,10 +116,16 @@ public class SubCommandSetSign extends AbstractSubCommand
         if( args.length == 2 ) return signCommands;
         if( args.length == 3 ) {
             String arg1lower = args[1].toLowerCase();
-            if( arg1lower.equals( "join" ) ) {
+            if( arg1lower.equals( "join" ) || arg1lower.equals( "stats" ) ) {
                 return plugin.getGameManager().getGameNames();
             } else if( arg1lower.equals( "top" ) ) {
                 return StatsPeriod.getStatsPeriods();
+            }
+        }
+        if( args.length == 4 ) {
+            String arg1lower = args[1].toLowerCase();
+            if( arg1lower.equals( "top" ) ) {
+                return plugin.getGameManager().getGameNames();
             }
         }
         return null;
