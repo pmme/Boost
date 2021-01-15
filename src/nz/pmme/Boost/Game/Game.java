@@ -217,8 +217,8 @@ public class Game implements Comparable<Game>
             player.setGameMode( plugin.getLoadedConfig().getLostGameMode() );
             plugin.messageSender( player, Messages.LOST, gameConfig.getDisplayName() );
             plugin.getInventoryManager().removeBoostItems( player );
-            plugin.getDataHandler().logLoss( player.getUniqueId(), null );
-            plugin.getDataHandler().logLoss( player.getUniqueId(), gameConfig.getName() );
+            plugin.getDataHandler().logLoss( player.getUniqueId(), player.getDisplayName(), null );
+            plugin.getDataHandler().logLoss( player.getUniqueId(), player.getDisplayName(), gameConfig.getName() );
             player.playSound( player.getLocation(), plugin.getLoadedConfig().getLoseSound(), 1, 1 );
 
             String message = plugin.formatMessage( Messages.PLAYER_LOST, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
@@ -257,8 +257,8 @@ public class Game implements Comparable<Game>
         for( PlayerInfo playerInfo : players.values() ) {
             plugin.messageSender( playerInfo.getPlayer(), message );
         }
-        plugin.getDataHandler().logWin( player.getUniqueId(), null );
-        plugin.getDataHandler().logWin( player.getUniqueId(), gameConfig.getName() );
+        plugin.getDataHandler().logWin( player.getUniqueId(), player.getDisplayName(), null );
+        plugin.getDataHandler().logWin( player.getUniqueId(), player.getDisplayName(), gameConfig.getName() );
         plugin.getLoadedConfig().runWinCommands( player.getUniqueId(), this.getGameConfig().getDisplayName(), this.getGameConfig().getWinCommands() );
     }
 
@@ -349,8 +349,8 @@ public class Game implements Comparable<Game>
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
 
             playerInfo.setActive();
-            plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId(), null );
-            plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId(), gameConfig.getName() );
+            plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId(), playerInfo.getPlayer().getDisplayName(), null );
+            plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId(), playerInfo.getPlayer().getDisplayName(), gameConfig.getName() );
         }
         gameConfig.getStartSpawn().getWorld().playSound( gameConfig.getStartSpawn(), plugin.getLoadedConfig().getStartSound(), plugin.getLoadedConfig().getWorldSoundRange() / 16f, 1 );
         return true;

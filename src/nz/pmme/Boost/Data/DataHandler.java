@@ -154,15 +154,16 @@ public class DataHandler
         }
     }
 
-    private void updateCountColumn( StatsPeriod statsPeriod, UUID playerId, String gameName, String countColumn )
+    private void updateCountColumn( StatsPeriod statsPeriod, UUID playerId, String playerName, String gameName, String countColumn )
     {
         Connection connection = this.database.getConnection();
         if( connection == null ) return;
         try {
-            String updateSql = "UPDATE " + statsPeriod.getTable() + " SET " + countColumn + "=" + countColumn + "+1 WHERE player_id=? AND game_name" + ( gameName != null ? "=?" : " IS NULL" );
+            String updateSql = "UPDATE " + statsPeriod.getTable() + " SET player_name=?, " + countColumn + "=" + countColumn + "+1 WHERE player_id=? AND game_name" + ( gameName != null ? "=?" : " IS NULL" );
             PreparedStatement updateGamesStatement = connection.prepareStatement( updateSql );
-            updateGamesStatement.setString( 1, playerId.toString() );
-            if( gameName != null ) updateGamesStatement.setString( 2, gameName.toLowerCase() );
+            updateGamesStatement.setString( 1, playerName );
+            updateGamesStatement.setString( 2, playerId.toString() );
+            if( gameName != null ) updateGamesStatement.setString( 3, gameName.toLowerCase() );
             updateGamesStatement.executeUpdate();
             updateGamesStatement.close();
         } catch( SQLException sQLException ) {
@@ -171,24 +172,24 @@ public class DataHandler
         }
     }
 
-    public void logGame( UUID playerId, String gameName )
+    public void logGame( UUID playerId, String playerName, String gameName )
     {
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
-            this.updateCountColumn( statsPeriod, playerId, gameName, "games" );
+            this.updateCountColumn( statsPeriod, playerId, playerName, gameName, "games" );
         }
     }
 
-    public void logLoss( UUID playerId, String gameName )
+    public void logLoss( UUID playerId, String playerName, String gameName )
     {
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
-            this.updateCountColumn( statsPeriod, playerId, gameName, "losses" );
+            this.updateCountColumn( statsPeriod, playerId, playerName, gameName, "losses" );
         }
     }
 
-    public void logWin( UUID playerId, String gameName )
+    public void logWin( UUID playerId, String playerName, String gameName )
     {
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
-            this.updateCountColumn( statsPeriod, playerId, gameName, "wins" );
+            this.updateCountColumn( statsPeriod, playerId, playerName, gameName, "wins" );
         }
     }
 
