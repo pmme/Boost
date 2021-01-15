@@ -139,7 +139,8 @@ public class Game implements Comparable<Game>
         player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
         plugin.messageSender( player, Messages.JOIN_GAME, gameConfig.getDisplayName() );
         if( playersRequired > 0 ) plugin.messageSender( player, messagePlayerCount );
-        plugin.getDataHandler().addPlayer( player.getUniqueId(), player.getDisplayName() );
+        plugin.getDataHandler().addPlayer( player.getUniqueId(), player.getDisplayName(), null );
+        plugin.getDataHandler().addPlayer( player.getUniqueId(), player.getDisplayName(), gameConfig.getName() );
         player.playSound( player.getLocation(), plugin.getLoadedConfig().getJoinSound(), 1, 1 );
 
         plugin.getInventoryManager().giveBoostSticks( player );
@@ -216,7 +217,8 @@ public class Game implements Comparable<Game>
             player.setGameMode( plugin.getLoadedConfig().getLostGameMode() );
             plugin.messageSender( player, Messages.LOST, gameConfig.getDisplayName() );
             plugin.getInventoryManager().removeBoostItems( player );
-            plugin.getDataHandler().logLoss( player.getUniqueId() );
+            plugin.getDataHandler().logLoss( player.getUniqueId(), null );
+            plugin.getDataHandler().logLoss( player.getUniqueId(), gameConfig.getName() );
             player.playSound( player.getLocation(), plugin.getLoadedConfig().getLoseSound(), 1, 1 );
 
             String message = plugin.formatMessage( Messages.PLAYER_LOST, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
@@ -255,7 +257,8 @@ public class Game implements Comparable<Game>
         for( PlayerInfo playerInfo : players.values() ) {
             plugin.messageSender( playerInfo.getPlayer(), message );
         }
-        plugin.getDataHandler().logWin( player.getUniqueId() );
+        plugin.getDataHandler().logWin( player.getUniqueId(), null );
+        plugin.getDataHandler().logWin( player.getUniqueId(), gameConfig.getName() );
         plugin.getLoadedConfig().runWinCommands( player.getUniqueId(), this.getGameConfig().getDisplayName(), this.getGameConfig().getWinCommands() );
     }
 
@@ -346,7 +349,8 @@ public class Game implements Comparable<Game>
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
 
             playerInfo.setActive();
-            plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId() );
+            plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId(), null );
+            plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId(), gameConfig.getName() );
         }
         gameConfig.getStartSpawn().getWorld().playSound( gameConfig.getStartSpawn(), plugin.getLoadedConfig().getStartSound(), plugin.getLoadedConfig().getWorldSoundRange() / 16f, 1 );
         return true;

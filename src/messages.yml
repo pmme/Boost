@@ -102,9 +102,9 @@ command_usage_user:
   - "&5Boost commands:"
   - "&f/boost join Arena1 &3- Join the named game."
   - "&f/boost leave &3- Leave your current game."
-  - "&f/boost stats <player> &3- Display game stats for player."
+  - "&f/boost stats <player> <Arena1> &3- Display game stats for player."
   - "&f/boost top &3- Display leader board."
-  - "&f/boost top <Daily/Weekly/Monthly> &3- Display period leader board."
+  - "&f/boost top <Daily/Weekly/Monthly> <Arena1> &3- Display period leader board."
   - "&f/boost status &3- Get a list of games and their status."
 
 command_usage_admin:
@@ -147,8 +147,8 @@ command_usage_admin:
   - "&f/boost stop * &3- Force-stop all games without re-queuing."
   - "&f/boost stop Arena1 &3- Force-stop the game, no re-queuing."
   - "&f/boost cleargames &3- End and unload all games."
-  - "&f/boost delstats * &3- Delete all game stats for all players."
-  - "&f/boost delstats [player] &3- Delete game stats for player."
+  - "&f/boost delstats * <Arena1> &3- Delete all game stats for all players."
+  - "&f/boost delstats [player] <Arena1> &3- Delete game stats for player."
   - "&f/boost reload &3- End all games, reload config, and re-initialise."
   - "&f/boost updateconfig &3- Update config files to latest content."
   - "&f/boost addgameworld <world> &3- Add a world to be managed by Boost."

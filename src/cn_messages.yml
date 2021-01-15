@@ -102,9 +102,9 @@ command_usage_user:
   - "&5平台争霸指令:"
   - "&f/boost join Arena1 &3- 加入游戏"
   - "&f/boost leave &3- 离开当前游戏"
-  - "&f/boost stats <player> &3- 查询玩家的统计信息"
+  - "&f/boost stats <player> <Arena1> &3- 查询玩家的统计信息"
   - "&f/boost top &3- 查询排行榜"
-  - "&f/boost top <天/周/月> &3- 查询 天/周/月 的排行榜"
+  - "&f/boost top <天/周/月> <Arena1> &3- 查询 天/周/月 的排行榜"
   - "&f/boost status &3- 查询当前所有游戏的状态列表"
 
 command_usage_admin:
@@ -147,8 +147,8 @@ command_usage_admin:
   - "&f/boost stop * &3- 强制关闭所有游戏，不重新排队"
   - "&f/boost stop Arena1 &3- 强制关闭指定游戏，不重新排队"
   - "&f/boost cleargames &3- 结束并卸载所有游戏"
-  - "&f/boost delstats * &3- 删除所有玩家的游戏统计信息"
-  - "&f/boost delstats [player] &3- 删除指定玩家的游戏统计信息"
+  - "&f/boost delstats * <Arena1> &3- 删除所有玩家的游戏统计信息"
+  - "&f/boost delstats [player] <Arena1> &3- 删除指定玩家的游戏统计信息"
   - "&f/boost reload &3- 结束所有游戏，重新加载配置文件"
   - "&f/boost updateconfig &3- Update config files to latest content."
   - "&f/boost addgameworld <world> &3- 添加平台争霸游戏世界"

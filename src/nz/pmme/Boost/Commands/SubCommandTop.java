@@ -21,21 +21,25 @@ public class SubCommandTop extends AbstractSubCommand
 
     @Override
     protected boolean executeSubCommand( CommandSender sender, String[] args ) {
-        if( args.length == 2 ) {
+        if( args.length == 2 || args.length == 3 ) {
             String period = args[1].toLowerCase();
+            String gameName = args.length == 3 ? args[2] : null;
             if( period.equalsIgnoreCase( "daily" ) ) {
-                plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.DAILY );
+                plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.DAILY, gameName );
                 return true;
             } else if( period.equalsIgnoreCase( "weekly" ) ) {
-                plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.WEEKLY );
+                plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.WEEKLY, gameName );
                 return true;
             } else if( period.equalsIgnoreCase( "monthly" ) ) {
-                plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.MONTHLY );
+                plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.MONTHLY, gameName );
+                return true;
+            } else if( args.length == 2 ) {
+                plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.TOTAL, period ); // Assume the second parameter was a game name.
                 return true;
             }
             return false;
         } else if( args.length == 1 ) {
-            plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.TOTAL );
+            plugin.getGameManager().displayLeaderBoard( sender, StatsPeriod.TOTAL, null );
             return true;
         }
         return false;
@@ -44,6 +48,7 @@ public class SubCommandTop extends AbstractSubCommand
     @Override
     protected List< String > tabCompleteArgs( CommandSender sender, String[] args ) {
         if( args.length == 2 ) return StatsPeriod.getStatsPeriods();
+        if( args.length == 3 ) return plugin.getGameManager().getGameNames();
         return null;
     }
 }

@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class DataHandler
 {
-    private static final int thisVersion = 1;
+    private static final int thisVersion = 2;
     private Plugin plugin;
     private Database database;
 
@@ -36,7 +36,7 @@ public class DataHandler
 
             for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
                 PreparedStatement preparedStatsStatement;
-                preparedStatsStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL UNIQUE,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL)");
+                preparedStatsStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL,game_name VARCHAR(255))");
                 preparedStatsStatement.executeUpdate();
                 preparedStatsStatement.close();
             }
@@ -50,7 +50,7 @@ public class DataHandler
     {
         boolean versionOkay = true;
         Connection connection = this.database.getConnection();
-        if( connection == null ) return versionOkay;
+        if( connection == null ) return true;
         try {
             int version = 0;
             String statement = "SELECT value FROM other WHERE key='VERSION'";
@@ -58,7 +58,7 @@ public class DataHandler
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()) {
                 String value = resultSet.getString("value");
-                version = Integer.valueOf(value);
+                version = Integer.parseInt(value);
             }
             resultSet.close();
             preparedStatement.close();
@@ -77,14 +77,39 @@ public class DataHandler
             }
             else if( version < thisVersion )
             {
-                plugin.getLogger().info( "Database version " + version + " will be upgraded to " + thisVersion + "." );
+                plugin.getLogger().warning( "Database version " + version + " will be upgraded to " + thisVersion + "." );
+
+                preparedStatement = connection.prepareStatement( "BEGIN TRANSACTION;" );
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
 
                 // Upgrade the table structure to this version.
+                for( StatsPeriod statsPeriod : StatsPeriod.values() )
+                {
+                    preparedStatement = connection.prepareStatement( "CREATE TABLE updated_" + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL,game_name VARCHAR(255));" );
+                    preparedStatement.executeUpdate();
+                    preparedStatement.close();
+                    preparedStatement = connection.prepareStatement( "INSERT INTO updated_" + statsPeriod.getTable() + "(player_id,player_name,games,wins,losses) SELECT player_id,player_name,games,wins,losses FROM " + statsPeriod.getTable() + ";" );
+                    preparedStatement.executeUpdate();
+                    preparedStatement.close();
+                    preparedStatement = connection.prepareStatement( "DROP TABLE " + statsPeriod.getTable() + ";" );
+                    preparedStatement.executeUpdate();
+                    preparedStatement.close();
+                    preparedStatement = connection.prepareStatement( "ALTER TABLE updated_" + statsPeriod.getTable() + " RENAME TO " + statsPeriod.getTable() + ";" );
+                    preparedStatement.execute();    // ALTER TABLE requires calling execute() not executeUpdate() even though it does not return results.
+                    preparedStatement.close();
+                }
 
                 // Update version number.
                 preparedStatement = connection.prepareStatement( "UPDATE other SET value='" + thisVersion + "' WHERE key='VERSION'" );
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
+
+                preparedStatement = connection.prepareStatement( "COMMIT TRANSACTION;" );
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+
+                plugin.getLogger().info( "Database upgrade completed." );
             }
         }
         catch (SQLException sQLException) {
@@ -93,100 +118,103 @@ public class DataHandler
         return versionOkay;
     }
 
-    public void addPlayer( UUID playerId, String playerName )
+    public void addPlayer( UUID playerId, String playerName, String gameName )
     {
         Connection connection = this.database.getConnection();
         if( connection == null ) return;
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             try {
-                String insertPlayerSql = "INSERT OR IGNORE INTO " + statsPeriod.getTable() + "(player_id,player_name,games,wins,losses) VALUES (?,?,0,0,0)";
-                PreparedStatement insertPlayerStatement = connection.prepareStatement( insertPlayerSql );
-                insertPlayerStatement.setString( 1, playerId.toString() );
-                insertPlayerStatement.setString( 2, playerName );
-                insertPlayerStatement.executeUpdate();
-                insertPlayerStatement.close();
+                String checkForPlayerSql = "SELECT 1 FROM " + statsPeriod.getTable() + " WHERE player_id=? AND game_name" + ( gameName != null ? "=?" : " IS NULL" );
+                PreparedStatement checkForPlayerStatement = connection.prepareStatement( checkForPlayerSql );
+                checkForPlayerStatement.setString( 1, playerId.toString() );
+                if( gameName != null ) checkForPlayerStatement.setString( 2, gameName.toLowerCase() );
+                ResultSet resultSet = checkForPlayerStatement.executeQuery();
+                boolean playerRecordExists = resultSet.next();
+                resultSet.close();
+                checkForPlayerStatement.close();
+
+                if( !playerRecordExists )
+                {
+                    String insertPlayerSql = "INSERT INTO " + statsPeriod.getTable() + "(player_id,player_name,games,wins,losses,game_name) VALUES (?,?,0,0,0,?)";
+                    PreparedStatement insertPlayerStatement = connection.prepareStatement( insertPlayerSql );
+                    insertPlayerStatement.setString( 1, playerId.toString() );
+                    insertPlayerStatement.setString( 2, playerName );
+                    if( gameName != null ) {
+                        insertPlayerStatement.setString( 3, gameName.toLowerCase() );
+                    } else {
+                        insertPlayerStatement.setNull( 3, java.sql.Types.VARCHAR );
+                    }
+                    insertPlayerStatement.executeUpdate();
+                    insertPlayerStatement.close();
+                }
             } catch( SQLException sQLException ) {
-                plugin.getLogger().severe( "Failed to create or update " + statsPeriod.getTable() + " statistics record for " + playerName + " " + playerId.toString() );
+                plugin.getLogger().severe( "Failed to create or update " + statsPeriod.getTable() + " statistics record for " + playerName + " " + playerId.toString() + " in game " + gameName );
                 sQLException.printStackTrace();
             }
         }
     }
 
-    public void logGame( UUID playerId )
+    private void updateCountColumn( StatsPeriod statsPeriod, UUID playerId, String gameName, String countColumn )
     {
         Connection connection = this.database.getConnection();
         if( connection == null ) return;
-        for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
-            try {
-                String updateGamesSql = "UPDATE " + statsPeriod.getTable() + " SET games=games+1 WHERE player_id=?";
-                PreparedStatement updateGamesStatement = connection.prepareStatement( updateGamesSql );
-                updateGamesStatement.setString( 1, playerId.toString() );
-                updateGamesStatement.executeUpdate();
-                updateGamesStatement.close();
-            } catch( SQLException sQLException ) {
-                plugin.getLogger().severe( "Failed to update " + statsPeriod.getTable() + " games count for player " + playerId.toString() );
-                sQLException.printStackTrace();
-            }
+        try {
+            String updateSql = "UPDATE " + statsPeriod.getTable() + " SET " + countColumn + "=" + countColumn + "+1 WHERE player_id=? AND game_name" + ( gameName != null ? "=?" : " IS NULL" );
+            PreparedStatement updateGamesStatement = connection.prepareStatement( updateSql );
+            updateGamesStatement.setString( 1, playerId.toString() );
+            if( gameName != null ) updateGamesStatement.setString( 2, gameName.toLowerCase() );
+            updateGamesStatement.executeUpdate();
+            updateGamesStatement.close();
+        } catch( SQLException sQLException ) {
+            plugin.getLogger().severe( "Failed to update " + statsPeriod.getTable() + " " + countColumn + " count for player " + playerId.toString() + " in game " + gameName );
+            sQLException.printStackTrace();
         }
     }
 
-    public void logLoss( UUID playerId )
+    public void logGame( UUID playerId, String gameName )
     {
-        Connection connection = this.database.getConnection();
-        if( connection == null ) return;
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
-            try {
-                String updateLossesSql = "UPDATE " + statsPeriod.getTable() + " SET losses=losses+1 WHERE player_id=?";
-                PreparedStatement updateLossesStatement = connection.prepareStatement( updateLossesSql );
-                updateLossesStatement.setString( 1, playerId.toString() );
-                updateLossesStatement.executeUpdate();
-                updateLossesStatement.close();
-            } catch( SQLException sQLException ) {
-                plugin.getLogger().severe( "Failed to update " + statsPeriod.getTable() + " losses count for player " + playerId.toString() );
-                sQLException.printStackTrace();
-            }
+            this.updateCountColumn( statsPeriod, playerId, gameName, "games" );
         }
     }
 
-    public void logWin( UUID playerId )
+    public void logLoss( UUID playerId, String gameName )
     {
-        Connection connection = this.database.getConnection();
-        if( connection == null ) return;
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
-            try {
-                String updateWinsSql = "UPDATE " + statsPeriod.getTable() + " SET wins=wins+1 WHERE player_id=?";
-                PreparedStatement updateWinsStatement = connection.prepareStatement( updateWinsSql );
-                updateWinsStatement.setString( 1, playerId.toString() );
-                updateWinsStatement.executeUpdate();
-                updateWinsStatement.close();
-            } catch( SQLException sQLException ) {
-                plugin.getLogger().severe( "Failed to update " + statsPeriod.getTable() + " wins count for player " + playerId.toString() );
-                sQLException.printStackTrace();
-            }
+            this.updateCountColumn( statsPeriod, playerId, gameName, "losses" );
         }
     }
 
-    public PlayerStats queryPlayerStats( StatsPeriod statsPeriod, UUID playerId )
+    public void logWin( UUID playerId, String gameName )
+    {
+        for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
+            this.updateCountColumn( statsPeriod, playerId, gameName, "wins" );
+        }
+    }
+
+    public PlayerStats queryPlayerStats( StatsPeriod statsPeriod, UUID playerId, String gameName )
     {
         PlayerStats playerStats = null;
         Connection connection = this.database.getConnection();
-        if( connection == null ) return playerStats;
+        if( connection == null ) return null;
         try {
-            String queryStatsSql = "SELECT * FROM " + statsPeriod.getTable() + " WHERE player_id=?";
+            String queryStatsSql = "SELECT * FROM " + statsPeriod.getTable() + " WHERE player_id=? AND game_name" + ( gameName != null ? "=?" : " IS NULL" );
             PreparedStatement queryStatsStatement = connection.prepareStatement( queryStatsSql );
             queryStatsStatement.setString( 1, playerId.toString() );
+            if( gameName != null ) queryStatsStatement.setString( 2, gameName.toLowerCase() );
             ResultSet resultSetStats = queryStatsStatement.executeQuery();
             if( resultSetStats.next() )
             {
-                String queryRankSql = "SELECT COUNT(*) FROM " + statsPeriod.getTable() + " WHERE wins>?";
+                String queryRankSql = "SELECT COUNT(*) FROM " + statsPeriod.getTable() + " WHERE wins>? AND game_name" + ( gameName != null ? "=?" : " IS NULL" );
                 PreparedStatement queryRankStatement = connection.prepareStatement( queryRankSql );
                 queryRankStatement.setInt( 1, resultSetStats.getInt( "wins" ) );
+                if( gameName != null ) queryRankStatement.setString( 2, gameName.toLowerCase() );
                 ResultSet resultSetRank = queryRankStatement.executeQuery();
                 int rank = resultSetRank.next() ? resultSetRank.getInt(1)+1 : 0;
                 resultSetRank.close();
                 queryRankStatement.close();
 
-                playerStats = new PlayerStats( resultSetStats.getString( "player_name" ), playerId, resultSetStats.getInt( "games" ), resultSetStats.getInt( "wins" ), resultSetStats.getInt( "losses" ), rank );
+                playerStats = new PlayerStats( resultSetStats.getString( "player_name" ), playerId, gameName, resultSetStats.getInt( "games" ), resultSetStats.getInt( "wins" ), resultSetStats.getInt( "losses" ), rank );
             }
             resultSetStats.close();
             queryStatsStatement.close();
@@ -204,7 +232,7 @@ public class DataHandler
         Connection connection = this.database.getConnection();
         if( connection == null ) return results;
         try {
-            String queryPlayersSql = "SELECT player_name FROM " + statsPeriod.getTable() + " ORDER BY player_name";
+            String queryPlayersSql = "SELECT DISTINCT player_name FROM " + statsPeriod.getTable() + " ORDER BY player_name";
             PreparedStatement queryPlayersStatement = connection.prepareStatement(queryPlayersSql);
             ResultSet resultSet = queryPlayersStatement.executeQuery();
             while( resultSet.next() ) {
@@ -220,18 +248,19 @@ public class DataHandler
         return results;
     }
 
-    public List<PlayerStats> queryLeaderBoard( StatsPeriod statsPeriod, int numberToFetch, boolean mustHaveWon )
+    public List<PlayerStats> queryLeaderBoard( StatsPeriod statsPeriod, String gameName, int numberToFetch, boolean mustHaveWon )
     {
         List<PlayerStats> leaderBoard = new ArrayList<>();
         Connection connection = this.database.getConnection();
         if( connection == null ) return leaderBoard;
         try {
-            String queryLeaderBoardSql = "SELECT * FROM " + statsPeriod.getTable() + ( mustHaveWon ? " WHERE wins>0" : "" ) + " ORDER BY wins DESC, losses ASC, games DESC LIMIT " + numberToFetch;
+            String queryLeaderBoardSql = "SELECT * FROM " + statsPeriod.getTable() + " WHERE " + ( mustHaveWon ? "wins>0 AND game_name" : "game_name" ) + ( gameName != null ? "=?" : " IS NULL" ) + " ORDER BY wins DESC, losses ASC, games DESC LIMIT " + numberToFetch;
             PreparedStatement queryLeaderBoardStatement = connection.prepareStatement( queryLeaderBoardSql );
+            if( gameName != null ) queryLeaderBoardStatement.setString( 1, gameName.toLowerCase() );
             ResultSet resultSet = queryLeaderBoardStatement.executeQuery();
             while( resultSet.next() ) {
                 try {
-                    leaderBoard.add( new PlayerStats( resultSet.getString( "player_name" ), UUID.fromString( resultSet.getString( "player_id" ) ), resultSet.getInt( "games" ), resultSet.getInt( "wins" ), resultSet.getInt( "losses" ), 0 ) );
+                    leaderBoard.add( new PlayerStats( resultSet.getString( "player_name" ), UUID.fromString( resultSet.getString( "player_id" ) ), gameName, resultSet.getInt( "games" ), resultSet.getInt( "wins" ), resultSet.getInt( "losses" ), 0 ) );
                 } catch( IllegalArgumentException e ) {
                     plugin.getLogger().warning( "Failed to convert player_id '" + resultSet.getString( "player_id" ) + "' to UUID when querying leader board." );
                 }
@@ -246,19 +275,26 @@ public class DataHandler
         return leaderBoard;
     }
 
-    public void deleteStats( StatsPeriod statsPeriod, UUID playerId )
+    public void deleteStats( StatsPeriod statsPeriod, UUID playerId, String gameName )
     {
         Connection connection = this.database.getConnection();
         if( connection == null ) return;
         try {
             StringBuilder deleteStatsSql = new StringBuilder();
             deleteStatsSql.append( "DELETE FROM " ).append( statsPeriod.getTable() );
-            if( playerId != null ) {
-                deleteStatsSql.append( " WHERE player_id=?" );
+            if( playerId != null || gameName != null ) {
+                deleteStatsSql.append( " WHERE " );
+                if( playerId != null ) deleteStatsSql.append( "player_id=?" );
+                if( playerId != null && gameName != null ) deleteStatsSql.append( " AND " );
+                if( gameName != null ) deleteStatsSql.append( "game_name=?" );
             }
             PreparedStatement deleteStatsStatement = connection.prepareStatement( deleteStatsSql.toString() );
+            int parameterIndex = 1;
             if( playerId != null ) {
-                deleteStatsStatement.setString( 1, playerId.toString() );
+                deleteStatsStatement.setString( parameterIndex++, playerId.toString() );
+            }
+            if( gameName != null ) {
+                deleteStatsStatement.setString( parameterIndex++, gameName.toLowerCase() );
             }
             deleteStatsStatement.executeUpdate();
             deleteStatsStatement.close();

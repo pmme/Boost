@@ -47,13 +47,13 @@ public class StatsResetTask extends BukkitRunnable
                 }
                 if( periodCounter != plugin.getLoadedConfig().getPeriodTracker( statsPeriod ) )
                 {
-                    List<PlayerStats> top3 = plugin.getDataHandler().queryLeaderBoard( statsPeriod, 3, true );
+                    List<PlayerStats> top3 = plugin.getDataHandler().queryLeaderBoard( statsPeriod, null, 3, true );
                     new BukkitRunnable() {
                         @Override
                         public void run() { plugin.getLoadedConfig().runPeriodicWinCommandsForTop3( statsPeriod, top3 ); }
                     }.runTask( this.plugin );
 
-                    plugin.getDataHandler().deleteStats( statsPeriod, null );
+                    plugin.getDataHandler().deleteStats( statsPeriod, null, null );
                     plugin.getLoadedConfig().setPeriodTracker( statsPeriod, periodCounter );
                     plugin.getLogger().info( statsPeriod.getLogName() + " player stats reset." );
                 }

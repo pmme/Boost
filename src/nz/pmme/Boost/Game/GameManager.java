@@ -265,11 +265,13 @@ public class GameManager
         }
     }
 
-    public void displayPlayerStats( CommandSender sender, OfflinePlayer player )
+    public void displayPlayerStats( CommandSender sender, OfflinePlayer player, String gameName )
     {
         String playerName = player.getName();
+        Game game = gameName != null ? plugin.getGameManager().getGame( gameName ) : null;
+        String gameDisplayName = game != null ? game.getGameConfig().getDisplayName() : "";
         List<String> playerStatsMessage = new ArrayList<>();
-        PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( StatsPeriod.TOTAL, player.getUniqueId() );
+        PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( StatsPeriod.TOTAL, player.getUniqueId(), gameName );
         if( playerStats == null ) {
             plugin.messageSender( sender, Messages.PLAYER_NO_STATS, "", "%player%", playerName != null ? playerName : player.getUniqueId().toString() );
         } else {
@@ -280,6 +282,7 @@ public class GameManager
                         .replaceAll( "%wins%", String.valueOf( playerStats.getWins() ) )
                         .replaceAll( "%losses%", String.valueOf( playerStats.getLosses() ) )
                         .replaceAll( "%rank%", String.valueOf( playerStats.getRank() ) )
+                        .replaceAll( "%game%", gameDisplayName )
                 ) );
             }
             sender.sendMessage( playerStatsMessage.toArray( new String[0] ) );
@@ -289,11 +292,13 @@ public class GameManager
         }
     }
 
-    public void displayLeaderBoard( CommandSender sender, StatsPeriod statsPeriod )
+    public void displayLeaderBoard( CommandSender sender, StatsPeriod statsPeriod, String gameName )
     {
+        Game game = gameName != null ? plugin.getGameManager().getGame( gameName ) : null;
+        String gameDisplayName = game != null ? game.getGameConfig().getDisplayName() : "";
         List<String> leaderBoardMessage = new ArrayList<>();
         leaderBoardMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_TITLE ) ) );
-        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard( statsPeriod, 10, false );
+        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard( statsPeriod, gameName, 10, false );
         if( playerStatsList != null ) {
             int index = 1;
             for( PlayerStats playerStats : playerStatsList ) {
@@ -303,6 +308,7 @@ public class GameManager
                         .replaceAll( "%games%", String.valueOf( playerStats.getGames() ) )
                         .replaceAll( "%wins%", String.valueOf( playerStats.getWins() ) )
                         .replaceAll( "%losses%", String.valueOf( playerStats.getLosses() ) )
+                        .replaceAll( "%game%", gameDisplayName )
                 ) );
             }
         }
@@ -312,10 +318,10 @@ public class GameManager
         }
     }
 
-    public void deletePlayerStats( CommandSender sender, OfflinePlayer player )
+    public void deletePlayerStats( CommandSender sender, OfflinePlayer player, String gameName )
     {
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
-            plugin.getDataHandler().deleteStats( statsPeriod, player != null ? player.getUniqueId() : null );
+            plugin.getDataHandler().deleteStats( statsPeriod, player != null ? player.getUniqueId() : null, gameName );
         }
         plugin.messageSender( sender, Messages.DELETED_STATS );
     }

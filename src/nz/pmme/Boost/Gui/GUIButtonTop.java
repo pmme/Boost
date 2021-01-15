@@ -25,6 +25,6 @@ public class GUIButtonTop implements GUIButton
 
     @Override
     public void onClick( InventoryClickEvent e, Player player ) {
-        this.plugin.getGameManager().displayLeaderBoard( player, this.statsPeriod );
+        this.plugin.getGameManager().displayLeaderBoard( player, this.statsPeriod, null );
     }
 }
