@@ -44,6 +44,8 @@ public enum Messages
     GROUND_SET("ground_set"),
     CEILING_SET("ceiling_set"),
     START_SPAWN_SET("start_spawn_set"),
+    START_SPAWN_DELETED("start_spawn_deleted"),
+    START_SPAWN_NOT_FOUND("start_spawn_not_found"),
     LOBBY_SPAWN_SET("lobby_spawn_set"),
     LOSS_SPAWN_SET("loss_spawn_set"),
     SPREAD_SET("spread_set"),

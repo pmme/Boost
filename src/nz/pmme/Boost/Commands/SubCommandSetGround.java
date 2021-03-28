@@ -35,10 +35,11 @@ public class SubCommandSetGround extends AbstractSubCommand
                     game.getGameConfig().setGroundLevel(y);
                     plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
-                    Location spawn = game.getGameConfig().getStartSpawn();
-                    if( spawn != null && spawn.getBlockY() <= y && y != -1 ) {
-                        String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                        plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
+                    int startSpawnsMinY = game.getGameConfig().getStartSpawnsMinY();
+                    if( y != -1 && game.getGameConfig().hasStartSpawn() && startSpawnsMinY <= y ) {
+                        String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( startSpawnsMinY ) )
+                                .replaceAll( "%ground%", String.valueOf( y ) );
+                        plugin.messageSender( sender, message );
                     }
                 } catch( NumberFormatException e ) {
                     plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be an integer number." ) );
@@ -55,10 +56,11 @@ public class SubCommandSetGround extends AbstractSubCommand
                     game.getGameConfig().setGroundLevel(y);
                     plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
-                    Location spawn = game.getGameConfig().getStartSpawn();
-                    if( spawn != null && spawn.getBlockY() <= y && y != -1 ) {
-                        String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                        plugin.messageSender( sender, message.replaceAll( "%ground%", String.valueOf( y ) ) );
+                    int startSpawnsMinY = game.getGameConfig().getStartSpawnsMinY();
+                    if( y != -1 && game.getGameConfig().hasStartSpawn() && startSpawnsMinY <= y ) {
+                        String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( startSpawnsMinY ) )
+                                .replaceAll( "%ground%", String.valueOf( y ) );
+                        plugin.messageSender( sender, message );
                     }
                 } else {
                     plugin.messageSender( sender, Messages.NO_CONSOLE );

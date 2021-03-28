@@ -4,6 +4,7 @@ import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
 import nz.pmme.Boost.Main;
+import org.bukkit.Location;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -344,7 +345,9 @@ public class Game implements Comparable<Game>
             playerInfo.getPlayer().setVelocity( Game.VECTOR0 );
             playerInfo.getPlayer().setFlying( false );
             playerInfo.getPlayer().removePotionEffect( PotionEffectType.GLOWING );
-            playerInfo.getPlayer().teleport( gameConfig.getStartSpawn() );
+            Location startSpawn = gameConfig.getStartSpawn();
+            playerInfo.getPlayer().teleport( startSpawn );
+            startSpawn.getWorld().playSound( startSpawn, plugin.getLoadedConfig().getStartSound(), plugin.getLoadedConfig().getWorldSoundRange() / 16f, 1 );
             playerInfo.getPlayer().setGameMode( plugin.getLoadedConfig().getPlayingGameMode() );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
 
@@ -352,7 +355,6 @@ public class Game implements Comparable<Game>
             plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId(), playerInfo.getPlayer().getDisplayName(), null );
             plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId(), playerInfo.getPlayer().getDisplayName(), gameConfig.getName() );
         }
-        gameConfig.getStartSpawn().getWorld().playSound( gameConfig.getStartSpawn(), plugin.getLoadedConfig().getStartSound(), plugin.getLoadedConfig().getWorldSoundRange() / 16f, 1 );
         return true;
     }
 

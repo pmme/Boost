@@ -35,10 +35,11 @@ public class SubCommandSetCeiling extends AbstractSubCommand
                     game.getGameConfig().setCeilingLevel(y);
                     plugin.messageSender( sender, Messages.CEILING_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
-                    Location spawn = game.getGameConfig().getStartSpawn();
-                    if( spawn != null && spawn.getBlockY() >= y && y != -1 ) {
-                        String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                        plugin.messageSender( sender, message.replaceAll( "%ceiling%", String.valueOf( y ) ) );
+                    int startSpawnsMaxY = game.getGameConfig().getStartSpawnsMaxY();
+                    if( y != -1 && game.getGameConfig().hasStartSpawn() && startSpawnsMaxY >= y ) {
+                        String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( startSpawnsMaxY ) )
+                                .replaceAll( "%ceiling%", String.valueOf( y ) );
+                        plugin.messageSender( sender, message );
                     }
                 } catch( NumberFormatException e ) {
                     plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be an integer number." ) );
@@ -55,10 +56,11 @@ public class SubCommandSetCeiling extends AbstractSubCommand
                     game.getGameConfig().setCeilingLevel(y);
                     plugin.messageSender( sender, Messages.CEILING_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
-                    Location spawn = game.getGameConfig().getStartSpawn();
-                    if( spawn != null && spawn.getBlockY() >= y && y != -1 ) {
-                        String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) );
-                        plugin.messageSender( sender, message.replaceAll( "%ceiling%", String.valueOf( y ) ) );
+                    int startSpawnsMaxY = game.getGameConfig().getStartSpawnsMaxY();
+                    if( y != -1 && game.getGameConfig().hasStartSpawn() && startSpawnsMaxY >= y ) {
+                        String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( startSpawnsMaxY ) )
+                                .replaceAll( "%ceiling%", String.valueOf( y ) );
+                        plugin.messageSender( sender, message );
                     }
                 } else {
                     plugin.messageSender( sender, Messages.NO_CONSOLE );
