@@ -77,6 +77,15 @@ public class GameConfig
 
         this.lobbySpawn = new SpawnLocation( plugin, configPath + "game_lobby" );
         this.lossSpawn = new SpawnLocation( plugin, configPath + "game_loss" );
+        if( !plugin.getConfig().contains( configPath + "game_starts" ) ) {
+            // Copy previous single start spawn and save as a node "Start1" in the new multiple start_spawns.
+            Object oldStartSpawnConfigSection = plugin.getConfig().get( configPath + "game_start" );
+            if( oldStartSpawnConfigSection != null ) {
+                plugin.getConfig().set( configPath + "game_starts.Start1", oldStartSpawnConfigSection );
+                plugin.getConfig().set( configPath + "game_start", null );
+                plugin.saveConfig();
+            }
+        }
         ConfigurationSection gameStartsSection = plugin.getConfig().getConfigurationSection( configPath + "game_starts" );
         if( gameStartsSection != null ) {
             for( String startSpawnNode : gameStartsSection.getKeys( false ) ) {
