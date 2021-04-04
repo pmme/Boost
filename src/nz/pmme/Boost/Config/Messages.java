@@ -95,6 +95,7 @@ public enum Messages
     START_DELAY_TITLE( "start_delay_title" ),
     GLOW_AFTER_BOOST_ENABLED( "glow_after_boost_enabled" ),
     GLOW_AFTER_BOOST_DISABLED( "glow_after_boost_disabled" ),
+    SPAWN_NOT_SET( "spawn_not_set" ),
 
     END("end");
 

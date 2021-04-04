@@ -92,6 +92,7 @@ messages:
   start_delay_title: "&5Boosting begins in %time% seconds! Get ready..."
   glow_after_boost_enabled: "Glowing &aenabled&r after boosting."
   glow_after_boost_disabled: "Glowing &cdisabled&r after boosting."
+  spawn_not_set: "&cThat spawn is not set."
 
 player_stats:
   - "&5[平台争霸] &f玩家统计信息: %player%"
@@ -121,6 +122,7 @@ command_usage_admin:
   - "&f/boost deletestart Arena1 [startNode] &3- Delete the named start spawn."
   - "&f/boost setlobby Arena1 <world x y z> &3- 设置加入大厅传送的位置"
   - "&f/boost setloss Arena1 <world x y z> &3- 设置离开游戏传送的位置"
+  - "&f/boost testtp Arena1 [lobby|loss|start] [startNode] &3- Test a spawn by teleporting to it."
   - "&f/boost setspread Arena1 [startNode] [spread] &3- 设置玩家传送时的分散距离"
   - "&f/boost setreturn Arena1 [on/off] &3- Set players return to start on falling."
   - "&f/boost setboostblock Arena1 &3- Set a block that boosts you when stepped on."

@@ -290,6 +290,10 @@ public class GameConfig
         lobbySpawn.setSpawn( spawn );
     }
 
+    public Location getConfiguredLobbySpawn() {
+        return lobbySpawn.getConfiguredSpawn();
+    }
+
     public Location getLossSpawn() {
         return lossSpawn.getSpawn();
     }
@@ -297,6 +301,10 @@ public class GameConfig
     public void setLossSpawn( Location spawn )
     {
         lossSpawn.setSpawn( spawn );
+    }
+
+    public Location getConfiguredLossSpawn() {
+        return lossSpawn.getConfiguredSpawn();
     }
 
     public Location getStartSpawn()
@@ -328,6 +336,16 @@ public class GameConfig
             }
         }
         throw new StartSpawnNodeNotFoundException();
+    }
+
+    public Location getConfiguredStartSpawn( String startSpawnNode )
+    {
+        for( SpawnLocation startSpawn : startSpawns ) {
+            if( startSpawn.getStartSpawnNode().equalsIgnoreCase( startSpawnNode ) ) {
+                return startSpawn.getConfiguredSpawn();
+            }
+        }
+        return null;
     }
 
     public boolean hasStartSpawn() {

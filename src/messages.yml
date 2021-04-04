@@ -92,6 +92,7 @@ messages:
   start_delay_title: "&5Boosting begins in %time% seconds! Get ready..."
   glow_after_boost_enabled: "Glowing &aenabled&r after boosting."
   glow_after_boost_disabled: "Glowing &cdisabled&r after boosting."
+  spawn_not_set: "&cThat spawn is not set."
 
 player_stats:
   - "&5[Boost] &fPlayer stats: %player%"
@@ -121,6 +122,7 @@ command_usage_admin:
   - "&f/boost deletestart Arena1 [startNode] &3- Delete the named start spawn."
   - "&f/boost setlobby Arena1 <world x y z> &3- Set the lobby spawn position."
   - "&f/boost setloss Arena1 <world x y z> &3- Set the spawn position on losing."
+  - "&f/boost testtp Arena1 [lobby|loss|start] [startNode] &3- Test a spawn by teleporting to it."
   - "&f/boost setspread Arena1 [startNode] [spread] &3- Set the player spread at start."
   - "&f/boost setreturn Arena1 [on/off] &3- Set players return to start on falling."
   - "&f/boost setboostblock Arena1 &3- Set a block that boosts you when stepped on."
