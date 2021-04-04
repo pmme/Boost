@@ -44,6 +44,8 @@ public enum Messages
     GROUND_SET("ground_set"),
     CEILING_SET("ceiling_set"),
     START_SPAWN_SET("start_spawn_set"),
+    START_SPAWN_DELETED("start_spawn_deleted"),
+    START_SPAWN_NOT_FOUND("start_spawn_not_found"),
     LOBBY_SPAWN_SET("lobby_spawn_set"),
     LOSS_SPAWN_SET("loss_spawn_set"),
     SPREAD_SET("spread_set"),
@@ -93,6 +95,7 @@ public enum Messages
     START_DELAY_TITLE( "start_delay_title" ),
     GLOW_AFTER_BOOST_ENABLED( "glow_after_boost_enabled" ),
     GLOW_AFTER_BOOST_DISABLED( "glow_after_boost_disabled" ),
+    SPAWN_NOT_SET( "spawn_not_set" ),
 
     END("end");
 

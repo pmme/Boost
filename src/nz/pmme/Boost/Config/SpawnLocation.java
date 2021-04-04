@@ -8,6 +8,7 @@ import org.bukkit.util.Vector;
 public class SpawnLocation
 {
     private Main plugin;
+    private String name;
     private Location spawn;
     private int spread;
     private String configPath;
@@ -16,6 +17,7 @@ public class SpawnLocation
     {
         this.plugin = plugin;
         this.configPath = spawnConfigPath + ".";
+        this.name = spawnConfigPath.substring( spawnConfigPath.lastIndexOf( '.' ) + 1 );
         String spawnWorldName = plugin.getConfig().getString( configPath + "world" );
         if( spawnWorldName != null ) {
             World spawnWorld = plugin.getServer().getWorld( spawnWorldName );
@@ -47,6 +49,17 @@ public class SpawnLocation
         plugin.getConfig().set( configPath + "z", spawn.getBlockZ() );
         plugin.getConfig().set( configPath + "yaw", (int)spawn.getYaw() );
         plugin.getConfig().set( configPath + "spread", spread );
+    }
+
+    public void removeConfig()
+    {
+        if( spawn == null ) return;
+        plugin.getConfig().set( this.configPath.substring( 0, this.configPath.length()-1 ), null );
+        plugin.saveConfig();
+    }
+
+    public String getStartSpawnNode() {
+        return name;
     }
 
     public Location getSpawn() {

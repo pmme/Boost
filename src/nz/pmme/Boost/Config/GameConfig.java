@@ -1,12 +1,15 @@
 package nz.pmme.Boost.Config;
 
 import nz.pmme.Boost.Exceptions.GameDisplayNameMustMatchConfigurationException;
+import nz.pmme.Boost.Exceptions.StartSpawnNodeNotFoundException;
 import nz.pmme.Boost.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,8 +34,8 @@ public class GameConfig
     private Material guiItem = null;
 
     private SpawnLocation lobbySpawn;
-    private SpawnLocation startSpawn;
     private SpawnLocation lossSpawn;
+    private List<SpawnLocation> startSpawns = new ArrayList<>();
 
     private int countdownAnnounceTime;
     private List<String> winCommands;
@@ -73,21 +76,36 @@ public class GameConfig
         }
 
         this.lobbySpawn = new SpawnLocation( plugin, configPath + "game_lobby" );
-        this.startSpawn = new SpawnLocation( plugin, configPath + "game_start" );
         this.lossSpawn = new SpawnLocation( plugin, configPath + "game_loss" );
+        if( !plugin.getConfig().contains( configPath + "game_starts" ) ) {
+            // Copy previous single start spawn and save as a node "Start1" in the new multiple start_spawns.
+            Object oldStartSpawnConfigSection = plugin.getConfig().get( configPath + "game_start" );
+            if( oldStartSpawnConfigSection != null ) {
+                plugin.getConfig().set( configPath + "game_starts.Start1", oldStartSpawnConfigSection );
+                plugin.getConfig().set( configPath + "game_start", null );
+                plugin.saveConfig();
+            }
+        }
+        ConfigurationSection gameStartsSection = plugin.getConfig().getConfigurationSection( configPath + "game_starts" );
+        if( gameStartsSection != null ) {
+            for( String startSpawnNode : gameStartsSection.getKeys( false ) ) {
+                SpawnLocation startSpawn = new SpawnLocation( plugin, configPath + "game_starts." + startSpawnNode );
+                this.startSpawns.add( startSpawn );
+                Location spawn = startSpawn.getConfiguredSpawn();
+                if( spawn != null ) {
+                    if( spawn.getBlockY() <= this.groundLevel && this.groundLevel != -1 ) {
+                        plugin.getLogger().warning( "Start spawn " + startSpawn.getStartSpawnNode() + " Y " + spawn.getBlockY() + " should be higher than ground " + this.groundLevel + " for game " + this.name );
+                    }
+                    if( spawn.getBlockY() >= this.ceilingLevel && this.ceilingLevel != -1 ) {
+                        plugin.getLogger().warning( "Start spawn " + startSpawn.getStartSpawnNode() + " Y " + spawn.getBlockY() + " should be lower than ceiling " + this.ceilingLevel + " for game " + this.name );
+                    }
+                }
+            }
+        }
 
         this.countdownAnnounceTime = plugin.getConfig().getInt( configPath + "countdown_announce_time", 10 );
         this.winCommands = plugin.getConfig().getStringList( configPath + "win_commands" );
 
-        Location spawn = this.startSpawn.getConfiguredSpawn();
-        if( spawn != null ) {
-            if( spawn.getBlockY() <= this.groundLevel && this.groundLevel != -1 ) {
-                plugin.getLogger().warning( "Start spawn Y " + spawn.getBlockY() + " should be higher than ground " + this.groundLevel + " for game " + this.name );
-            }
-            if( spawn.getBlockY() >= this.ceilingLevel && this.ceilingLevel != -1 ) {
-                plugin.getLogger().warning( "Start spawn Y " + spawn.getBlockY() + " should be lower than ceiling " + this.ceilingLevel + " for game " + this.name );
-            }
-        }
         if( this.groundLevel == -1 && this.returnToStartAtGround ) {
             plugin.getLogger().warning( "Ground is required since Return to Start is true for game " + this.name );
         }
@@ -117,8 +135,10 @@ public class GameConfig
         plugin.getConfig().set( configPath + "gui_item", this.guiItem != null ? this.guiItem.toString() : "" );
 
         this.lobbySpawn.setConfig();
-        this.startSpawn.setConfig();
         this.lossSpawn.setConfig();
+        for( SpawnLocation startSpawn : this.startSpawns ) {
+            startSpawn.setConfig();
+        }
 
         plugin.getConfig().set( configPath + "countdown_announce_time", this.countdownAnnounceTime );
         plugin.getConfig().set( configPath + "win_commands", this.winCommands != null ? this.winCommands : Collections.emptyList() );
@@ -270,13 +290,8 @@ public class GameConfig
         lobbySpawn.setSpawn( spawn );
     }
 
-    public Location getStartSpawn() {
-        return startSpawn.getSpawn();
-    }
-
-    public void setStartSpawn( Location spawn )
-    {
-        startSpawn.setSpawn( spawn );
+    public Location getConfiguredLobbySpawn() {
+        return lobbySpawn.getConfiguredSpawn();
     }
 
     public Location getLossSpawn() {
@@ -288,9 +303,90 @@ public class GameConfig
         lossSpawn.setSpawn( spawn );
     }
 
-    public void setSpawnSpread( int spread )
+    public Location getConfiguredLossSpawn() {
+        return lossSpawn.getConfiguredSpawn();
+    }
+
+    public Location getStartSpawn()
     {
-        startSpawn.setSpread( spread );
+        if( startSpawns.isEmpty() ) return null;
+        return startSpawns.get( (int)( Math.random() * startSpawns.size() ) ).getSpawn();
+    }
+
+    public void setStartSpawn( Location spawn, String startSpawnNode )
+    {
+        for( SpawnLocation startSpawn : startSpawns ) {
+            if( startSpawn.getStartSpawnNode().equalsIgnoreCase( startSpawnNode ) ) {
+                startSpawn.setSpawn( spawn );
+                return;
+            }
+        }
+        SpawnLocation startSpawn = new SpawnLocation( plugin, configPath + "game_starts." + startSpawnNode );
+        startSpawn.setSpawn( spawn );
+        startSpawns.add( startSpawn );
+    }
+
+    public void deleteStartSpawn( String startSpawnNode ) throws StartSpawnNodeNotFoundException
+    {
+        for( int i = 0; i < startSpawns.size(); ++i ) {
+            if( startSpawns.get(i).getStartSpawnNode().equalsIgnoreCase( startSpawnNode ) ) {
+                startSpawns.get(i).removeConfig();
+                startSpawns.remove(i);
+                return;
+            }
+        }
+        throw new StartSpawnNodeNotFoundException();
+    }
+
+    public Location getConfiguredStartSpawn( String startSpawnNode )
+    {
+        for( SpawnLocation startSpawn : startSpawns ) {
+            if( startSpawn.getStartSpawnNode().equalsIgnoreCase( startSpawnNode ) ) {
+                return startSpawn.getConfiguredSpawn();
+            }
+        }
+        return null;
+    }
+
+    public boolean hasStartSpawn() {
+        return !startSpawns.isEmpty();
+    }
+
+    public List<String> getStartSpawnNodes() {
+        List<String> nodes = new ArrayList<>();
+        for( SpawnLocation startSpawn : startSpawns ) {
+            nodes.add( startSpawn.getStartSpawnNode() );
+        }
+        return nodes;
+    }
+
+    public int getStartSpawnsMinY() {
+        if( startSpawns.isEmpty() ) return -256;
+        int y = startSpawns.get(0).getSpawn().getBlockY();
+        for( SpawnLocation startSpawn : startSpawns ) {
+            if( startSpawn.getSpawn().getBlockY() < y ) y = startSpawn.getSpawn().getBlockY();
+        }
+        return y;
+    }
+
+    public int getStartSpawnsMaxY() {
+        if( startSpawns.isEmpty() ) return -256;
+        int y = startSpawns.get(0).getSpawn().getBlockY();
+        for( SpawnLocation startSpawn : startSpawns ) {
+            if( startSpawn.getSpawn().getBlockY() > y ) y = startSpawn.getSpawn().getBlockY();
+        }
+        return y;
+    }
+
+    public void setSpawnSpread( int spread, String startSpawnNode ) throws StartSpawnNodeNotFoundException
+    {
+        for( SpawnLocation startSpawn : startSpawns ) {
+            if( startSpawn.getStartSpawnNode().equalsIgnoreCase( startSpawnNode ) ) {
+                startSpawn.setSpread( spread );
+                return;
+            }
+        }
+        throw new StartSpawnNodeNotFoundException();
     }
 
     public int getCountdownAnnounceTime() {
@@ -327,11 +423,11 @@ public class GameConfig
     public boolean isProperlyConfigured(){
         if( this.getLobbySpawn() == null ) return false;
         if( ( this.getGroundLevel() != -1 && !this.isReturnToStartAtGround() ) && this.getLossSpawn() == null ) return false;
-        if( this.getStartSpawn() == null ) return false;
+        if( this.startSpawns.isEmpty() ) return false;
         if( this.getGroundLevel() == -1 && this.isReturnToStartAtGround() ) return false;
         if( this.getGroundLevel() >= this.getCeilingLevel() && this.getGroundLevel() != -1 && this.getCeilingLevel() != -1 ) return false;
-        if( this.getStartSpawn().getBlockY() <= this.getGroundLevel() && this.getGroundLevel() != -1 ) return false;
-        if( this.getStartSpawn().getBlockY() >= this.getCeilingLevel() && this.getCeilingLevel() != -1 ) return false;
+        if( this.getStartSpawnsMinY() <= this.getGroundLevel() && this.getGroundLevel() != -1 ) return false;
+        if( this.getStartSpawnsMaxY() >= this.getCeilingLevel() && this.getCeilingLevel() != -1 ) return false;
         return true;
     }
 
@@ -363,16 +459,17 @@ public class GameConfig
             Location spawn = this.lobbySpawn.getConfiguredSpawn();
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Lobby spawn: &3" + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
         }
-        if( this.startSpawn.getConfiguredSpawn() == null ) {
+        if( this.startSpawns.isEmpty() ) {
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn: &cNot configured" ) );
         } else {
-            Location spawn = this.startSpawn.getConfiguredSpawn();
-            boolean errorStartToGround = ( spawn.getBlockY() <= this.groundLevel && this.groundLevel != -1 );
-            boolean errorStartToCeiling = ( spawn.getBlockY() >= this.ceilingLevel && this.ceilingLevel != -1 );
-            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn: " + (errorStartToGround||errorStartToCeiling?"&c":"&3") + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() ) );
-            sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn spread: &3" + this.startSpawn.getSpread() ) );
-            if( errorStartToGround ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Start spawn Y " + spawn.getBlockY() + " should be higher than ground " + this.groundLevel ) );
-            if( errorStartToCeiling ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Start spawn Y " + spawn.getBlockY() + " should be lower than ceiling " + this.ceilingLevel ) );
+            for( SpawnLocation startSpawn : this.startSpawns ) {
+                Location spawn = startSpawn.getConfiguredSpawn();
+                boolean errorStartToGround = ( spawn.getBlockY() <= this.groundLevel && this.groundLevel != -1 );
+                boolean errorStartToCeiling = ( spawn.getBlockY() >= this.ceilingLevel && this.ceilingLevel != -1 );
+                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start spawn &3" + startSpawn.getStartSpawnNode() + "&f : " + (errorStartToGround||errorStartToCeiling?"&c":"&3") + spawn.getWorld().getName() + " " + spawn.getBlockX() + ", " + spawn.getBlockY() + ", " + spawn.getBlockZ() + "&f Spread: &3" + startSpawn.getSpread() ) );
+                if( errorStartToGround ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Start spawn Y " + spawn.getBlockY() + " should be higher than ground " + this.groundLevel ) );
+                if( errorStartToCeiling ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Start spawn Y " + spawn.getBlockY() + " should be lower than ceiling " + this.ceilingLevel ) );
+            }
         }
         if( this.lossSpawn.getConfiguredSpawn() == null ) {
             if( this.groundLevel == -1 || this.returnToStartAtGround ) {

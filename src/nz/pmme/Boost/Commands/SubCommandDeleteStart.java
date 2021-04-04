@@ -9,9 +9,9 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class SubCommandSetSpread extends AbstractSubCommand
+public class SubCommandDeleteStart extends AbstractSubCommand
 {
-    public SubCommandSetSpread( Main plugin, String subCommand ) {
+    public SubCommandDeleteStart( Main plugin, String subCommand ) {
         super( plugin, subCommand );
     }
 
@@ -22,18 +22,15 @@ public class SubCommandSetSpread extends AbstractSubCommand
 
     @Override
     protected boolean executeSubCommand( CommandSender sender, String[] args ) {
-        if( args.length == 4 ) {
+        if( args.length == 3 ) {
             Game game = plugin.getGameManager().getGame( args[1] );
             if( game == null ) {
                 plugin.messageSender( sender, Messages.GAME_DOES_NOT_EXIST, args[1] );
                 return true;
             }
             try {
-                int spread = Integer.parseUnsignedInt( args[3] );
-                game.getGameConfig().setSpawnSpread( spread, args[2] );
-                String message = plugin.formatMessage( Messages.SPREAD_SET, game.getGameConfig().getDisplayName(), "%spread%", String.valueOf( spread ) )
-                        .replaceAll( "%name%", args[2] );
-                plugin.messageSender( sender, message );
+                game.getGameConfig().deleteStartSpawn( args[2] );
+                plugin.messageSender( sender, Messages.START_SPAWN_DELETED, game.getGameConfig().getDisplayName(), "%name%", args[2] );
             } catch( NumberFormatException e ) {
                 plugin.messageSender( sender, ChatColor.translateAlternateColorCodes( '&', "&cThe last parameter must be a positive integer number." ) );
             } catch( StartSpawnNodeNotFoundException e ) {
