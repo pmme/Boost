@@ -3,6 +3,7 @@ package nz.pmme.Boost.Config;
 import nz.pmme.Boost.Exceptions.GameDisplayNameMustMatchConfigurationException;
 import nz.pmme.Boost.Exceptions.StartSpawnNodeNotFoundException;
 import nz.pmme.Boost.Main;
+import nz.pmme.Utils.RandomisedDistributor;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,6 +37,7 @@ public class GameConfig
     private SpawnLocation lobbySpawn;
     private SpawnLocation lossSpawn;
     private List<SpawnLocation> startSpawns = new ArrayList<>();
+    private RandomisedDistributor startDistributor;
 
     private int countdownAnnounceTime;
     private List<String> winCommands;
@@ -102,6 +104,7 @@ public class GameConfig
                 }
             }
         }
+        this.startDistributor = new RandomisedDistributor( this.startSpawns.size() );
 
         this.countdownAnnounceTime = plugin.getConfig().getInt( configPath + "countdown_announce_time", 10 );
         this.winCommands = plugin.getConfig().getStringList( configPath + "win_commands" );
@@ -310,7 +313,7 @@ public class GameConfig
     public Location getStartSpawn()
     {
         if( startSpawns.isEmpty() ) return null;
-        return startSpawns.get( (int)( Math.random() * startSpawns.size() ) ).getSpawn();
+        return startSpawns.get( startDistributor.getNext() ).getSpawn();
     }
 
     public void setStartSpawn( Location spawn, String startSpawnNode )
@@ -324,6 +327,7 @@ public class GameConfig
         SpawnLocation startSpawn = new SpawnLocation( plugin, configPath + "game_starts." + startSpawnNode );
         startSpawn.setSpawn( spawn );
         startSpawns.add( startSpawn );
+        startDistributor.setRange( startSpawns.size() );
     }
 
     public void deleteStartSpawn( String startSpawnNode ) throws StartSpawnNodeNotFoundException
@@ -332,6 +336,7 @@ public class GameConfig
             if( startSpawns.get(i).getStartSpawnNode().equalsIgnoreCase( startSpawnNode ) ) {
                 startSpawns.get(i).removeConfig();
                 startSpawns.remove(i);
+                startDistributor.setRange( startSpawns.size() );
                 return;
             }
         }
