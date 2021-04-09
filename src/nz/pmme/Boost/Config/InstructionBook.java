@@ -56,7 +56,10 @@ public class InstructionBook
     {
         if( item != null && item.getType() == Material.WRITTEN_BOOK ) {
             BookMeta bookMeta = (BookMeta)item.getItemMeta();
-            if( bookMeta != null && bookMeta.getTitle().equals( this.instructionsTitle ) ) return true;
+            if( bookMeta == null ) return false;
+            String title = bookMeta.getTitle();
+            if( title == null ) return false;
+            return title.equals( this.instructionsTitle );
         }
         return false;
     }
