@@ -3,6 +3,7 @@ package nz.pmme.Boost.Game;
 import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Enums.GameState;
+import nz.pmme.Boost.Enums.GameType;
 import nz.pmme.Boost.Main;
 import org.bukkit.Location;
 import org.bukkit.boss.BossBar;
@@ -171,7 +172,7 @@ public class Game implements Comparable<Game>
                 gameState = GameState.STOPPED;
                 this.end( false );
                 return;
-            } else if( activePlayers.size() == 1 && !this.getGameConfig().isReturnToStartAtGround() ) {
+            } else if( activePlayers.size() == 1 && this.getGameConfig().getGameType() != GameType.PARKOUR ) {
                 gameState = GameState.STOPPED;
                 if( this.aPlayerHasLost ) this.playerWon( activePlayers.get(0) ); // Can only win if at least one player has lost. If everyone else quits the game just ends.
                 this.end( false );

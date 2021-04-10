@@ -1,5 +1,6 @@
 package nz.pmme.Boost.Config;
 
+import nz.pmme.Boost.Enums.GameType;
 import nz.pmme.Boost.Exceptions.GameDisplayNameMustMatchConfigurationException;
 import nz.pmme.Boost.Exceptions.StartSpawnNodeNotFoundException;
 import nz.pmme.Boost.Main;
@@ -22,6 +23,7 @@ public class GameConfig
 
     private String configPath;
 
+    private GameType gameType;
     private int groundLevel;
     private int ceilingLevel;
     private boolean returnToStartAtGround;
@@ -50,9 +52,17 @@ public class GameConfig
         this.configPath = "games." + this.name + ".";
 
         this.displayName = plugin.getConfig().getString( configPath + "name", this.name );
+
+        this.gameType = GameType.fromString( plugin.getConfig().getString( configPath + "game_type", null ) );
         this.groundLevel = plugin.getConfig().getInt( configPath + "ground", 64 );
         this.ceilingLevel = plugin.getConfig().getInt( configPath + "ceiling", -1 );
         this.returnToStartAtGround = plugin.getConfig().getBoolean( configPath + "return_to_start_at_ground", false );
+        if( this.gameType == null ) {
+            if( this.ceilingLevel != -1 && this.groundLevel != -1 && !this.returnToStartAtGround ) this.gameType = GameType.ELIMINATION_RACE;
+            else if( this.ceilingLevel != -1 ) this.gameType = GameType.RACE;
+            else this.gameType = GameType.ELIMINATION;
+        }
+
         this.targetDist = plugin.getConfig().getInt( configPath + "target_dist", 150 );
 
         this.countdown = plugin.getConfig().getInt( configPath + "countdown", 30 );
@@ -109,14 +119,37 @@ public class GameConfig
         this.countdownAnnounceTime = plugin.getConfig().getInt( configPath + "countdown_announce_time", 10 );
         this.winCommands = plugin.getConfig().getStringList( configPath + "win_commands" );
 
-        if( this.groundLevel == -1 && this.returnToStartAtGround ) {
-            plugin.getLogger().warning( "Ground is required since Return to Start is true for game " + this.name );
-        }
-        if( this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 ) {
-            plugin.getLogger().warning( "Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel + " for game " + this.name );
-        }
-        if( this.ceilingLevel == -1 && ( this.groundLevel == -1 || this.returnToStartAtGround ) ) {
-            plugin.getLogger().warning( "There is no way to win in game " + this.name );
+        switch( this.gameType ) {
+            case ELIMINATION:
+                if( this.groundLevel == -1 ) plugin.getLogger().warning( "Ground must be set for Elimination type game " + this.name );
+                if( this.returnToStartAtGround ) plugin.getLogger().warning( "Return to Start should not be set for Elimination type game " + this.name );
+                break;
+            case ELIMINATION_RACE:
+                if( this.groundLevel == -1 ) plugin.getLogger().warning( "Ground must be set for Elimination Race type game " + this.name );
+                if( this.ceilingLevel == -1 ) plugin.getLogger().warning( "Ceiling must be set for Elimination Race type game " + this.name );
+                if( this.returnToStartAtGround ) plugin.getLogger().warning( "Return to Start should not be set for Elimination Race type game " + this.name );
+                if( this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 ) {
+                    plugin.getLogger().warning( "Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel + " for game " + this.name );
+                }
+                break;
+            case RACE:
+                if( this.ceilingLevel == -1 ) plugin.getLogger().warning( "Ceiling must be set for Race type game " + this.name );
+                if( this.returnToStartAtGround && this.groundLevel == -1 ) {
+                    plugin.getLogger().warning( "Ground is required since Return to Start is true for Race type game " + this.name );
+                }
+                if( this.returnToStartAtGround && this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 ) {
+                    plugin.getLogger().warning( "Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel + " for game " + this.name );
+                }
+                break;
+            case PARKOUR:
+                if( this.ceilingLevel == -1 ) plugin.getLogger().warning( "Ceiling must be set for Parkour type game " + this.name );
+                if( this.returnToStartAtGround && this.groundLevel == -1 ) {
+                    plugin.getLogger().warning( "Ground is required since Return to Start is true for Parkour type game " + this.name );
+                }
+                if( this.returnToStartAtGround && this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 ) {
+                    plugin.getLogger().warning( "Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel + " for game " + this.name );
+                }
+                break;
         }
 
     }
@@ -124,6 +157,7 @@ public class GameConfig
     public void setConfig()
     {
         plugin.getConfig().set( configPath + "name", this.displayName );
+        plugin.getConfig().set( configPath + "game_type", this.gameType.toString() );
         plugin.getConfig().set( configPath + "ground", this.groundLevel );
         plugin.getConfig().set( configPath + "ceiling", this.ceilingLevel );
         plugin.getConfig().set( configPath + "return_to_start_at_ground", this.returnToStartAtGround );
@@ -239,6 +273,18 @@ public class GameConfig
     public void setGuiItem( Material material )
     {
         guiItem = material != Material.AIR ? material : null;
+        this.setConfig();
+        plugin.saveConfig();
+    }
+
+    public GameType getGameType()
+    {
+        return gameType;
+    }
+
+    public void setGameType( GameType gameType )
+    {
+        this.gameType = gameType;
         this.setConfig();
         plugin.saveConfig();
     }
@@ -427,12 +473,33 @@ public class GameConfig
 
     public boolean isProperlyConfigured(){
         if( this.getLobbySpawn() == null ) return false;
-        if( ( this.getGroundLevel() != -1 && !this.isReturnToStartAtGround() ) && this.getLossSpawn() == null ) return false;
         if( this.startSpawns.isEmpty() ) return false;
-        if( this.getGroundLevel() == -1 && this.isReturnToStartAtGround() ) return false;
-        if( this.getGroundLevel() >= this.getCeilingLevel() && this.getGroundLevel() != -1 && this.getCeilingLevel() != -1 ) return false;
-        if( this.getStartSpawnsMinY() <= this.getGroundLevel() && this.getGroundLevel() != -1 ) return false;
-        if( this.getStartSpawnsMaxY() >= this.getCeilingLevel() && this.getCeilingLevel() != -1 ) return false;
+        switch( this.gameType )
+        {
+            case ELIMINATION:
+                if( this.getGroundLevel() == -1 ) return false;
+                if( this.getLossSpawn() == null ) return false;
+                if( this.getStartSpawnsMinY() <= this.getGroundLevel() ) return false;
+                break;
+            case ELIMINATION_RACE:
+                if( this.getGroundLevel() == -1 ) return false;
+                if( this.getCeilingLevel() == -1 ) return false;
+                if( this.getLossSpawn() == null ) return false;
+                if( this.getGroundLevel() >= this.getCeilingLevel() ) return false;
+                if( this.getStartSpawnsMinY() <= this.getGroundLevel() ) return false;
+                if( this.getStartSpawnsMaxY() >= this.getCeilingLevel() ) return false;
+                break;
+            case RACE:
+            case PARKOUR:
+                if( this.getCeilingLevel() == -1 ) return false;
+                if( this.isReturnToStartAtGround() ) {
+                    if( this.getGroundLevel() == -1 ) return false;
+                    if( this.getGroundLevel() >= this.getCeilingLevel() ) return false;
+                    if( this.getStartSpawnsMinY() <= this.getGroundLevel() ) return false;
+                }
+                if( this.getStartSpawnsMaxY() >= this.getCeilingLevel() ) return false;
+                break;
+        }
         return true;
     }
 
@@ -441,14 +508,57 @@ public class GameConfig
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost game config:" ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Config name: &3" + this.name ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Display name: &3" + this.displayName ) );
-        boolean errorRequired = ( this.groundLevel == -1 && this.returnToStartAtGround );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: " + (errorRequired?"&c":"&3") + this.groundLevel + ( this.groundLevel == -1 && !this.returnToStartAtGround ? " disabled" : "" ) ) );
-        if( errorRequired ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Ground is required since Return to Start is true" ) );
-        boolean errorCeilingLow = ( this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: " + (errorCeilingLow?"&c":"&3") + this.ceilingLevel + ( this.ceilingLevel == -1 ? " disabled" : "" ) ) );
-        if( errorCeilingLow ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel ) );
-        if( this.ceilingLevel == -1 && ( this.groundLevel == -1 || this.returnToStartAtGround ) ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c There is no way to win" ) );
-        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Return to start at ground: &3" + ( this.returnToStartAtGround ? "true" : "false" ) ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Game type: &3" + this.gameType.toString() ) );
+        switch( this.gameType )
+        {
+            case ELIMINATION:
+                if( this.groundLevel == -1 ) {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: &c" + this.groundLevel + " disabled" ) );
+                } else {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: &3" + this.groundLevel ) );
+                }
+                if( this.ceilingLevel == -1 ) {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: &3" + this.ceilingLevel + " disabled" ) );
+                } else {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: &c" + this.ceilingLevel + " but not required" ) );
+                }
+                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Return to start at ground: " + ( this.returnToStartAtGround ? "&ctrue" : "&3false" ) ) );
+                break;
+            case ELIMINATION_RACE:
+                if( this.groundLevel == -1 ) {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: &c" + this.groundLevel + " disabled" ) );
+                } else {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: &3" + this.groundLevel ) );
+                }
+                if( this.ceilingLevel == -1 ) {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: &c" + this.ceilingLevel + " disabled" ) );
+                } else {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: &3" + this.ceilingLevel ) );
+                }
+                if( this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 ) {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel ) );
+                }
+                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Return to start at ground: " + ( this.returnToStartAtGround ? "&ctrue" : "&3false" ) ) );
+                break;
+            case RACE:
+            case PARKOUR:
+                if( this.groundLevel == -1 ) {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: " + (this.returnToStartAtGround?"&c":"&3") + this.groundLevel + " disabled" ) );
+                    if( this.returnToStartAtGround ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Ground is required since Return to Start is true" ) );
+                } else {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: " + (!this.returnToStartAtGround?"&c":"&3") + this.groundLevel + (!this.returnToStartAtGround?" but not required":"") ) );
+                }
+                if( this.ceilingLevel == -1 ) {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: &c" + this.ceilingLevel + " disabled" ) );
+                } else {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: &3" + this.ceilingLevel ) );
+                }
+                if( this.returnToStartAtGround && this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 ) {
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel ) );
+                }
+                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Return to start at ground: &3" + ( this.returnToStartAtGround ? "true" : "false" ) ) );
+                break;
+        }
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Target distance: &3" + this.targetDist ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start countdown: &3" + this.countdown ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Countdown announcement period: &3" + this.countdownAnnounceTime ) );
@@ -477,10 +587,15 @@ public class GameConfig
             }
         }
         if( this.lossSpawn.getConfiguredSpawn() == null ) {
-            if( this.groundLevel == -1 || this.returnToStartAtGround ) {
-                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &3Not required" ) );
-            } else {
-                sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &cNot configured" ) );
+            switch( this.gameType ) {
+                case ELIMINATION:
+                case ELIMINATION_RACE:
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &cNot configured" ) );
+                    break;
+                case RACE:
+                case PARKOUR:
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Loss spawn: &3Not required" ) );
+                    break;
             }
         } else {
             Location spawn = this.lossSpawn.getConfiguredSpawn();
