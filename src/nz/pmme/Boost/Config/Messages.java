@@ -96,6 +96,7 @@ public enum Messages
     GLOW_AFTER_BOOST_ENABLED( "glow_after_boost_enabled" ),
     GLOW_AFTER_BOOST_DISABLED( "glow_after_boost_disabled" ),
     SPAWN_NOT_SET( "spawn_not_set" ),
+    GAME_TYPE_SET( "game_type_set" ),
 
     END("end");
 

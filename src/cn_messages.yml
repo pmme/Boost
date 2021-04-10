@@ -93,6 +93,7 @@ messages:
   glow_after_boost_enabled: "Glowing &aenabled&r after boosting."
   glow_after_boost_disabled: "Glowing &cdisabled&r after boosting."
   spawn_not_set: "&cThat spawn is not set."
+  game_type_set: "%game%&r set to %gametype%&r."
 
 player_stats:
   - "&5[平台争霸] &f玩家统计信息: %player%"
@@ -116,6 +117,7 @@ command_usage_admin:
   - "&f/boost deletegame Arena1 confirm &3- &c删除&3游戏"
   - "&f/boost showgameconfig Arena1 &3- Display the configuration for a game."
   - "&f/boost setdisplayname Arena1 [name] &3- 设置游戏的显示名"
+  - "&f/boost setgametype Arena1 [gameType] &3- Set the type for the game."
   - "&f/boost setground Arena1 [yPos] &3- 设置游戏场地大小"
   - "&f/boost setceiling Arena1 [yPos] &3- Set the winning ceiling level."
   - "&f/boost setstart Arena1 [startNode] <world x y z> &3- 设置加入游戏传送的位置"

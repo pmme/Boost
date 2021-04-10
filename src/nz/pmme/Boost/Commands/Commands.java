@@ -37,6 +37,7 @@ public class Commands implements TabExecutor
         this.registerSubCommand( new SubCommandDeleteGame( plugin, "deletegame" ) );
         this.registerSubCommand( new SubCommandShowGameConfig( plugin, "showgameconfig" ) );
         this.registerSubCommand( new SubCommandSetDisplayName( plugin, "setdisplayname" ) );
+        this.registerSubCommand( new SubCommandSetGameType( plugin, "setgametype" ) );
         this.registerSubCommand( new SubCommandSetGround( plugin, "setground" ) );
         this.registerSubCommand( new SubCommandSetCeiling( plugin, "setceiling" ) );
         this.registerSubCommand( new SubCommandSetStart( plugin, "setstart" ) );

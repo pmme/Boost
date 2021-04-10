@@ -99,6 +99,7 @@ bar:
 #  games:
 #    Arena1:
 #      name: '&aArena1'
+#      game_type: ELIMINATION
 #      ground: 64
 #      ceiling: -1
 #      return_to_start_at_ground: false
