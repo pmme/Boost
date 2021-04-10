@@ -166,6 +166,11 @@ public class EventsListener implements Listener
                         plugin.getGameManager().displayLeaderBoard( player, StatsPeriod.TOTAL, null );
                     }
                     return true;
+                } else if( strippedLine1.equalsIgnoreCase( plugin.getLoadedConfig().getSignWinStripped() ) && lines.length >= 3 ) {
+                    Game game = plugin.getGameManager().getPlayersGame( player );
+                    if( game == null ) return true;
+                    if( game.isActiveInGame( player ) && !game.isQueuing() ) game.setPlayerWon( player );
+                    return true;
                 }
                 plugin.messageSender( player, Messages.ERROR_IN_SIGN );
                 return true;

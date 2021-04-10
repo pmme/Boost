@@ -69,6 +69,7 @@ public class Config
     private String signWeekly;
     private String signMonthly;
     private String signTotal;
+    private String signWin;
 
     private SpawnLocation mainLobbySpawn;
 
@@ -374,6 +375,7 @@ public class Config
         signWeekly = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.weekly", "Weekly" ) );
         signMonthly = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.monthly", "Monthly" ) );
         signTotal = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.total", "All time" ) );
+        signWin = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.win", "Click to WIN!" ) );
 
         mainLobbySpawn = new SpawnLocation( plugin, "main_lobby" );
 
@@ -524,6 +526,8 @@ public class Config
     public String getSignMonthlyStripped() { return ChatColor.stripColor( signMonthly ); }
     public String getSignTotal() { return signTotal; }
     public String getSignTotalStripped() { return ChatColor.stripColor( signTotal ); }
+    public String getSignWin() { return signWin; }
+    public String getSignWinStripped() { return ChatColor.stripColor( signWin ); }
 
     public Location getMainLobbySpawn() { return mainLobbySpawn.getSpawn(); }
     public void setMainLobbySpawn( Location spawn ) {
