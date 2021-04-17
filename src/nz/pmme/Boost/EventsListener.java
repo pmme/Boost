@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,6 +33,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -200,6 +202,7 @@ public class EventsListener implements Listener
             final Game playersGame = plugin.getGameManager().getPlayersGame( thisPlayer );
 
             Block targetBlock = null;
+            Player targetPlayer = null;
             switch( event.getAction() ) {
                 case LEFT_CLICK_BLOCK:
                 case RIGHT_CLICK_BLOCK:
@@ -217,12 +220,43 @@ public class EventsListener implements Listener
                     if( playersGame == null ) return;
                     if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
                     if( playersGame.isOnCoolDown( thisPlayer ) ) return;
-                    targetBlock = event.getPlayer().getTargetBlock( null, playersGame.getGameConfig().getTargetDist() );
+                    if( !playersGame.isQueuing() ) {
+                        for( RayIterator rayIterator = new RayIterator( thisPlayer, playersGame.getGameConfig().getTargetDist(), 1.0 ); !rayIterator.end(); rayIterator.step() ) {
+                            Collection< Entity > entities = thisPlayer.getWorld().getNearbyEntities( rayIterator.toLocation( thisPlayer.getWorld() ), plugin.getLoadedConfig().getTargetBoxH(), plugin.getLoadedConfig().getTargetBoxV(), plugin.getLoadedConfig().getTargetBoxH() );
+                            for( Entity entity : entities ) {
+                                if( entity instanceof Player ) {
+                                    if( plugin.getGameManager().activeInSameGame( thisPlayer, (Player)entity ) && thisPlayer != entity ) {
+                                        targetPlayer = (Player)entity;
+                                        break;
+                                    }
+                                }
+                            }
+                            if( targetPlayer != null ) break;
+                        }
+                    }
+                    if( targetPlayer == null ) {
+                        targetBlock = event.getPlayer().getTargetBlock( null, playersGame.getGameConfig().getTargetDist() );
+                    }
                     break;
                 case PHYSICAL:
                     break;
             }
-            if( targetBlock != null ) {
+            if( targetPlayer != null )
+            {
+                thisPlayer.playSound( thisPlayer.getLocation(), plugin.getLoadedConfig().getBoostSound(), 1, 1 );
+                plugin.getLoadedConfig().getBoostedParticleForPlayer( thisPlayer ).spawn( targetPlayer.getWorld(), targetPlayer.getLocation() );
+                this.boostPlayer( targetPlayer, thisPlayer.getLocation(), targetPlayer.getLocation() );
+                BoostParticle boostParticle = plugin.getLoadedConfig().getBoostParticleForPlayer( thisPlayer );
+                if( boostParticle.isEnabled() ) {
+                    for( RayIterator rayIterator = new RayIterator( thisPlayer, targetPlayer.getLocation(), boostParticle.getSpacing() ); !rayIterator.end(); rayIterator.step() ) {
+                        boostParticle.spawn( thisPlayer.getWorld(), rayIterator.toLocation( thisPlayer.getWorld() ) );
+                    }
+                }
+                if( plugin.getLoadedConfig().shouldGlowAfterBoost() ) thisPlayer.addPotionEffect( new PotionEffect( PotionEffectType.GLOWING, (int)plugin.getLoadedConfig().getCoolDown()/50, 0, false, false, true ) );
+                playersGame.coolDown( thisPlayer );
+            }
+            else if( targetBlock != null )
+            {
                 thisPlayer.playSound( thisPlayer.getLocation(), plugin.getLoadedConfig().getBoostSound(), 1, 1 );
 
                 // Check if there is a player standing on the target block.
@@ -254,7 +288,9 @@ public class EventsListener implements Listener
                 plugin.getLoadedConfig().getBoostHitParticleForPlayer( thisPlayer ).spawn( thisPlayer.getWorld(), targetPotentialPlayerPosition.getBlockX() + 0.5, targetPotentialPlayerPosition.getBlockY() + 0.5, targetPotentialPlayerPosition.getBlockZ() + 0.5 );
                 if( plugin.getLoadedConfig().shouldGlowAfterBoost() ) thisPlayer.addPotionEffect( new PotionEffect( PotionEffectType.GLOWING, (int)plugin.getLoadedConfig().getCoolDown()/50, 0, false, false, true ) );
                 playersGame.coolDown( thisPlayer );
-            } else {
+            }
+            else
+            {
                 BoostParticle boostParticle = plugin.getLoadedConfig().getBoostParticleForPlayer( thisPlayer );
                 if( boostParticle.isEnabled() ) {
                     for( RayIterator rayIterator = new RayIterator( thisPlayer, playersGame.getGameConfig().getTargetDist(), boostParticle.getSpacing() ); !rayIterator.end(); rayIterator.step() ) {
