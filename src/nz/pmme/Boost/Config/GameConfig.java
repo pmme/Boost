@@ -33,6 +33,7 @@ public class GameConfig
     private int maxPlayers;
     private boolean autoQueue;
     private boolean requiresPermission;
+    private Material winBlock = null;
     private Material boostBlock = null;
     private Material guiItem = null;
 
@@ -70,6 +71,14 @@ public class GameConfig
         this.maxPlayers = plugin.getConfig().getInt( configPath + "max_players", 0 );
         this.autoQueue = plugin.getConfig().getBoolean( configPath + "auto_queue", false );
         this.requiresPermission = plugin.getConfig().getBoolean( configPath + "requires_permission", false );
+
+        String winBlockName = plugin.getConfig().getString( configPath + "win_block", "" ).toUpperCase();
+        if( !winBlockName.isEmpty() ) {
+            this.winBlock = Material.getMaterial( winBlockName );
+            if( this.winBlock == null ) {
+                plugin.getLogger().warning( "Win block " + winBlockName + " is not a recognised material name." );
+            }
+        }
 
         String boostBlockName = plugin.getConfig().getString( configPath + "boost_block", "" ).toUpperCase();
         if( !boostBlockName.isEmpty() ) {
@@ -126,14 +135,14 @@ public class GameConfig
                 break;
             case ELIMINATION_RACE:
                 if( this.groundLevel == -1 ) plugin.getLogger().warning( "Ground must be set for Elimination Race type game " + this.name );
-                if( this.ceilingLevel == -1 ) plugin.getLogger().warning( "Ceiling must be set for Elimination Race type game " + this.name );
+                if( this.ceilingLevel == -1 && this.winBlock == null ) plugin.getLogger().warning( "Ceiling or win block must be set for Elimination Race type game " + this.name );
                 if( this.returnToStartAtGround ) plugin.getLogger().warning( "Return to Start should not be set for Elimination Race type game " + this.name );
                 if( this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 ) {
                     plugin.getLogger().warning( "Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel + " for game " + this.name );
                 }
                 break;
             case RACE:
-                if( this.ceilingLevel == -1 ) plugin.getLogger().warning( "Ceiling must be set for Race type game " + this.name );
+                if( this.ceilingLevel == -1 && this.winBlock == null ) plugin.getLogger().warning( "Ceiling or win block must be set for Race type game " + this.name );
                 if( this.returnToStartAtGround && this.groundLevel == -1 ) {
                     plugin.getLogger().warning( "Ground is required since Return to Start is true for Race type game " + this.name );
                 }
@@ -142,7 +151,7 @@ public class GameConfig
                 }
                 break;
             case PARKOUR:
-                if( this.ceilingLevel == -1 ) plugin.getLogger().warning( "Ceiling must be set for Parkour type game " + this.name );
+                if( this.ceilingLevel == -1 && this.winBlock == null ) plugin.getLogger().warning( "Ceiling or win block must be set for Parkour type game " + this.name );
                 if( this.returnToStartAtGround && this.groundLevel == -1 ) {
                     plugin.getLogger().warning( "Ground is required since Return to Start is true for Parkour type game " + this.name );
                 }
@@ -168,6 +177,7 @@ public class GameConfig
         plugin.getConfig().set( configPath + "max_players", this.maxPlayers );
         plugin.getConfig().set( configPath + "auto_queue", this.autoQueue );
         plugin.getConfig().set( configPath + "requires_permission", this.requiresPermission );
+        plugin.getConfig().set( configPath + "win_block", this.winBlock != null ? this.winBlock.toString() : "" );
         plugin.getConfig().set( configPath + "boost_block", this.boostBlock != null ? this.boostBlock.toString() : "" );
         plugin.getConfig().set( configPath + "gui_item", this.guiItem != null ? this.guiItem.toString() : "" );
 
@@ -251,6 +261,17 @@ public class GameConfig
     public void setRequiresPermission( boolean newRequiresPermission )
     {
         requiresPermission = newRequiresPermission;
+        this.setConfig();
+        plugin.saveConfig();
+    }
+
+    public Material getWinBlock() {
+        return winBlock;
+    }
+
+    public void setWinBlock( Material material )
+    {
+        winBlock = material != Material.AIR ? material : null;
         this.setConfig();
         plugin.saveConfig();
     }
@@ -483,21 +504,21 @@ public class GameConfig
                 break;
             case ELIMINATION_RACE:
                 if( this.getGroundLevel() == -1 ) return false;
-                if( this.getCeilingLevel() == -1 ) return false;
+                if( this.getCeilingLevel() == -1 && this.getWinBlock() == null ) return false;
                 if( this.getLossSpawn() == null ) return false;
-                if( this.getGroundLevel() >= this.getCeilingLevel() ) return false;
+                if( this.getGroundLevel() >= this.getCeilingLevel() && this.getCeilingLevel() != -1 ) return false;
                 if( this.getStartSpawnsMinY() <= this.getGroundLevel() ) return false;
-                if( this.getStartSpawnsMaxY() >= this.getCeilingLevel() ) return false;
+                if( this.getStartSpawnsMaxY() >= this.getCeilingLevel() && this.getCeilingLevel() != -1 ) return false;
                 break;
             case RACE:
             case PARKOUR:
-                if( this.getCeilingLevel() == -1 ) return false;
+                if( this.getCeilingLevel() == -1 && this.getWinBlock() == null ) return false;
                 if( this.isReturnToStartAtGround() ) {
                     if( this.getGroundLevel() == -1 ) return false;
-                    if( this.getGroundLevel() >= this.getCeilingLevel() ) return false;
+                    if( this.getGroundLevel() >= this.getCeilingLevel() && this.getCeilingLevel() != -1 ) return false;
                     if( this.getStartSpawnsMinY() <= this.getGroundLevel() ) return false;
                 }
-                if( this.getStartSpawnsMaxY() >= this.getCeilingLevel() ) return false;
+                if( this.getStartSpawnsMaxY() >= this.getCeilingLevel() && this.getCeilingLevel() != -1 ) return false;
                 break;
         }
         return true;
@@ -505,6 +526,7 @@ public class GameConfig
 
     public void displayConfig( CommandSender sender )
     {
+        boolean errorCeilingOrWinBlock = ( this.winBlock == null && this.ceilingLevel == -1 && this.gameType != GameType.ELIMINATION );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5Boost game config:" ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Config name: &3" + this.name ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Display name: &3" + this.displayName ) );
@@ -531,10 +553,11 @@ public class GameConfig
                     sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: &3" + this.groundLevel ) );
                 }
                 if( this.ceilingLevel == -1 ) {
-                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: &c" + this.ceilingLevel + " disabled" ) );
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: " + (errorCeilingOrWinBlock?"&c":"&3") + this.ceilingLevel + " disabled" ) );
                 } else {
                     sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: &3" + this.ceilingLevel ) );
                 }
+                if( errorCeilingOrWinBlock ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Either a ceiling or a win block is required" ) );
                 if( this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 ) {
                     sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel ) );
                 }
@@ -549,10 +572,11 @@ public class GameConfig
                     sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ground level: " + (!this.returnToStartAtGround?"&c":"&3") + this.groundLevel + (!this.returnToStartAtGround?" but not required":"") ) );
                 }
                 if( this.ceilingLevel == -1 ) {
-                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: &c" + this.ceilingLevel + " disabled" ) );
+                    sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: " + (errorCeilingOrWinBlock?"&c":"&3") + this.ceilingLevel + " disabled" ) );
                 } else {
                     sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Ceiling level: &3" + this.ceilingLevel ) );
                 }
+                if( errorCeilingOrWinBlock ) sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Either a ceiling or a win block is required" ) );
                 if( this.returnToStartAtGround && this.groundLevel >= this.ceilingLevel && this.groundLevel != -1 && this.ceilingLevel != -1 ) {
                     sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&c Ceiling " + this.ceilingLevel + " should be higher than ground " + this.groundLevel ) );
                 }
@@ -566,6 +590,7 @@ public class GameConfig
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Maximum players: &3" + this.maxPlayers ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Auto queue: &3" + ( this.autoQueue ? "&aon" : "&coff" ) ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Requires permission: &3" + ( this.requiresPermission ? "true" : "false" ) ) );
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Win block: " + (errorCeilingOrWinBlock?"&c":"&3") + ( this.winBlock != null ? this.winBlock.toString() : "-" ) ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Boost block: &3" + ( this.boostBlock != null ? this.boostBlock.toString() : "-" ) ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f GUI item: &3" + ( this.guiItem != null ? this.guiItem.toString() : "-" ) ) );
         if( this.lobbySpawn.getConfiguredSpawn() == null ) {

@@ -3,6 +3,7 @@ package nz.pmme.Boost;
 import nz.pmme.Boost.Config.BoostParticle;
 import nz.pmme.Boost.Config.GUIButtonConfig;
 import nz.pmme.Boost.Config.Messages;
+import nz.pmme.Boost.Enums.GameType;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Gui.GUI;
@@ -179,6 +180,17 @@ public class EventsListener implements Listener
         return false;   // Not a sign-click.
     }
 
+    private boolean handleWinBlockClickEvent( Block clickedBlock, Player player, Game game )
+    {
+        if( game != null && game.isActiveInGame( player ) && !game.isQueuing() && game.getGameConfig().getGameType() != GameType.ELIMINATION ) {
+            if( clickedBlock.getType() == game.getGameConfig().getWinBlock() ) {
+                game.setPlayerWon( player );
+                return true;
+            }
+        }
+        return false;
+    }
+
     @EventHandler
     public void onPlayerInteract( PlayerInteractEvent event )
     {
@@ -193,6 +205,7 @@ public class EventsListener implements Listener
                 case RIGHT_CLICK_BLOCK:
                     if( handleMainGuiItemClickEvent( event.getPlayer() ) ) return;
                     if( handleSignClickEvent( event.getClickedBlock(), event.getPlayer() ) ) return;
+                    if( handleWinBlockClickEvent( event.getClickedBlock(), thisPlayer, playersGame ) ) return;
                     if( playersGame == null ) return;
                     if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
                     if( playersGame.isOnCoolDown( thisPlayer ) ) return;

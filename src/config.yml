@@ -110,6 +110,7 @@ bar:
 #      auto_queue: true
 #      countdown_announce_time: 10
 #      requires_permission: false
+#      win_block: ''
 #      boost_block: REDSTONE_ORE
 #      gui_item: GLASS
 #      game_starts:

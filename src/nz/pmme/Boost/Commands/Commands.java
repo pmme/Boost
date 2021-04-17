@@ -47,6 +47,7 @@ public class Commands implements TabExecutor
         this.registerSubCommand( new SubCommandTesttp( plugin, "testtp" ) );
         this.registerSubCommand( new SubCommandSetSpread( plugin, "setspread" ) );
         this.registerSubCommand( new SubCommandSetReturn( plugin, "setreturn" ) );
+        this.registerSubCommand( new SubCommandSetWinBlock( plugin, "setwinblock" ) );
         this.registerSubCommand( new SubCommandSetBoostBlock( plugin, "setboostblock" ) );
         this.registerSubCommand( new SubCommandSetGuiItem( plugin, "setguiitem" ) );
         this.registerSubCommand( new SubCommandSetMinPlayers( plugin, "setminplayers" ) );
