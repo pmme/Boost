@@ -96,6 +96,8 @@ messages:
   glow_after_boost_disabled: "Glowing &cdisabled&r after boosting."
   spawn_not_set: "&cThat spawn is not set."
   game_type_set: "%game%&r set to %gametype%&r."
+  target_players_enabled: "Targeting players in air &aenabled&r in game %game%&r."
+  target_players_disabled: "Targeting players in air &cdisabled&r in game %game%&r."
 
 player_stats:
   - "&5[Boost] &fPlayer stats: %player%"
@@ -138,6 +140,7 @@ command_usage_admin:
   - "&f/boost requirespermission Arena1 [on/off] &3- Make game only available with permission."
   - "&f/boost setcountdown Arena1 [time] &3- Set the countdown time to start a game."
   - "&f/boost setannouncement Arena1 [time] &3- Set the period the countdown is announced."
+  - "&f/boost targetplayers Arena1 [on/off] &3 - Set whether players can be targeted in air."
   - "&f/boost addwincommand Arena1 [command] &3- Add a command executed for the winner."
   - "&f/boost addwincommand [daily|weekly|monthly] [first|second|third] [command]"
   - "&f/boost removewincommand Arena1 [index] &3- Remove the numbered win command."

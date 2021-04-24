@@ -99,6 +99,8 @@ public enum Messages
     GLOW_AFTER_BOOST_DISABLED( "glow_after_boost_disabled" ),
     SPAWN_NOT_SET( "spawn_not_set" ),
     GAME_TYPE_SET( "game_type_set" ),
+    TARGET_PLAYERS_ENABLED( "target_players_enabled" ),
+    TARGET_PLAYERS_DISABLED( "target_players_disabled" ),
 
     END("end");
 

@@ -220,7 +220,7 @@ public class EventsListener implements Listener
                     if( playersGame == null ) return;
                     if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
                     if( playersGame.isOnCoolDown( thisPlayer ) ) return;
-                    if( !playersGame.isQueuing() ) {
+                    if( !playersGame.isQueuing() && playersGame.getGameConfig().canTargetPlayers() ) {
                         for( RayIterator rayIterator = new RayIterator( thisPlayer, playersGame.getGameConfig().getTargetDist(), 1.0 ); !rayIterator.end(); rayIterator.step() ) {
                             Collection< Entity > entities = thisPlayer.getWorld().getNearbyEntities( rayIterator.toLocation( thisPlayer.getWorld() ), plugin.getLoadedConfig().getTargetBoxH(), plugin.getLoadedConfig().getTargetBoxV(), plugin.getLoadedConfig().getTargetBoxH() );
                             for( Entity entity : entities ) {
