@@ -18,7 +18,8 @@ public class SubCommandSetSign extends AbstractSubCommand
             "leave",
             "status",
             "stats",
-            "top"
+            "top",
+            "win"
     );
 
     public SubCommandSetSign( Main plugin, String subCommand ) {
@@ -54,7 +55,7 @@ public class SubCommandSetSign extends AbstractSubCommand
             }
             if( args.length > 1 ) {
                 String args1lower = args[1].toLowerCase();
-                if( args.length != 3 && args1lower.equals( "join" ) ) return false;
+                if( args.length != 3 && ( args1lower.equals( "join" ) || args1lower.equals( "win" ) ) ) return false;
                 Sign sign = (Sign)( targetBlock.getState() );
                 int line = 0;
                 sign.setLine( line++, plugin.getLoadedConfig().getSignTitle() );
@@ -93,6 +94,10 @@ public class SubCommandSetSign extends AbstractSubCommand
                         }
                         if( args.length == 4 ) sign.setLine( line++, this.getGameNameForSign( args[3] ) );
                         break;
+                    case "win":
+                        sign.setLine( line++, plugin.getLoadedConfig().getSignWin() );
+                        sign.setLine( line++, this.getGameNameForSign( args[2] ) );
+                        break;
                     default:
                         String arg1Coloured = ChatColor.translateAlternateColorCodes( '&', args[1] );
                         sign.setLine( line++, arg1Coloured );
@@ -116,7 +121,7 @@ public class SubCommandSetSign extends AbstractSubCommand
         if( args.length == 2 ) return signCommands;
         if( args.length == 3 ) {
             String arg1lower = args[1].toLowerCase();
-            if( arg1lower.equals( "join" ) || arg1lower.equals( "stats" ) ) {
+            if( arg1lower.equals( "join" ) || arg1lower.equals( "stats" ) || arg1lower.equals( "win" ) ) {
                 return plugin.getGameManager().getGameNames();
             } else if( arg1lower.equals( "top" ) ) {
                 return StatsPeriod.getStatsPeriods();

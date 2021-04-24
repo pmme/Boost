@@ -81,6 +81,8 @@ public enum Messages
     GAME_NOT_AVAILABLE("game_not_available"),
     COOL_DOWN_SET("cool_down_set"),
     START_DELAY_SET("start_delay_set"),
+    WIN_BLOCK_SET("win_block_set"),
+    WIN_BLOCK_DISABLED("win_block_disabled"),
     BOOST_BLOCK_SET("boost_block_set"),
     BOOST_BLOCK_DISABLED("boost_block_disabled"),
     RETURN_TO_START_ENABLED( "return_to_start_enabled" ),

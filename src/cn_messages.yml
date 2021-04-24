@@ -78,6 +78,8 @@ messages:
   game_not_available: "%game%&r is not available to you."
   cool_down_set: "Cool down set to %count%ms."
   start_delay_set: "Delay before boost after game start set to %count%s."
+  win_block_set: "Win block for %game%&r set to %block%."
+  win_block_disabled: "%game%&r set to have no win block."
   boost_block_set: "Boost block for %game%&r set to %block%."
   boost_block_disabled: "%game%&r set to have no Boost block."
   return_to_start_enabled: "%game%&r set to return to start on falling."
@@ -127,6 +129,7 @@ command_usage_admin:
   - "&f/boost testtp Arena1 [lobby|loss|start] [startNode] &3- Test a spawn by teleporting to it."
   - "&f/boost setspread Arena1 [startNode] [spread] &3- 设置玩家传送时的分散距离"
   - "&f/boost setreturn Arena1 [on/off] &3- Set players return to start on falling."
+  - "&f/boost setwinblock Arena1 &3- Set a block that you click to win a game."
   - "&f/boost setboostblock Arena1 &3- Set a block that boosts you when stepped on."
   - "&f/boost setguiitem Arena1 &3- Set the item to click in the GUI to join a game."
   - "&f/boost setminplayers Arena1 [min] &3- 设置游戏开始的最小玩家数"
@@ -201,3 +204,4 @@ signs:
   weekly: '周'
   monthly: '月'
   total: '全部时间'
+  win: 'Click to WIN!'

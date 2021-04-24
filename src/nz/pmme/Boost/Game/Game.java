@@ -39,7 +39,7 @@ public class Game implements Comparable<Game>
         this.gameState = GameState.STOPPED;
         this.aPlayerHasLost = false;
 
-        if( this.gameConfig.isAutoQueue() ) this.startQueuing();
+        if( this.gameConfig.isAutoQueue() && this.gameConfig.isProperlyConfigured() ) this.startQueuing();
     }
 
     @Override
