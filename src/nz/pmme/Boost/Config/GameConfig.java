@@ -28,6 +28,7 @@ public class GameConfig
     private int ceilingLevel;
     private boolean returnToStartAtGround;
     private int targetDist;
+    private boolean targetPlayers;
     private int countdown;
     private int minPlayers;
     private int maxPlayers;
@@ -65,6 +66,7 @@ public class GameConfig
         }
 
         this.targetDist = plugin.getConfig().getInt( configPath + "target_dist", 150 );
+        this.targetPlayers = plugin.getConfig().getBoolean( configPath + "target_players", true );
 
         this.countdown = plugin.getConfig().getInt( configPath + "countdown", 30 );
         this.minPlayers = plugin.getConfig().getInt( configPath + "min_players", 2 );
@@ -171,6 +173,7 @@ public class GameConfig
         plugin.getConfig().set( configPath + "ceiling", this.ceilingLevel );
         plugin.getConfig().set( configPath + "return_to_start_at_ground", this.returnToStartAtGround );
         plugin.getConfig().set( configPath + "target_dist", this.targetDist );
+        plugin.getConfig().set( configPath + "target_players", this.targetPlayers );
 
         plugin.getConfig().set( configPath + "countdown", this.countdown );
         plugin.getConfig().set( configPath + "min_players", this.minPlayers );
@@ -349,6 +352,18 @@ public class GameConfig
     public int getTargetDist()
     {
         return targetDist;
+    }
+
+    public boolean canTargetPlayers()
+    {
+        return targetPlayers;
+    }
+
+    public void setTargetPlayers( boolean newTargetPlayers )
+    {
+        targetPlayers = newTargetPlayers;
+        this.setConfig();
+        plugin.saveConfig();
     }
 
     public Location getLobbySpawn() {
@@ -583,6 +598,7 @@ public class GameConfig
                 sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Return to start at ground: &3" + ( this.returnToStartAtGround ? "true" : "false" ) ) );
                 break;
         }
+        sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Target players in air: &3" + ( this.targetPlayers ? "true" : "false" ) ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Target distance: &3" + this.targetDist ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Start countdown: &3" + this.countdown ) );
         sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', "&5|&f Countdown announcement period: &3" + this.countdownAnnounceTime ) );

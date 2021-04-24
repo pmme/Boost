@@ -104,6 +104,7 @@ bar:
 #      ceiling: -1
 #      return_to_start_at_ground: false
 #      target_dist: 150
+#      target_players: true
 #      countdown: 30
 #      min_players: 2
 #      max_players: 0
