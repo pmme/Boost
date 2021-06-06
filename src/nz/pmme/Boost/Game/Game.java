@@ -39,7 +39,13 @@ public class Game implements Comparable<Game>
         this.gameState = GameState.STOPPED;
         this.aPlayerHasLost = false;
 
-        if( this.gameConfig.isAutoQueue() && this.gameConfig.isProperlyConfigured() ) this.startQueuing();
+        if( this.gameConfig.isAutoQueue() && this.gameConfig.isProperlyConfigured() ) {
+            if( this.gameConfig.getGameType() != GameType.PARKOUR ) {
+                this.startQueuing();
+            } else {
+                this.start();
+            }
+        }
     }
 
     @Override
@@ -107,7 +113,7 @@ public class Game implements Comparable<Game>
             plugin.messageSender( player, Messages.GAME_NOT_AVAILABLE, gameConfig.getDisplayName() );
             return false;
         }
-        if( gameState != GameState.QUEUING )
+        if( this.gameConfig.getGameType() != GameType.PARKOUR && gameState != GameState.QUEUING )
         {
             switch( gameState )
             {
@@ -118,6 +124,11 @@ public class Game implements Comparable<Game>
                     plugin.messageSender( player, Messages.NO_JOIN_GAME_STOPPED, gameConfig.getDisplayName() );
                     break;
             }
+            return false;
+        }
+        else if( this.gameConfig.getGameType() == GameType.PARKOUR && gameState == GameState.STOPPED )
+        {
+            plugin.messageSender( player, Messages.NO_JOIN_GAME_STOPPED, gameConfig.getDisplayName() );
             return false;
         }
         if( gameConfig.getMaxPlayers() > 0 && this.getPlayerCount() >= gameConfig.getMaxPlayers() )
@@ -134,15 +145,26 @@ public class Game implements Comparable<Game>
             if( playersRequired > 0 ) plugin.messageSender( playerInfo.getPlayer(), messagePlayerCount );
         }
 
-        players.put( player.getUniqueId(), new PlayerInfo( player ) );
+        PlayerInfo playerInfo = new PlayerInfo( player );
+        if( gameConfig.getGameType() == GameType.PARKOUR ) playerInfo.setActive();
+        players.put( player.getUniqueId(), playerInfo );
         player.setVelocity( Game.VECTOR0 );
         player.setFlying( false );
-        player.teleport( gameConfig.getLobbySpawn() );
-        player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
+        if( gameConfig.getGameType() != GameType.PARKOUR ) {
+            player.teleport( gameConfig.getLobbySpawn() );
+            player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
+        } else {
+            player.teleport( gameConfig.getStartSpawn() );
+            player.setGameMode( plugin.getLoadedConfig().getPlayingGameMode() );
+        }
         plugin.messageSender( player, Messages.JOIN_GAME, gameConfig.getDisplayName() );
         if( playersRequired > 0 ) plugin.messageSender( player, messagePlayerCount );
         plugin.getDataHandler().addPlayer( player.getUniqueId(), player.getDisplayName(), null );
         plugin.getDataHandler().addPlayer( player.getUniqueId(), player.getDisplayName(), gameConfig.getName() );
+        if( gameConfig.getGameType() == GameType.PARKOUR ) {
+            plugin.getDataHandler().logGame( player.getUniqueId(), player.getDisplayName(), null );
+            plugin.getDataHandler().logGame( player.getUniqueId(), player.getDisplayName(), gameConfig.getName() );
+        }
         player.playSound( player.getLocation(), plugin.getLoadedConfig().getJoinSound(), 1, 1 );
 
         plugin.getInventoryManager().giveBoostSticks( player );
@@ -172,7 +194,7 @@ public class Game implements Comparable<Game>
                 gameState = GameState.STOPPED;
                 this.end( false );
                 return;
-            } else if( activePlayers.size() == 1 && this.getGameConfig().getGameType() != GameType.PARKOUR ) {
+            } else if( activePlayers.size() == 1 && gameConfig.getGameType() != GameType.PARKOUR ) {
                 gameState = GameState.STOPPED;
                 if( this.aPlayerHasLost ) this.playerWon( activePlayers.get(0) ); // Can only win if at least one player has lost. If everyone else quits the game just ends.
                 this.end( false );
@@ -243,11 +265,27 @@ public class Game implements Comparable<Game>
 
     public void setPlayerWon( Player player )
     {
-        if( gameState == GameState.RUNNING )
-        {
-            gameState = GameState.STOPPED;
-            this.playerWon( player );
-            this.end( false );
+        if( gameState == GameState.RUNNING ) {
+            if( gameConfig.getGameType() != GameType.PARKOUR ) {
+                gameState = GameState.STOPPED;
+                this.playerWon( player );
+                this.end( false );
+            } else {
+                this.playerWon( player );
+
+                PlayerInfo playerInfo = players.get( player.getUniqueId() );
+                if( playerInfo != null ) playerInfo.resetCoolDown();
+                players.remove( player.getUniqueId() );
+                player.setVelocity( Game.VECTOR0 );
+                player.setFlying( false );
+                player.teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
+                player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
+                plugin.getInventoryManager().removeBoostItems( player );
+                plugin.getInventoryManager().giveInstructionBook( player );
+                plugin.getInventoryManager().giveMainGuiItem( player, true );
+
+                plugin.getGameManager().removePlayer( player );
+            }
         }
     }
 
@@ -256,8 +294,12 @@ public class Game implements Comparable<Game>
         String message = plugin.formatMessage( Messages.WINNER, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
         player.playSound( player.getLocation(), plugin.getLoadedConfig().getWinSound(), 0.75f, 1 );
         player.playSound( plugin.getLoadedConfig().getMainLobbySpawn(), plugin.getLoadedConfig().getWinSound(), 0.75f, 1 );     // The player is about to be teleported to the mainLobbySpawn.
-        for( PlayerInfo playerInfo : players.values() ) {
-            plugin.messageSender( playerInfo.getPlayer(), message );
+        if( gameConfig.getGameType() != GameType.PARKOUR ) {
+            for( PlayerInfo playerInfo : players.values() ) {
+                plugin.messageSender( playerInfo.getPlayer(), message );
+            }
+        } else {
+            plugin.messageSender( player, message );
         }
         plugin.getDataHandler().logWin( player.getUniqueId(), player.getDisplayName(), null );
         plugin.getDataHandler().logWin( player.getUniqueId(), player.getDisplayName(), gameConfig.getName() );
@@ -380,7 +422,13 @@ public class Game implements Comparable<Game>
         }
         players.clear();
         this.aPlayerHasLost = false;
-        if( gameConfig.isAutoQueue() /*&& !wasQueuing*/ && !noAutoQueue ) this.startQueuing();
+        if( gameConfig.isAutoQueue() /*&& !wasQueuing*/ && !noAutoQueue ) {
+            if( gameConfig.getGameType() != GameType.PARKOUR ) {
+                this.startQueuing();
+            } else {
+                this.start();
+            }
+        }
         return true;
     }
 }
