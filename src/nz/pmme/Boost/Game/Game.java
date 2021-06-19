@@ -77,7 +77,7 @@ public class Game implements Comparable<Game>
             @Override
             public void run() {
                 if( !plugin.isBoostEnabled() ) return;
-                if( getPlayerCount() < gameConfig.getMinPlayers() ) {
+                if( getPlayerCount() < gameConfig.getMinPlayers() || getPlayerCount() == 0 ) {
                     remainingQueueTime = gameConfig.getCountdown();
                 } else {
                     if( remainingQueueTime <= 0 ) {
