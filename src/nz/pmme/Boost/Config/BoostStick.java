@@ -42,9 +42,9 @@ public class BoostStick
                 lore.add( ChatColor.translateAlternateColorCodes( '&', string ) );
             }
 
-            this.boostParticle = new BoostParticle( this.plugin, boostSticksConfig, configPath + "particles.boost", null );
-            this.boostHitParticle = new BoostParticle( this.plugin, boostSticksConfig, configPath + "particles.hit", null );
-            this.boostedParticle = new BoostParticle( this.plugin, boostSticksConfig, configPath + "particles.boosted", null );
+            this.boostParticle = new BoostParticle( this.plugin, boostSticksConfig, configPath + "particles.boost" );
+            this.boostHitParticle = new BoostParticle( this.plugin, boostSticksConfig, configPath + "particles.hit" );
+            this.boostedParticle = new BoostParticle( this.plugin, boostSticksConfig, configPath + "particles.boosted" );
         }
         else
         {

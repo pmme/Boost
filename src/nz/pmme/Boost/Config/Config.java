@@ -331,14 +331,14 @@ public class Config
         return somethingWasAdded;
     }
 
-    private <T extends Enum<T>> T tryGetEnumValueFromConfig( Class<T> enumType, String path, String def )
+    private <T extends Enum<T>> T tryGetEnumValueFromConfig( Class<T> enumType, String path )
     {
         try {
-            String value = plugin.getConfig().getString( path, def );
+            String value = plugin.getConfig().getString( path );
             if( value == null || value.equals( "" ) ) return null;
             return T.valueOf( enumType, value.toUpperCase() );
         } catch( IllegalArgumentException e ) {
-            plugin.getLogger().warning( "Enum " + enumType.getName() + " " + plugin.getConfig().getString( path, def ) + " not recognised." );
+            plugin.getLogger().warning( "Enum " + enumType.getName() + " " + plugin.getConfig().getString( path ) + " not recognised." );
             return null;
         }
     }
@@ -356,56 +356,56 @@ public class Config
         this.loadStatsResetConfig();
 
         // targetDistance is the radius from the centre block, so a box of 3 blocks is (3-1)/2 = 1 block bigger than the main block. 1 block is (1-1)/2 = 0 blocks bigger, or just the main block.
-        targetBoxH = ( plugin.getConfig().getInt( "physics.target_box_width", 3 ) - 1 ) / 2;
-        targetBoxV = plugin.getConfig().getInt( "physics.target_box_height", 1 );
-        vertical_velocity = plugin.getConfig().getDouble( "physics.vertical_velocity", 2.0 );
-        max_horizontal_velocity = plugin.getConfig().getDouble( "physics.max_horizontal_velocity", 2.5 );
-        min_horizontal_velocity = plugin.getConfig().getDouble( "physics.min_horizontal_velocity", 0.1 );
-        block_hit_horizontal_velocity = plugin.getConfig().getDouble( "physics.block_hit_horizontal_velocity", 2.5 );
-        coolDown = plugin.getConfig().getLong( "physics.cooldown", 500L );
+        targetBoxH = ( plugin.getConfig().getInt( "physics.target_box_width" ) - 1 ) / 2;
+        targetBoxV = plugin.getConfig().getInt( "physics.target_box_height" );
+        vertical_velocity = plugin.getConfig().getDouble( "physics.vertical_velocity" );
+        max_horizontal_velocity = plugin.getConfig().getDouble( "physics.max_horizontal_velocity" );
+        min_horizontal_velocity = plugin.getConfig().getDouble( "physics.min_horizontal_velocity" );
+        block_hit_horizontal_velocity = plugin.getConfig().getDouble( "physics.block_hit_horizontal_velocity" );
+        coolDown = plugin.getConfig().getLong( "physics.cooldown" );
         gameStartBoostDelay = plugin.getConfig().getLong( "physics.game_start_boost_delay", 5L );
 
-        signTitle = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.title", "[Boost]" ) );
-        signJoin = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.join", "Click to join" ) );
-        signLeave = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.leave", "Click to leave" ) );
-        signStatus = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.status", "Click for status" ) );
-        signStats = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.stats", "Your stats" ) );
-        signTop = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.top", "Leader board" ) );
-        signDaily = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.daily", "Daily" ) );
-        signWeekly = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.weekly", "Weekly" ) );
-        signMonthly = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.monthly", "Monthly" ) );
-        signTotal = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.total", "All time" ) );
-        signWin = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.win", "Click to WIN!" ) );
+        signTitle = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.title" ) );
+        signJoin = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.join" ) );
+        signLeave = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.leave" ) );
+        signStatus = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.status" ) );
+        signStats = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.stats" ) );
+        signTop = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.top" ) );
+        signDaily = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.daily" ) );
+        signWeekly = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.weekly" ) );
+        signMonthly = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.monthly" ) );
+        signTotal = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.total" ) );
+        signWin = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "signs.win" ) );
 
         mainLobbySpawn = new SpawnLocation( plugin, "main_lobby" );
 
-        worldSoundRange = plugin.getConfig().getInt( "sounds.world_sound_range", 80 );
-        tickSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.tick", "ITEM_FLINTANDSTEEL_USE" );
-        joinSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.join", "UI_LOOM_SELECT_PATTERN" );
-        leaveSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.leave", "UI_LOOM_TAKE_RESULT" );
-        startSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.start", "ENTITY_EVOKER_PREPARE_SUMMON" );
-        winSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.win", "UI_TOAST_CHALLENGE_COMPLETE" );
-        loseSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.lose", "ENTITY_GHAST_HURT" );
-        boostSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.boost", "ITEM_TRIDENT_THROW" );
-        boostedSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.boosted", "ITEM_TRIDENT_RIPTIDE_3" );
-        statsSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.stats", "ENTITY_ENDER_EYE_DEATH" );
-        leaderSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.leader", "ENTITY_ENDER_EYE_DEATH" );
+        worldSoundRange = plugin.getConfig().getInt( "sounds.world_sound_range" );
+        tickSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.tick" );
+        joinSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.join" );
+        leaveSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.leave" );
+        startSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.start" );
+        winSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.win" );
+        loseSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.lose" );
+        boostSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.boost" );
+        boostedSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.boosted" );
+        statsSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.stats" );
+        leaderSound = this.tryGetEnumValueFromConfig( Sound.class, "sounds.leader" );
 
-        playingGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.playing", "ADVENTURE" ).toUpperCase() );
-        lostGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lost", "SPECTATOR" ).toUpperCase() );
-        lobbyGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lobby", "ADVENTURE" ).toUpperCase() );
-        buildGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.build", "CREATIVE" ).toUpperCase() );
+        playingGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.playing" ).toUpperCase() );
+        lostGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lost" ).toUpperCase() );
+        lobbyGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.lobby" ).toUpperCase() );
+        buildGameMode = GameMode.valueOf( plugin.getConfig().getString( "gamemode.build" ).toUpperCase() );
 
-        boostWhileQueuing = plugin.getConfig().getBoolean( "boost_while_queuing", false );
-        glowAfterBoost = plugin.getConfig().getBoolean( "glow_after_boost", true );
-        commandsBlockedWhilePlaying = plugin.getConfig().getBoolean( "other_commands.block_while_playing", true );
+        boostWhileQueuing = plugin.getConfig().getBoolean( "boost_while_queuing" );
+        glowAfterBoost = plugin.getConfig().getBoolean( "glow_after_boost" );
+        commandsBlockedWhilePlaying = plugin.getConfig().getBoolean( "other_commands.block_while_playing" );
         for( String command : plugin.getConfig().getStringList( "other_commands.allowed_commands" ) ) {
             commandsAllowedWhilePlaying.add( command.toLowerCase() );
         }
 
-        boostParticle = new BoostParticle( this.plugin, this.plugin.getConfig(), "particles.boost", null );
-        boostHitParticle = new BoostParticle( this.plugin, this.plugin.getConfig(), "particles.hit", null );
-        boostedParticle = new BoostParticle( this.plugin, this.plugin.getConfig(), "particles.boosted", null );
+        boostParticle = new BoostParticle( this.plugin, this.plugin.getConfig(), "particles.boost" );
+        boostHitParticle = new BoostParticle( this.plugin, this.plugin.getConfig(), "particles.hit" );
+        boostedParticle = new BoostParticle( this.plugin, this.plugin.getConfig(), "particles.boosted" );
 
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             if( statsPeriod == StatsPeriod.TOTAL ) break;
@@ -416,8 +416,8 @@ public class Config
             winCommands.put( statsPeriod, periodicWinCommands );
         }
 
-        gameStartBoostDelayBarColor = this.tryGetEnumValueFromConfig( BarColor.class, "bar.game_start_boost_delay.color", "BLUE" );
-        int segments = plugin.getConfig().getInt( "bar.game_start_boost_delay.segments", 0 );
+        gameStartBoostDelayBarColor = this.tryGetEnumValueFromConfig( BarColor.class, "bar.game_start_boost_delay.color" );
+        int segments = plugin.getConfig().getInt( "bar.game_start_boost_delay.segments" );
         switch( segments ) {
             case 0: gameStartBoostDelayBarStyle = BarStyle.SOLID; break;
             case 6: gameStartBoostDelayBarStyle = BarStyle.SEGMENTED_6; break;
@@ -430,9 +430,9 @@ public class Config
                 break;
         }
 
-        boostStickRandom = sticksConfig.getBoolean( "boost_sticks.random", true );
+        boostStickRandom = sticksConfig.getBoolean( "boost_sticks.random" );
         defaultBoostStick = sticksConfig.getString( "boost_sticks.default" );
-        giveOnlyBestBoostStick = sticksConfig.getBoolean( "boost_sticks.give_only_best", false );
+        giveOnlyBestBoostStick = sticksConfig.getBoolean( "boost_sticks.give_only_best" );
         ConfigurationSection boostSticksSection = sticksConfig.getConfigurationSection( "boost_sticks.stick_types" );
         if( boostSticksSection != null ) {
             for( String boostStickName : boostSticksSection.getKeys( false ) ) {
@@ -442,8 +442,8 @@ public class Config
             }
         }
 
-        guiName = guiConfig.getString( "gui.name", "Boost menu" );
-        guiRows = guiConfig.getInt( "gui.rows", 4 );
+        guiName = guiConfig.getString( "gui.name" );
+        guiRows = guiConfig.getInt( "gui.rows" );
         ConfigurationSection guiButtonsSection = guiConfig.getConfigurationSection( "gui.buttons" );
         if( guiButtonsSection != null ) {
             for( String guiButtonName : guiButtonsSection.getKeys( false ) ) {
@@ -680,8 +680,9 @@ public class Config
     public GUIButtonConfig getGuiButtonConfig( String name ) {
         GUIButtonConfig guiButtonConfig = guiButtons.get( name.toLowerCase() );
         if( guiButtonConfig == null ) {
-            guiButtonConfig = new GUIButtonConfig( plugin, name.toLowerCase(), null );
-            guiButtons.put( name, guiButtonConfig );
+            plugin.getLogger().severe( "Missing gui.yml configuration for gui.buttons." + name.toLowerCase() );
+            guiButtonConfig = new GUIButtonConfig( plugin, name.toLowerCase(), guiConfig );
+            guiButtons.put( guiButtonConfig.getName(), guiButtonConfig );
         }
         return guiButtonConfig;
     }

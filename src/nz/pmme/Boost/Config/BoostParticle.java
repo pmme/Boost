@@ -15,14 +15,14 @@ public class BoostParticle
     private int number = 1;
     private double spacing = 1.0;
 
-    public BoostParticle( Main plugin, ConfigurationSection config, String configPath, String def )
+    public BoostParticle( Main plugin, ConfigurationSection config, String configPath )
     {
         this.plugin = plugin;
-        String particleName = config.getString( configPath + ".particle", def );
+        String particleName = config.getString( configPath + ".particle" );
         try {
             this.particle = ( particleName == null || particleName.equals( "" ) ) ? null : Particle.valueOf( particleName.toUpperCase() );
         } catch( IllegalArgumentException e ) {
-            plugin.getLogger().warning( "Particle " + config.getString( configPath + ".particle", def ) + " not recognised." );
+            plugin.getLogger().warning( "Particle " + config.getString( configPath + ".particle" ) + " not recognised." );
         }
         if( this.particle != null ) {
             if( this.particle.getDataType().getName().equals( "BlockData" ) ) {

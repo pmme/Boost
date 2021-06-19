@@ -31,17 +31,17 @@ public class GUIButtonConfig
         final String configPath = "gui.buttons." + this.name + ".";
         if( guiConfig != null )
         {
-            this.enabled = guiConfig.getBoolean( configPath + "enabled", true );
-            this.displayName = guiConfig.getString( configPath + "name", this.name );
-            String item = guiConfig.getString( configPath + "item", "COBBLESTONE" ).toUpperCase();
+            this.enabled = guiConfig.getBoolean( configPath + "enabled" );
+            this.displayName = guiConfig.getString( configPath + "name" );
+            String item = guiConfig.getString( configPath + "item" ).toUpperCase();
             this.material = Material.getMaterial( item );
             if( this.material == null ) {
                 this.material = Material.COBBLESTONE;
                 plugin.getLogger().severe( "Material " + item + " for gui item " + this.name + " is invalid." );
             }
             this.lore.addAll( guiConfig.getStringList( configPath + "lore" ) );
-            this.row = guiConfig.getInt( configPath + "row", 0 );
-            this.col = guiConfig.getInt( configPath + "col", 0 );
+            this.row = guiConfig.getInt( configPath + "row" );
+            this.col = guiConfig.getInt( configPath + "col" );
         }
         else
         {

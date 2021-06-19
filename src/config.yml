@@ -51,7 +51,7 @@ boost_while_queuing: false
 glow_after_boost: true
 
 other_commands:
-  block_while_playing: true;
+  block_while_playing: true
   allowed_commands:
     - 'boost'
     - 'msg'

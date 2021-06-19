@@ -50,6 +50,8 @@ public class Main extends JavaPlugin
         if( this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new nz.pmme.Boost.papi.BoostExpansion(this).register();
         }
+
+        this.getLogger().info( "Boost " + this.getDescription().getVersion() + " enabled." );
     }
 
     @Override

@@ -22,10 +22,10 @@ public class InstructionBook
     {
         this.plugin = plugin;
 
-        this.enabled = messagesConfig.getBoolean( "instructions.enabled", true );
+        this.enabled = messagesConfig.getBoolean( "instructions.enabled" );
 
-        this.instructionsTitle = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "instructions.title", "Boost Instructions" ) );
-        this.instructionsAuthor = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "instructions.author", "Boost" ) );
+        this.instructionsTitle = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "instructions.title" ) );
+        this.instructionsAuthor = ChatColor.translateAlternateColorCodes( '&', messagesConfig.getString( "instructions.author" ) );
 
         for( int pageNum = 1; ; ++pageNum )
         {
