@@ -55,6 +55,7 @@ public class GUIButtonConfig
         if( this.row == 0 ) {
             switch( this.name ) {
                 case "join":
+                case "join_parkour":
                 case "leave":
                     this.row = 2;
                     break;
@@ -70,6 +71,7 @@ public class GUIButtonConfig
         if( this.col == 0 ) {
             switch( this.name ) {
                 case "join":
+                case "join_parkour":
                 case "leave":
                     this.col = 5;
                     break;
