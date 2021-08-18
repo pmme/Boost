@@ -1,5 +1,5 @@
 name: Boost
-version: 1.18.0
+version: 1.19.0
 author: pmme
 api-version: 1.13
 main: nz.pmme.Boost.Main
