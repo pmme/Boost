@@ -18,6 +18,15 @@ gui:
         - "&7%min% players required"
       row: 2
       col: 5
+    join_parkour:
+      enabled: true
+      item: "GLASS"
+      name: "&f加入游戏 %game%"
+      lore:
+        - "&7点击加入"
+        - "&f%players% players"
+      row: 2
+      col: 5
     leave:
       enabled: true
       item: "IRON_DOOR"

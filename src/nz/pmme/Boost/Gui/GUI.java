@@ -1,6 +1,7 @@
 package nz.pmme.Boost.Gui;
 
 import nz.pmme.Boost.Config.GUIButtonConfig;
+import nz.pmme.Boost.Enums.GameType;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
@@ -50,13 +51,13 @@ public class GUI implements InventoryHolder
             if( joinButtonConfig.isEnabled() ) {
                 int queuingGames = 0;
                 for( Game game : plugin.getGameManager().getGames() ) {
-                    if( game.isQueuing() ) ++queuingGames;
+                    if( game.isQueuing() || ( game.getGameConfig().getGameType() == GameType.PARKOUR && game.isRunning() ) ) ++queuingGames;
                 }
                 int gameSlot = this.calcSlot( joinButtonConfig.getRow(), joinButtonConfig.getCol() );
                 if( joinButtonConfig.getCol() == rowSize/2+1 ) gameSlot -= queuingGames / 2;
                 else if( joinButtonConfig.getCol() == rowSize ) gameSlot -= queuingGames;
                 for( Game game : plugin.getGameManager().getGames() ) {
-                    if( game.isQueuing() ) {
+                    if( game.isQueuing() || ( game.getGameConfig().getGameType() == GameType.PARKOUR && game.isRunning() ) ) {
                         int slot = this.addButton( gameSlot++, new GUIButtonJoin( this.plugin, game ) );
                         slotsOccupied[slot] = true;
                     }

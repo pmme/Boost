@@ -1,5 +1,6 @@
 package nz.pmme.Boost.Gui;
 
+import nz.pmme.Boost.Enums.GameType;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
 import nz.pmme.Utils.PairedValue;
@@ -30,7 +31,7 @@ public class GUIButtonJoin implements GUIButton
         placeHolders.add( new PairedValue<String,String>( "%players%", String.valueOf( this.game.getPlayerCount() ) ) );
         placeHolders.add( new PairedValue<String,String>( "%min%", String.valueOf( this.game.getGameConfig().getMinPlayers() ) ) );
         placeHolders.add( new PairedValue<String,String>( "%max%", String.valueOf( this.game.getGameConfig().getMaxPlayers() ) ) );
-        return this.plugin.getLoadedConfig().getGuiButtonConfig( "join" ).create( placeHolders, this.guiItemOverride );
+        return this.plugin.getLoadedConfig().getGuiButtonConfig( game.getGameConfig().getGameType() == GameType.PARKOUR ? "join_parkour" : "join" ).create( placeHolders, this.guiItemOverride );
     }
 
     @Override
