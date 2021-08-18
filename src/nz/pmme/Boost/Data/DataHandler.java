@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class DataHandler
 {
-    private static final int thisVersion = 2;
+    private static final int thisVersion = 3;
     private Plugin plugin;
     private Database database;
 
@@ -36,7 +36,7 @@ public class DataHandler
 
             for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
                 PreparedStatement preparedStatsStatement;
-                preparedStatsStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL,game_name VARCHAR(255))");
+                preparedStatsStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL,best_time INTEGER,last_time INTEGER,time_sum INTEGER,game_name VARCHAR(255))");
                 preparedStatsStatement.executeUpdate();
                 preparedStatsStatement.close();
             }
@@ -86,10 +86,14 @@ public class DataHandler
                 // Upgrade the table structure to this version.
                 for( StatsPeriod statsPeriod : StatsPeriod.values() )
                 {
-                    preparedStatement = connection.prepareStatement( "CREATE TABLE updated_" + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL,game_name VARCHAR(255));" );
+                    preparedStatement = connection.prepareStatement( "CREATE TABLE updated_" + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL,best_time INTEGER,last_time INTEGER,time_sum INTEGER,game_name VARCHAR(255));" );
                     preparedStatement.executeUpdate();
                     preparedStatement.close();
-                    preparedStatement = connection.prepareStatement( "INSERT INTO updated_" + statsPeriod.getTable() + "(player_id,player_name,games,wins,losses) SELECT player_id,player_name,games,wins,losses FROM " + statsPeriod.getTable() + ";" );
+                    if( version == 1 ) {
+                        preparedStatement = connection.prepareStatement( "INSERT INTO updated_" + statsPeriod.getTable() + "(player_id,player_name,games,wins,losses) SELECT player_id,player_name,games,wins,losses FROM " + statsPeriod.getTable() + ";" );
+                    } else if( version == 2 ) {
+                        preparedStatement = connection.prepareStatement( "INSERT INTO updated_" + statsPeriod.getTable() + "(player_id,player_name,games,wins,losses,game_name) SELECT player_id,player_name,games,wins,losses,game_name FROM " + statsPeriod.getTable() + ";" );
+                    }
                     preparedStatement.executeUpdate();
                     preparedStatement.close();
                     preparedStatement = connection.prepareStatement( "DROP TABLE " + statsPeriod.getTable() + ";" );
@@ -190,6 +194,36 @@ public class DataHandler
     {
         for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
             this.updateCountColumn( statsPeriod, playerId, playerName, gameName, "wins" );
+        }
+    }
+
+    private void updateTimeColumn( StatsPeriod statsPeriod, UUID playerId, String playerName, String gameName, long time )
+    {
+        Connection connection = this.database.getConnection();
+        if( connection == null ) return;
+        try {
+            String updateSql = "UPDATE " + statsPeriod.getTable() + " SET player_name=?, best_time=iif( (best_time IS NULL) OR (best_time>?), ?, best_time ), last_time=?, time_sum=iif( (time_sum IS NULL), ?, time_sum+?) WHERE player_id=? AND game_name=?";
+            PreparedStatement updateGamesStatement = connection.prepareStatement( updateSql );
+            updateGamesStatement.setString( 1, playerName );
+            updateGamesStatement.setLong( 2, time );
+            updateGamesStatement.setLong( 3, time );
+            updateGamesStatement.setLong( 4, time );
+            updateGamesStatement.setLong( 5, time );
+            updateGamesStatement.setLong( 6, time );
+            updateGamesStatement.setString( 7, playerId.toString() );
+            updateGamesStatement.setString( 8, gameName.toLowerCase() );
+            updateGamesStatement.executeUpdate();
+            updateGamesStatement.close();
+        } catch( SQLException sQLException ) {
+            plugin.getLogger().severe( "Failed to update " + statsPeriod.getTable() + " win_time for player " + playerId.toString() + " in game " + gameName );
+            sQLException.printStackTrace();
+        }
+    }
+
+    public void logTimeToWin( UUID playerId, String playerName, long time, String gameName )
+    {
+        for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
+            this.updateTimeColumn( statsPeriod, playerId, playerName, gameName, time );
         }
     }
 

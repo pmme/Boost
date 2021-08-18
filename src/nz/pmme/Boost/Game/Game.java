@@ -291,6 +291,9 @@ public class Game implements Comparable<Game>
 
     private void playerWon( Player player )
     {
+        PlayerInfo winningPlayerInfo = players.get( player.getUniqueId() );
+        long time = winningPlayerInfo != null ? winningPlayerInfo.getTimePlaying() : 0L;
+
         String message = plugin.formatMessage( Messages.WINNER, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
         player.playSound( player.getLocation(), plugin.getLoadedConfig().getWinSound(), 0.75f, 1 );
         player.playSound( plugin.getLoadedConfig().getMainLobbySpawn(), plugin.getLoadedConfig().getWinSound(), 0.75f, 1 );     // The player is about to be teleported to the mainLobbySpawn.
@@ -303,6 +306,7 @@ public class Game implements Comparable<Game>
         }
         plugin.getDataHandler().logWin( player.getUniqueId(), player.getDisplayName(), null );
         plugin.getDataHandler().logWin( player.getUniqueId(), player.getDisplayName(), gameConfig.getName() );
+        plugin.getDataHandler().logTimeToWin( player.getUniqueId(), player.getDisplayName(), time, gameConfig.getName() );
         plugin.getLoadedConfig().runWinCommands( player.getUniqueId(), this.getGameConfig().getDisplayName(), this.getGameConfig().getWinCommands() );
     }
 
