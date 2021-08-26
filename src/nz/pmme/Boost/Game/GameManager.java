@@ -3,6 +3,7 @@ package nz.pmme.Boost.Game;
 import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Data.PlayerStats;
+import nz.pmme.Boost.Enums.GameType;
 import nz.pmme.Boost.Enums.StatsPeriod;
 import nz.pmme.Boost.Exceptions.GameAlreadyExistsException;
 import nz.pmme.Boost.Exceptions.GameDoesNotExistException;
@@ -270,17 +271,22 @@ public class GameManager
         String playerName = player.getName();
         Game game = gameName != null ? plugin.getGameManager().getGame( gameName ) : null;
         String gameDisplayName = game != null ? game.getGameConfig().getDisplayName() : "";
+        boolean isParkour = game != null && game.getGameConfig().getGameType() == GameType.PARKOUR;
+        List<String> playerStatsTemplate = isParkour ? plugin.getLoadedConfig().getPlayerParkourStatsTemplate() : plugin.getLoadedConfig().getPlayerStatsTemplate();
         List<String> playerStatsMessage = new ArrayList<>();
-        PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( StatsPeriod.TOTAL, player.getUniqueId(), gameName );
+        PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( StatsPeriod.TOTAL, player.getUniqueId(), gameName, isParkour );
         if( playerStats == null ) {
             plugin.messageSender( sender, Messages.PLAYER_NO_STATS, "", "%player%", playerName != null ? playerName : player.getUniqueId().toString() );
         } else {
-            for( String string : plugin.getLoadedConfig().getPlayerStatsTemplate() ) {
+            for( String string : playerStatsTemplate ) {
                 playerStatsMessage.add( ChatColor.translateAlternateColorCodes( '&', string
                         .replaceAll( "%player%", playerName != null ? playerName : player.getUniqueId().toString() )
                         .replaceAll( "%games%", String.valueOf( playerStats.getGames() ) )
                         .replaceAll( "%wins%", String.valueOf( playerStats.getWins() ) )
                         .replaceAll( "%losses%", String.valueOf( playerStats.getLosses() ) )
+                        .replaceAll( "%best_time%", String.valueOf( (double)playerStats.getBestTime()/1000.0 ) )
+                        .replaceAll( "%last_time%", String.valueOf( (double)playerStats.getLastTime()/1000.0 ) )
+                        .replaceAll( "%avg_time%", String.valueOf( (double)playerStats.getAverageTime()/1000.0 ) )
                         .replaceAll( "%rank%", String.valueOf( playerStats.getRank() ) )
                         .replaceAll( "%game%", gameDisplayName )
                 ) );
@@ -296,18 +302,23 @@ public class GameManager
     {
         Game game = gameName != null ? plugin.getGameManager().getGame( gameName ) : null;
         String gameDisplayName = game != null ? game.getGameConfig().getDisplayName() : "";
+        boolean isParkour = game != null && game.getGameConfig().getGameType() == GameType.PARKOUR;
+        String playerEntryTemplate = isParkour ? plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_ENTRY_PARKOUR ) : plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_ENTRY );
         List<String> leaderBoardMessage = new ArrayList<>();
         leaderBoardMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_TITLE ) ) );
-        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard( statsPeriod, gameName, 10, false );
+        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard( statsPeriod, gameName, 10, false, isParkour );
         if( playerStatsList != null ) {
             int index = 1;
             for( PlayerStats playerStats : playerStatsList ) {
-                leaderBoardMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_ENTRY )
+                leaderBoardMessage.add( ChatColor.translateAlternateColorCodes( '&', playerEntryTemplate
                         .replaceAll( "%index%", String.valueOf( index++ ) )
                         .replaceAll( "%player%", playerStats.getName() )
                         .replaceAll( "%games%", String.valueOf( playerStats.getGames() ) )
                         .replaceAll( "%wins%", String.valueOf( playerStats.getWins() ) )
                         .replaceAll( "%losses%", String.valueOf( playerStats.getLosses() ) )
+                        .replaceAll( "%best_time%", String.valueOf( (double)playerStats.getBestTime()/1000.0 ) )
+                        .replaceAll( "%last_time%", String.valueOf( (double)playerStats.getLastTime()/1000.0 ) )
+                        .replaceAll( "%avg_time%", String.valueOf( (double)playerStats.getAverageTime()/1000.0 ) )
                         .replaceAll( "%game%", gameDisplayName )
                 ) );
             }

@@ -8,6 +8,7 @@ public class PlayerInfo
     private Player player;
     private PlayerGameState playerGameState;
     private long coolDownEndMillis = 0L;
+    private long startMillis = 0L;
 
     public PlayerInfo( Player player )
     {
@@ -25,6 +26,7 @@ public class PlayerInfo
 
     public void setActive() {
         playerGameState = PlayerGameState.ACTIVE;
+        startMillis = System.currentTimeMillis();
     }
 
     public void setLost() {
@@ -49,5 +51,9 @@ public class PlayerInfo
 
     public void resetCoolDown() {
         this.coolDownEndMillis = 0L;
+    }
+
+    public long getTimePlaying() {
+        return ( System.currentTimeMillis() - this.startMillis );
     }
 }

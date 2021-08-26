@@ -36,6 +36,7 @@ public enum Messages
     DELETED_STATS("deleted_stats"),
     LEADER_BOARD_TITLE("leader_board_title"),
     LEADER_BOARD_ENTRY("leader_board_entry"),
+    LEADER_BOARD_ENTRY_PARKOUR("leader_board_entry_parkour"),
     BUILD_ENABLED("build_enabled"),
     BUILD_DISABLED("build_disabled"),
     GAME_NOT_CONFIGURED("game_not_configured"),

@@ -45,6 +45,7 @@ public class Config
     private String messagePrefix;
     private EnumMap< Messages, String > messages = new EnumMap<>( Messages.class );
     private List<String> playerStatsTemplate = new ArrayList<>();
+    private List<String> playerParkourStatsTemplate = new ArrayList<>();
     private List<String> commandUsageUser = new ArrayList<>();
     private List<String> commandUsageAdmin = new ArrayList<>();
 
@@ -143,6 +144,7 @@ public class Config
         plugin.reloadConfig();
         this.messages.clear();
         this.playerStatsTemplate.clear();
+        this.playerParkourStatsTemplate.clear();
         this.commandUsageUser.clear();
         this.commandUsageAdmin.clear();
         this.boostSticks.clear();
@@ -470,6 +472,9 @@ public class Config
         for( String string : messagesConfig.getStringList( "player_stats" ) ) {
             playerStatsTemplate.add( string );
         }
+        for( String string : messagesConfig.getStringList( "player_stats_parkour" ) ) {
+            playerParkourStatsTemplate.add( string );
+        }
         for( String string : messagesConfig.getStringList( "command_usage_user" ) ) {
             commandUsageUser.add( ChatColor.translateAlternateColorCodes( '&', string ) );
         }
@@ -732,6 +737,7 @@ public class Config
     public String getMessage( Messages message ) { return messages.get( message ); }
     public String getPrefix() { return messagePrefix; }
     public List<String> getPlayerStatsTemplate() { return playerStatsTemplate; }
+    public List<String> getPlayerParkourStatsTemplate() { return playerParkourStatsTemplate; }
     public ItemStack createInstructionBook() { return instructionBook.create(); }
     public InstructionBook getInstructionBookConfig() { return instructionBook; }
 

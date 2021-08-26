@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class DataHandler
 {
-    private static final int thisVersion = 2;
+    private static final int thisVersion = 3;
     private Plugin plugin;
     private Database database;
 
@@ -36,7 +36,7 @@ public class DataHandler
 
             for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
                 PreparedStatement preparedStatsStatement;
-                preparedStatsStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL,game_name VARCHAR(255))");
+                preparedStatsStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS " + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL,best_time INTEGER,last_time INTEGER,time_sum INTEGER,game_name VARCHAR(255))");
                 preparedStatsStatement.executeUpdate();
                 preparedStatsStatement.close();
             }
@@ -86,10 +86,14 @@ public class DataHandler
                 // Upgrade the table structure to this version.
                 for( StatsPeriod statsPeriod : StatsPeriod.values() )
                 {
-                    preparedStatement = connection.prepareStatement( "CREATE TABLE updated_" + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL,game_name VARCHAR(255));" );
+                    preparedStatement = connection.prepareStatement( "CREATE TABLE updated_" + statsPeriod.getTable() + "(id INTEGER PRIMARY KEY,player_id VARCHAR(40) NOT NULL,player_name VARCHAR(255) NOT NULL,games INTEGER NOT NULL,wins INTEGER NOT NULL,losses INTEGER NOT NULL,best_time INTEGER,last_time INTEGER,time_sum INTEGER,game_name VARCHAR(255));" );
                     preparedStatement.executeUpdate();
                     preparedStatement.close();
-                    preparedStatement = connection.prepareStatement( "INSERT INTO updated_" + statsPeriod.getTable() + "(player_id,player_name,games,wins,losses) SELECT player_id,player_name,games,wins,losses FROM " + statsPeriod.getTable() + ";" );
+                    if( version == 1 ) {
+                        preparedStatement = connection.prepareStatement( "INSERT INTO updated_" + statsPeriod.getTable() + "(player_id,player_name,games,wins,losses) SELECT player_id,player_name,games,wins,losses FROM " + statsPeriod.getTable() + ";" );
+                    } else if( version == 2 ) {
+                        preparedStatement = connection.prepareStatement( "INSERT INTO updated_" + statsPeriod.getTable() + "(player_id,player_name,games,wins,losses,game_name) SELECT player_id,player_name,games,wins,losses,game_name FROM " + statsPeriod.getTable() + ";" );
+                    }
                     preparedStatement.executeUpdate();
                     preparedStatement.close();
                     preparedStatement = connection.prepareStatement( "DROP TABLE " + statsPeriod.getTable() + ";" );
@@ -193,7 +197,37 @@ public class DataHandler
         }
     }
 
-    public PlayerStats queryPlayerStats( StatsPeriod statsPeriod, UUID playerId, String gameName )
+    private void updateTimeColumn( StatsPeriod statsPeriod, UUID playerId, String playerName, String gameName, long time )
+    {
+        Connection connection = this.database.getConnection();
+        if( connection == null ) return;
+        try {
+            String updateSql = "UPDATE " + statsPeriod.getTable() + " SET player_name=?, best_time=iif( (best_time IS NULL) OR (best_time>?), ?, best_time ), last_time=?, time_sum=iif( (time_sum IS NULL), ?, time_sum+?) WHERE player_id=? AND game_name=?";
+            PreparedStatement updateGamesStatement = connection.prepareStatement( updateSql );
+            updateGamesStatement.setString( 1, playerName );
+            updateGamesStatement.setLong( 2, time );
+            updateGamesStatement.setLong( 3, time );
+            updateGamesStatement.setLong( 4, time );
+            updateGamesStatement.setLong( 5, time );
+            updateGamesStatement.setLong( 6, time );
+            updateGamesStatement.setString( 7, playerId.toString() );
+            updateGamesStatement.setString( 8, gameName.toLowerCase() );
+            updateGamesStatement.executeUpdate();
+            updateGamesStatement.close();
+        } catch( SQLException sQLException ) {
+            plugin.getLogger().severe( "Failed to update " + statsPeriod.getTable() + " win_time for player " + playerId.toString() + " in game " + gameName );
+            sQLException.printStackTrace();
+        }
+    }
+
+    public void logTimeToWin( UUID playerId, String playerName, long time, String gameName )
+    {
+        for( StatsPeriod statsPeriod : StatsPeriod.values() ) {
+            this.updateTimeColumn( statsPeriod, playerId, playerName, gameName, time );
+        }
+    }
+
+    public PlayerStats queryPlayerStats( StatsPeriod statsPeriod, UUID playerId, String gameName, boolean isParkour )
     {
         PlayerStats playerStats = null;
         Connection connection = this.database.getConnection();
@@ -206,16 +240,16 @@ public class DataHandler
             ResultSet resultSetStats = queryStatsStatement.executeQuery();
             if( resultSetStats.next() )
             {
-                String queryRankSql = "SELECT COUNT(*) FROM " + statsPeriod.getTable() + " WHERE wins>? AND game_name" + ( gameName != null ? "=?" : " IS NULL" );
+                String queryRankSql = "SELECT COUNT(*) FROM " + statsPeriod.getTable() + " WHERE " + ( isParkour ? "best_time<" : "wins>") + "? AND game_name" + ( gameName != null ? "=?" : " IS NULL" );
                 PreparedStatement queryRankStatement = connection.prepareStatement( queryRankSql );
-                queryRankStatement.setInt( 1, resultSetStats.getInt( "wins" ) );
+                queryRankStatement.setInt( 1, resultSetStats.getInt( isParkour ? "best_time" : "wins" ) );
                 if( gameName != null ) queryRankStatement.setString( 2, gameName.toLowerCase() );
                 ResultSet resultSetRank = queryRankStatement.executeQuery();
                 int rank = resultSetRank.next() ? resultSetRank.getInt(1)+1 : 0;
                 resultSetRank.close();
                 queryRankStatement.close();
 
-                playerStats = new PlayerStats( resultSetStats.getString( "player_name" ), playerId, gameName, resultSetStats.getInt( "games" ), resultSetStats.getInt( "wins" ), resultSetStats.getInt( "losses" ), rank );
+                playerStats = new PlayerStats( resultSetStats.getString( "player_name" ), playerId, gameName, resultSetStats.getInt( "games" ), resultSetStats.getInt( "wins" ), resultSetStats.getInt( "losses" ), resultSetStats.getInt( "best_time" ), resultSetStats.getInt( "last_time" ), resultSetStats.getInt( "time_sum" ), rank );
             }
             resultSetStats.close();
             queryStatsStatement.close();
@@ -249,19 +283,23 @@ public class DataHandler
         return results;
     }
 
-    public List<PlayerStats> queryLeaderBoard( StatsPeriod statsPeriod, String gameName, int numberToFetch, boolean mustHaveWon )
+    public List<PlayerStats> queryLeaderBoard( StatsPeriod statsPeriod, String gameName, int numberToFetch, boolean mustHaveWon, boolean isParkour )
     {
         List<PlayerStats> leaderBoard = new ArrayList<>();
         Connection connection = this.database.getConnection();
         if( connection == null ) return leaderBoard;
         try {
-            String queryLeaderBoardSql = "SELECT * FROM " + statsPeriod.getTable() + " WHERE " + ( mustHaveWon ? "wins>0 AND game_name" : "game_name" ) + ( gameName != null ? "=?" : " IS NULL" ) + " ORDER BY wins DESC, losses ASC, games DESC LIMIT " + numberToFetch;
-            PreparedStatement queryLeaderBoardStatement = connection.prepareStatement( queryLeaderBoardSql );
+            StringBuilder queryLeaderBoardSql = new StringBuilder();
+            queryLeaderBoardSql.append( "SELECT * FROM " ).append( statsPeriod.getTable() );
+            queryLeaderBoardSql.append( " WHERE " ).append( mustHaveWon ? "wins>0 AND game_name" : "game_name" ).append( gameName != null ? "=?" : " IS NULL" );
+            queryLeaderBoardSql.append( " ORDER BY " ).append( isParkour ? "best_time ASC" : "wins DESC, losses ASC, games DESC" );
+            queryLeaderBoardSql.append( " LIMIT " ).append( String.valueOf( numberToFetch ) );
+            PreparedStatement queryLeaderBoardStatement = connection.prepareStatement( queryLeaderBoardSql.toString() );
             if( gameName != null ) queryLeaderBoardStatement.setString( 1, gameName.toLowerCase() );
             ResultSet resultSet = queryLeaderBoardStatement.executeQuery();
             while( resultSet.next() ) {
                 try {
-                    leaderBoard.add( new PlayerStats( resultSet.getString( "player_name" ), UUID.fromString( resultSet.getString( "player_id" ) ), gameName, resultSet.getInt( "games" ), resultSet.getInt( "wins" ), resultSet.getInt( "losses" ), 0 ) );
+                    leaderBoard.add( new PlayerStats( resultSet.getString( "player_name" ), UUID.fromString( resultSet.getString( "player_id" ) ), gameName, resultSet.getInt( "games" ), resultSet.getInt( "wins" ), resultSet.getInt( "losses" ), resultSet.getInt( "best_time" ), resultSet.getInt( "last_time" ), resultSet.getInt( "time_sum" ), 0 ) );
                 } catch( IllegalArgumentException e ) {
                     plugin.getLogger().warning( "Failed to convert player_id '" + resultSet.getString( "player_id" ) + "' to UUID when querying leader board." );
                 }

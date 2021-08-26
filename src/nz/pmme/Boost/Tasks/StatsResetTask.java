@@ -47,7 +47,7 @@ public class StatsResetTask extends BukkitRunnable
                 }
                 if( periodCounter != plugin.getLoadedConfig().getPeriodTracker( statsPeriod ) )
                 {
-                    List<PlayerStats> top3 = plugin.getDataHandler().queryLeaderBoard( statsPeriod, null, 3, true );
+                    List<PlayerStats> top3 = plugin.getDataHandler().queryLeaderBoard( statsPeriod, null, 3, true, false );
                     new BukkitRunnable() {
                         @Override
                         public void run() { plugin.getLoadedConfig().runPeriodicWinCommandsForTop3( statsPeriod, top3 ); }
