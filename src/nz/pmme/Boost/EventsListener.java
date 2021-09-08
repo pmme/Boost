@@ -210,7 +210,7 @@ public class EventsListener implements Listener
                     if( handleSignClickEvent( event.getClickedBlock(), event.getPlayer() ) ) return;
                     if( handleWinBlockClickEvent( event.getClickedBlock(), thisPlayer, playersGame ) ) return;
                     if( playersGame == null ) return;
-                    if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
+                    if( !playersGame.isActiveInGame( thisPlayer ) && !( playersGame.isQueuing() && plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
                     if( playersGame.isOnCoolDown( thisPlayer ) ) return;
                     targetBlock = event.getClickedBlock();
                     break;
@@ -218,7 +218,7 @@ public class EventsListener implements Listener
                 case RIGHT_CLICK_AIR:
                     if( handleMainGuiItemClickEvent( event.getPlayer() ) ) return;
                     if( playersGame == null ) return;
-                    if( !playersGame.isActiveInGame( thisPlayer ) && ( !playersGame.isQueuing() || !plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
+                    if( !playersGame.isActiveInGame( thisPlayer ) && !( playersGame.isQueuing() && plugin.getLoadedConfig().canBoostWhileQueuing() ) ) return;
                     if( playersGame.isOnCoolDown( thisPlayer ) ) return;
                     if( !playersGame.isQueuing() && playersGame.getGameConfig().canTargetPlayers() && playersGame.getGameConfig().getGameType() != GameType.PARKOUR ) {
                         for( RayIterator rayIterator = new RayIterator( thisPlayer, playersGame.getGameConfig().getTargetDist(), 1.0 ); !rayIterator.end(); rayIterator.step() ) {

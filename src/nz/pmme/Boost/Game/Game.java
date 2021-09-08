@@ -120,13 +120,14 @@ public class Game implements Comparable<Game>
                 case RUNNING:
                     plugin.messageSender( player, Messages.NO_JOIN_GAME_RUNNING, gameConfig.getDisplayName() );
                     break;
+                case ENDING:
                 case STOPPED:
                     plugin.messageSender( player, Messages.NO_JOIN_GAME_STOPPED, gameConfig.getDisplayName() );
                     break;
             }
             return false;
         }
-        else if( this.gameConfig.getGameType() == GameType.PARKOUR && gameState == GameState.STOPPED )
+        else if( this.gameConfig.getGameType() == GameType.PARKOUR && gameState != GameState.RUNNING )
         {
             plugin.messageSender( player, Messages.NO_JOIN_GAME_STOPPED, gameConfig.getDisplayName() );
             return false;
@@ -191,11 +192,9 @@ public class Game implements Comparable<Game>
         {
             List<Player> activePlayers = getActivePlayerList();
             if( activePlayers.size() == 0 ) {
-                gameState = GameState.STOPPED;
                 this.end( false );
                 return;
             } else if( activePlayers.size() == 1 && gameConfig.getGameType() != GameType.PARKOUR ) {
-                gameState = GameState.STOPPED;
                 if( this.aPlayerHasLost ) this.playerWon( activePlayers.get(0) ); // Can only win if at least one player has lost. If everyone else quits the game just ends.
                 this.end( false );
                 return;
@@ -253,7 +252,6 @@ public class Game implements Comparable<Game>
             List<Player> activePlayers = getActivePlayerList();
             if( activePlayers.size() <= 1 )
             {
-                gameState = GameState.STOPPED;
                 if( activePlayers.size() == 1 )
                 {
                     this.playerWon( activePlayers.get(0) );
@@ -267,7 +265,6 @@ public class Game implements Comparable<Game>
     {
         if( gameState == GameState.RUNNING ) {
             if( gameConfig.getGameType() != GameType.PARKOUR ) {
-                gameState = GameState.STOPPED;
                 this.playerWon( player );
                 this.end( false );
             } else {
@@ -275,16 +272,21 @@ public class Game implements Comparable<Game>
 
                 PlayerInfo playerInfo = players.get( player.getUniqueId() );
                 if( playerInfo != null ) playerInfo.resetCoolDown();
-                players.remove( player.getUniqueId() );
-                player.setVelocity( Game.VECTOR0 );
-                player.setFlying( false );
-                player.teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
-                player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
-                plugin.getInventoryManager().removeBoostItems( player );
-                plugin.getInventoryManager().giveInstructionBook( player );
-                plugin.getInventoryManager().giveMainGuiItem( player, true );
-
-                plugin.getGameManager().removePlayer( player );
+                new BukkitRunnable()
+                {
+                    @Override
+                    public void run() {
+                        player.setVelocity( Game.VECTOR0 );
+                        player.setFlying( false );
+                        player.teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
+                        player.setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
+                        plugin.getInventoryManager().removeBoostItems( player );
+                        plugin.getInventoryManager().giveInstructionBook( player );
+                        plugin.getInventoryManager().giveMainGuiItem( player, true );
+                        players.remove( player.getUniqueId() );
+                        plugin.getGameManager().removePlayer( player );
+                    }
+                }.runTaskLater( plugin, ( 20 * plugin.getConfig().getLong( "physics.game_end_cooldown" ) / 1000 ) );
             }
         }
     }
@@ -296,7 +298,6 @@ public class Game implements Comparable<Game>
 
         String message = plugin.formatMessage( Messages.WINNER, gameConfig.getDisplayName(), "%player%", player.getDisplayName() );
         player.playSound( player.getLocation(), plugin.getLoadedConfig().getWinSound(), 0.75f, 1 );
-        player.playSound( plugin.getLoadedConfig().getMainLobbySpawn(), plugin.getLoadedConfig().getWinSound(), 0.75f, 1 );     // The player is about to be teleported to the mainLobbySpawn.
         if( gameConfig.getGameType() != GameType.PARKOUR ) {
             for( PlayerInfo playerInfo : players.values() ) {
                 plugin.messageSender( playerInfo.getPlayer(), message );
@@ -312,6 +313,7 @@ public class Game implements Comparable<Game>
 
     public boolean isActiveInGame( Player player )
     {
+        if( gameState != GameState.RUNNING ) return false;
         PlayerInfo playerInfo = players.get( player.getUniqueId() );
         if( playerInfo == null ) return false;
         return playerInfo.isActive();
@@ -346,6 +348,11 @@ public class Game implements Comparable<Game>
     public boolean isQueuing()
     {
         return gameState == GameState.QUEUING;
+    }
+
+    public boolean isEnding()
+    {
+        return gameState == GameState.ENDING;
     }
 
     public String getGameStateText()
@@ -394,7 +401,6 @@ public class Game implements Comparable<Game>
             playerInfo.getPlayer().removePotionEffect( PotionEffectType.GLOWING );
             Location startSpawn = gameConfig.getStartSpawn();
             playerInfo.getPlayer().teleport( startSpawn );
-            startSpawn.getWorld().playSound( startSpawn, plugin.getLoadedConfig().getStartSound(), plugin.getLoadedConfig().getWorldSoundRange() / 16f, 1 );
             playerInfo.getPlayer().setGameMode( plugin.getLoadedConfig().getPlayingGameMode() );
             plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_STARTED, gameConfig.getDisplayName() );
 
@@ -402,6 +408,12 @@ public class Game implements Comparable<Game>
             plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId(), playerInfo.getPlayer().getDisplayName(), null );
             plugin.getDataHandler().logGame( playerInfo.getPlayer().getUniqueId(), playerInfo.getPlayer().getDisplayName(), gameConfig.getName() );
         }
+
+        List<Location> startSpawns = gameConfig.getConfiguredStartSpawns();
+        for( Location startSpawn : startSpawns ) {
+            startSpawn.getWorld().playSound( startSpawn, plugin.getLoadedConfig().getStartSound(), plugin.getLoadedConfig().getWorldSoundRange() / 16f, 1 );
+        }
+
         return true;
     }
 
@@ -409,30 +421,39 @@ public class Game implements Comparable<Game>
     {
 //        boolean wasQueuing = ( gameState == GameState.QUEUING || ( queueTask != null && !queueTask.isCancelled() ) );
         if( queueTask != null && !queueTask.isCancelled() ) queueTask.cancel();  // Cancel the queue in case it's queuing rather than running.
-        gameState = GameState.STOPPED;
-        for( PlayerInfo playerInfo : players.values() )
+        gameState = GameState.ENDING;
+        Game thisGame = this;
+        BukkitRunnable endRunnable = new BukkitRunnable()
         {
-            playerInfo.resetCoolDown();
-            playerInfo.getPlayer().setVelocity( Game.VECTOR0 );
-            playerInfo.getPlayer().setFlying( false );
-            playerInfo.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
-            playerInfo.getPlayer().setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
-            plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_ENDED, gameConfig.getDisplayName() );
-            plugin.getInventoryManager().removeBoostItems( playerInfo.getPlayer() );
-            plugin.getInventoryManager().giveInstructionBook( playerInfo.getPlayer() );
-            plugin.getInventoryManager().giveMainGuiItem( playerInfo.getPlayer(), true );
+            @Override
+            public void run() {
+                thisGame.gameState = GameState.STOPPED;
+                for( PlayerInfo playerInfo : thisGame.players.values() )
+                {
+                    playerInfo.resetCoolDown();
+                    playerInfo.getPlayer().setVelocity( Game.VECTOR0 );
+                    playerInfo.getPlayer().setFlying( false );
+                    playerInfo.getPlayer().teleport( plugin.getLoadedConfig().getMainLobbySpawn() );
+                    playerInfo.getPlayer().setGameMode( plugin.getLoadedConfig().getLobbyGameMode() );
+                    plugin.messageSender( playerInfo.getPlayer(), Messages.GAME_ENDED, thisGame.gameConfig.getDisplayName() );
+                    plugin.getInventoryManager().removeBoostItems( playerInfo.getPlayer() );
+                    plugin.getInventoryManager().giveInstructionBook( playerInfo.getPlayer() );
+                    plugin.getInventoryManager().giveMainGuiItem( playerInfo.getPlayer(), true );
 
-            plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
-        }
-        players.clear();
-        this.aPlayerHasLost = false;
-        if( gameConfig.isAutoQueue() /*&& !wasQueuing*/ && !noAutoQueue ) {
-            if( gameConfig.getGameType() != GameType.PARKOUR ) {
-                this.startQueuing();
-            } else {
-                this.start();
+                    plugin.getGameManager().removePlayer( playerInfo.getPlayer() );
+                }
+                thisGame.players.clear();
+                thisGame.aPlayerHasLost = false;
+                if( thisGame.gameConfig.isAutoQueue() /*&& !wasQueuing*/ && !noAutoQueue ) {
+                    if( thisGame.gameConfig.getGameType() != GameType.PARKOUR ) {
+                        thisGame.startQueuing();
+                    } else {
+                        thisGame.start();
+                    }
+                }
             }
-        }
+        };
+        endRunnable.runTaskLater( plugin, ( 20L * (long)( (double)plugin.getConfig().getLong( "physics.game_end_cooldown" ) / 1000.0 ) ) );
         return true;
     }
 }

@@ -143,7 +143,7 @@ public class GameManager
 
     public void queueGame( Game game, CommandSender sender )
     {
-        if( game.isRunning() ) {
+        if( game.isRunning() || game.isEnding() ) {
             plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, game.getGameConfig().getDisplayName() );
             return;
         }
@@ -171,7 +171,7 @@ public class GameManager
 
     public void startGame( Game game, CommandSender sender )
     {
-        if( game.isRunning() ) {
+        if( game.isRunning() || game.isEnding() ) {
             plugin.messageSender( sender, Messages.GAME_ALREADY_RUNNING, game.getGameConfig().getDisplayName() );
             return;
         }
@@ -195,7 +195,7 @@ public class GameManager
 
     public void endGame( Game game, CommandSender sender )
     {
-        if( !game.isRunning() && !game.isQueuing() ) {
+        if( !game.isRunning() && !game.isQueuing() && !game.isEnding() ) {
             plugin.messageSender( sender, Messages.GAME_NOT_RUNNING, game.getGameConfig().getDisplayName() );
             return;
         }
@@ -215,7 +215,7 @@ public class GameManager
 
     public void stopGame( Game game, CommandSender sender )
     {
-        if( !game.isRunning() && !game.isQueuing() ) {
+        if( !game.isRunning() && !game.isQueuing() && !game.isEnding() ) {
             plugin.messageSender( sender, Messages.GAME_NOT_RUNNING, game.getGameConfig().getDisplayName() );
             return;
         }
@@ -248,10 +248,12 @@ public class GameManager
         for( Game game : this.getGames() )
         {
             String message = "- " + game.getGameConfig().getDisplayName() + ChatColor.RESET + " is " + game.getGameStateText() + " with " + game.getPlayerCount() + " players";
-            if( game.getPlayerCount() < game.getGameConfig().getMinPlayers() ) {
-                message += " " + ( game.getGameConfig().getMinPlayers() - game.getPlayerCount() ) + " more required";
-            } else if( game.isQueuing() ) {
-                message += " " + game.getRemainingQueueTime() + "s before start";
+            if( game.isQueuing() ) {
+                if( game.getPlayerCount() < game.getGameConfig().getMinPlayers() ) {
+                    message += " " + ( game.getGameConfig().getMinPlayers() - game.getPlayerCount() ) + " more required";
+                } else {
+                    message += " " + game.getRemainingQueueTime() + "s before start";
+                }
             }
             sender.sendMessage( ChatColor.translateAlternateColorCodes( '&', message ) );
         }

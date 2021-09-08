@@ -435,6 +435,15 @@ public class GameConfig
         return null;
     }
 
+    public List<Location> getConfiguredStartSpawns()
+    {
+        List<Location> configuredStartSpawns = new ArrayList<>();
+        for( SpawnLocation startSpawn : startSpawns ) {
+            configuredStartSpawns.add( startSpawn.getConfiguredSpawn() );
+        }
+        return configuredStartSpawns;
+    }
+
     public boolean hasStartSpawn() {
         return !startSpawns.isEmpty();
     }
