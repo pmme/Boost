@@ -291,7 +291,7 @@ public class DataHandler
         try {
             StringBuilder queryLeaderBoardSql = new StringBuilder();
             queryLeaderBoardSql.append( "SELECT * FROM " ).append( statsPeriod.getTable() );
-            queryLeaderBoardSql.append( " WHERE " ).append( mustHaveWon ? "wins>0 AND game_name" : "game_name" ).append( gameName != null ? "=?" : " IS NULL" );
+            queryLeaderBoardSql.append( " WHERE games>0 AND " ).append( mustHaveWon ? "wins>0 AND " : "" ).append( gameName != null ? "game_name=?" : "game_name IS NULL" );
             queryLeaderBoardSql.append( " ORDER BY " ).append( isParkour ? "best_time ASC" : "wins DESC, losses ASC, games DESC" );
             queryLeaderBoardSql.append( " LIMIT " ).append( String.valueOf( numberToFetch ) );
             PreparedStatement queryLeaderBoardStatement = connection.prepareStatement( queryLeaderBoardSql.toString() );
