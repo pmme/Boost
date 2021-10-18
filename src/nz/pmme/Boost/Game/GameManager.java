@@ -306,7 +306,7 @@ public class GameManager
         String playerEntryTemplate = isParkour ? plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_ENTRY_PARKOUR ) : plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_ENTRY );
         List<String> leaderBoardMessage = new ArrayList<>();
         leaderBoardMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_TITLE ) ) );
-        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard( statsPeriod, gameName, 10, false, isParkour );
+        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard( statsPeriod, gameName, 10, isParkour ? true : false, isParkour );
         if( playerStatsList != null ) {
             int index = 1;
             for( PlayerStats playerStats : playerStatsList ) {
