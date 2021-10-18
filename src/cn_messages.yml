@@ -33,7 +33,7 @@ messages:
   deleted_stats: "&3玩家统计信息已删除"
   leader_board_title: "&5[平台争霸] 排行榜:"
   leader_board_entry: "&5|&f %index% %player% &a胜利场数:%wins% &c失败场数:%losses% &3总场数:%games%"
-  leader_board_entry_parkour: "&5|&f %index% %player% &3Best:%best_time% Last:%last_time% Average:%avg_time%"
+  leader_board_entry_parkour: "&5|&f %index% %player% &3Best:%best_time% Last:%last_time% Average:%avg_time% Successes:%wins% Attempts:%games%"
   build_enabled: "%player% 建造模式开启"
   build_disabled: "%player% 建造模式关闭"
   game_not_configured: "%game%&r&c 设置错误"
@@ -109,6 +109,7 @@ player_stats:
 
 player_stats_parkour:
   - "&5[平台争霸] &f玩家统计信息: %player%"
+  - "  &3Attempts: %games%"
   - "  &3Successes: %wins%"
   - "  &3Best time: %best_time%"
   - "  &3Last time: %last_time%"

@@ -32,8 +32,8 @@ messages:
   player_no_stats: "&cNo stats for player %player%&r&c."
   deleted_stats: "&3Player stats deleted."
   leader_board_title: "&5[Boost] Leader board:"
-  leader_board_entry: "&5|&f %index% %player% &a%wins% wins &c%losses% losses &3%games% games"
-  leader_board_entry_parkour: "&5|&f %index% %player% &3%best_time% best %last_time% last %avg_time% average"
+  leader_board_entry: "&5|&f %index% %player% &a%wins% wins, &c%losses% losses, &3%games% games"
+  leader_board_entry_parkour: "&5|&f %index% %player% &3best %best_time%s, last %last_time%s, average %avg_time%s, %wins% successes, %games% attempts"
   build_enabled: "Build mode enabled for %player%."
   build_disabled: "Build mode disabled for %player%."
   game_not_configured: "%game%&r&c is not properly configured."
@@ -109,10 +109,11 @@ player_stats:
 
 player_stats_parkour:
   - "&5[Boost] &fPlayer stats: %player%"
+  - "  &3%games% total attempts"
   - "  &3%wins% successful attempts"
-  - "  &3%best_time% best time"
-  - "  &3%last_time% last time"
-  - "  &3%avg_time% average time"
+  - "  &3Best time %best_time%s"
+  - "  &3Last time %last_time%s"
+  - "  &3Average time %avg_time%s"
   - "  &fon %game%"
 
 command_usage_user:
