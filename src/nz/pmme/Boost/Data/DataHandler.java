@@ -261,6 +261,32 @@ public class DataHandler
         return playerStats;
     }
 
+    public List<PlayerStats> queryPlayersGames( StatsPeriod statsPeriod, UUID playerId )
+    {
+        List<PlayerStats> playersGames = new ArrayList<>();
+        Connection connection = this.database.getConnection();
+        if( connection == null ) return playersGames;
+        try {
+            StringBuilder queryPlayersGamesSql = new StringBuilder();
+            queryPlayersGamesSql.append( "SELECT * FROM " ).append( statsPeriod.getTable() );
+            queryPlayersGamesSql.append( " WHERE player_id=? AND game_name IS NOT NULL" );
+            queryPlayersGamesSql.append( " ORDER BY games DESC" );
+            PreparedStatement queryPlayersGamesStatement = connection.prepareStatement( queryPlayersGamesSql.toString() );
+            queryPlayersGamesStatement.setString( 1, playerId.toString() );
+            ResultSet resultSet = queryPlayersGamesStatement.executeQuery();
+            while( resultSet.next() ) {
+                playersGames.add( new PlayerStats( resultSet.getString( "player_name" ), playerId, resultSet.getString( "game_name" ), resultSet.getInt( "games" ), resultSet.getInt( "wins" ), resultSet.getInt( "losses" ), resultSet.getInt( "best_time" ), resultSet.getInt( "last_time" ), resultSet.getInt( "time_sum" ), 0 ) );
+            }
+            resultSet.close();
+            queryPlayersGamesStatement.close();
+        }
+        catch (SQLException sQLException) {
+            plugin.getLogger().severe( "Failed to query " + statsPeriod.getTable() + " game list for player " + playerId.toString() );
+            sQLException.printStackTrace();
+        }
+        return playersGames;
+    }
+
     public ArrayList<String> queryListOfPlayers( StatsPeriod statsPeriod )
     {
         ArrayList<String> results = new ArrayList<>();

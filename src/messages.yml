@@ -99,6 +99,8 @@ messages:
   game_type_set: "%game%&r set to %gametype%&r."
   target_players_enabled: "Targeting players in air &aenabled&r in game %game%&r."
   target_players_disabled: "Targeting players in air &cdisabled&r in game %game%&r."
+  players_games_title: "&5[Boost] &fGame list: %player%"
+  players_games_entry: "&5|&f %game% - &3%games% games, &a%wins% wins, &c%losses% losses, &fbest %best_time%s, &flast %last_time%s"
 
 player_stats:
   - "&5[Boost] &fPlayer stats: %player%"
@@ -121,6 +123,7 @@ command_usage_user:
   - "&f/boost join Arena1 &3- Join the named game."
   - "&f/boost leave &3- Leave your current game."
   - "&f/boost stats <player> <daily|weekly|monthly> <Arena1> &3- Display game stats for player."
+  - "&f/boost playersgames <player> <daily|weekly|monthly> &3- Display games played by player."
   - "&f/boost top &3- Display leader board."
   - "&f/boost top <daily|weekly|monthly> <Arena1> &3- Display period leader board."
   - "&f/boost status &3- Get a list of games and their status."

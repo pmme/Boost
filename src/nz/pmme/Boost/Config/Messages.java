@@ -102,6 +102,8 @@ public enum Messages
     GAME_TYPE_SET( "game_type_set" ),
     TARGET_PLAYERS_ENABLED( "target_players_enabled" ),
     TARGET_PLAYERS_DISABLED( "target_players_disabled" ),
+    PLAYERS_GAMES_TITLE( "players_games_title" ),
+    PLAYERS_GAMES_ENTRY( "players_games_entry" ),
 
     END("end");
 

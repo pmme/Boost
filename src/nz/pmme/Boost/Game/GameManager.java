@@ -298,6 +298,35 @@ public class GameManager
         }
     }
 
+    public void displayPlayersGames( CommandSender sender, OfflinePlayer player, StatsPeriod statsPeriod )
+    {
+        String playerName = player.getName();
+        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryPlayersGames( statsPeriod, player.getUniqueId() );
+        if( playerStatsList == null || playerStatsList.size() == 0 ) {
+            plugin.messageSender( sender, Messages.PLAYER_NO_STATS, "", "%player%", playerName != null ? playerName : player.getUniqueId().toString() );
+        } else {
+            List<String> playersGamesMessage = new ArrayList<>();
+            playersGamesMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.PLAYERS_GAMES_TITLE ) ).replaceAll( "%player%", playerName != null ? playerName : player.getUniqueId().toString() ) );
+            for( PlayerStats playerStats : playerStatsList ) {
+                Game game = plugin.getGameManager().getGame( playerStats.getGameName() );
+                playersGamesMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.PLAYERS_GAMES_ENTRY )
+                        .replaceAll( "%player%", playerStats.getName() )
+                        .replaceAll( "%games%", String.valueOf( playerStats.getGames() ) )
+                        .replaceAll( "%wins%", String.valueOf( playerStats.getWins() ) )
+                        .replaceAll( "%losses%", String.valueOf( playerStats.getLosses() ) )
+                        .replaceAll( "%best_time%", String.valueOf( (double)playerStats.getBestTime()/1000.0 ) )
+                        .replaceAll( "%last_time%", String.valueOf( (double)playerStats.getLastTime()/1000.0 ) )
+                        .replaceAll( "%avg_time%", String.valueOf( (double)playerStats.getAverageTime()/1000.0 ) )
+                        .replaceAll( "%game%", game != null ? game.getGameConfig().getDisplayName() : playerStats.getGameName() )
+                ) );
+            }
+            sender.sendMessage( playersGamesMessage.toArray( new String[0] ) );
+        }
+        if( sender instanceof Player ) {
+            ((Player)sender).playSound( ((Player)sender).getLocation(), plugin.getLoadedConfig().getStatsSound(), 1, 1 );
+        }
+    }
+
     public void displayLeaderBoard( CommandSender sender, StatsPeriod statsPeriod, String gameName )
     {
         Game game = gameName != null ? plugin.getGameManager().getGame( gameName ) : null;
