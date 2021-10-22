@@ -104,6 +104,9 @@ public enum Messages
     TARGET_PLAYERS_DISABLED( "target_players_disabled" ),
     PLAYERS_GAMES_TITLE( "players_games_title" ),
     PLAYERS_GAMES_ENTRY( "players_games_entry" ),
+    GAME_STATS_TITLE( "game_stats_title" ),
+    GAME_STATS_ENTRY( "game_stats_entry" ),
+    GAME_NO_STATS( "game_no_stats" ),
 
     END("end");
 

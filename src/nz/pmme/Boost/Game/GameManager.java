@@ -2,6 +2,7 @@ package nz.pmme.Boost.Game;
 
 import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
+import nz.pmme.Boost.Data.GameStats;
 import nz.pmme.Boost.Data.PlayerStats;
 import nz.pmme.Boost.Enums.GameType;
 import nz.pmme.Boost.Enums.StatsPeriod;
@@ -355,6 +356,32 @@ public class GameManager
         sender.sendMessage( leaderBoardMessage.toArray( new String[0] ) );
         if( sender instanceof Player ) {
             ((Player)sender).playSound( ((Player)sender).getLocation(), plugin.getLoadedConfig().getLeaderSound(), 1, 1 );
+        }
+    }
+
+    public void displayGameStats( CommandSender sender, StatsPeriod statsPeriod )
+    {
+        List<GameStats> gameStatsList = plugin.getDataHandler().queryGamePlays( statsPeriod );
+        if( gameStatsList == null || gameStatsList.size() == 0 ) {
+            plugin.messageSender( sender, Messages.GAME_NO_STATS );
+        } else {
+            List<String> gameStatsMessage = new ArrayList<>();
+            gameStatsMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.GAME_STATS_TITLE ) ) );
+            for( GameStats gameStats : gameStatsList ) {
+                Game game = this.getGame( gameStats.getName() );
+                gameStatsMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.GAME_STATS_ENTRY )
+                        .replaceAll( "%game%", game != null ? game.getGameConfig().getDisplayName() : gameStats.getName() )
+                        .replaceAll( "%games%", String.valueOf( gameStats.getGames() ) )
+                        .replaceAll( "%wins%", String.valueOf( gameStats.getWins() ) )
+                        .replaceAll( "%losses%", String.valueOf( gameStats.getLosses() ) )
+                        .replaceAll( "%best_time%", String.valueOf( (double)gameStats.getBestTime()/1000.0 ) )
+                        .replaceAll( "%avg_time%", String.valueOf( (double)gameStats.getAverageTime()/1000.0 ) )
+                ) );
+            }
+            sender.sendMessage( gameStatsMessage.toArray( new String[0] ) );
+        }
+        if( sender instanceof Player ) {
+            ((Player)sender).playSound( ((Player)sender).getLocation(), plugin.getLoadedConfig().getStatsSound(), 1, 1 );
         }
     }
 

@@ -101,6 +101,9 @@ messages:
   target_players_disabled: "Targeting players in air &cdisabled&r in game %game%&r."
   players_games_title: "&5[Boost] &fGame list: %player%"
   players_games_entry: "&5|&f %game% - &3%games% games, &a%wins% wins, &c%losses% losses, &fbest %best_time%s, &flast %last_time%s"
+  game_stats_title: "&5[Boost] &fGame stats:"
+  game_stats_entry: "&5|&f %game% - &3%games% games, &a%wins% wins, &c%losses% losses, &fbest %best_time%s, &faverage %avg_time%s"
+  game_no_stats: "No game stats stored yet."
 
 player_stats:
   - "&5[Boost] &fPlayer stats: %player%"
@@ -132,6 +135,7 @@ command_usage_admin:
   - "&5Boost admin commands:"
   - "&f/boost creategame Arena1 &3- Create a game configuration."
   - "&f/boost deletegame Arena1 confirm &3- &cDelete &3a game configuration."
+  - "&f/boost gamestats <daily|weekly|monthly> &3- Display play stats for each game arena."
   - "&f/boost showgameconfig Arena1 &3- Display the configuration for a game."
   - "&f/boost setdisplayname Arena1 [name] &3- Set the display name for the game."
   - "&f/boost setgametype Arena1 [gameType] &3- Set the type for the game."

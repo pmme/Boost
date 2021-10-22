@@ -75,6 +75,7 @@ public class Commands implements TabExecutor
         this.registerSubCommand( new SubCommandStats( plugin, "stats" ) );
         this.registerSubCommand( new SubCommandDelStats( plugin, "delstats" ) );
         this.registerSubCommand( new SubCommandPlayersGames( plugin, "playersgames" ) );
+        this.registerSubCommand( new SubCommandGameStats( plugin, "gamestats" ) );
         this.registerSubCommand( new SubCommandStatus( plugin, "status" ) );
         this.registerSubCommand( new SubCommandSetSign( plugin, "setsign") );
         this.registerSubCommand( new SubCommandBuild( plugin, "build" ) );

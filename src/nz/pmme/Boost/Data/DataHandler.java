@@ -2,6 +2,7 @@ package nz.pmme.Boost.Data;
 
 
 import nz.pmme.Boost.Enums.StatsPeriod;
+import nz.pmme.Boost.Game.Game;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.Connection;
@@ -338,6 +339,32 @@ public class DataHandler
             sQLException.printStackTrace();
         }
         return leaderBoard;
+    }
+
+    public List<GameStats> queryGamePlays( StatsPeriod statsPeriod )
+    {
+        List<GameStats> gameStats = new ArrayList<>();
+        Connection connection = this.database.getConnection();
+        if( connection == null ) return gameStats;
+        try {
+            StringBuilder queryGameStatsSql = new StringBuilder();
+            queryGameStatsSql.append( "SELECT game_name,SUM(games) AS gamesSum,SUM(wins) AS winsSum,SUM(losses) AS lossesSum,MIN(best_time) AS bestMin,SUM(time_sum) AS timeSum FROM " ).append( statsPeriod.getTable() );
+            queryGameStatsSql.append( " WHERE game_name IS NOT NULL" );
+            queryGameStatsSql.append( " GROUP BY game_name" );
+            queryGameStatsSql.append( " ORDER BY gamesSum DESC" );
+            PreparedStatement queryGameStatsStatement = connection.prepareStatement( queryGameStatsSql.toString() );
+            ResultSet resultSet = queryGameStatsStatement.executeQuery();
+            while( resultSet.next() ) {
+                gameStats.add( new GameStats( resultSet.getString( "game_name" ), resultSet.getInt( "gamesSum" ), resultSet.getInt( "winsSum" ), resultSet.getInt( "lossesSum" ), resultSet.getInt( "bestMin" ), resultSet.getInt( "timeSum" ) ) );
+            }
+            resultSet.close();
+            queryGameStatsStatement.close();
+        }
+        catch (SQLException sQLException) {
+            plugin.getLogger().severe( "Failed to query " + statsPeriod.getTable() + " game stats." );
+            sQLException.printStackTrace();
+        }
+        return gameStats;
     }
 
     public void deleteStats( StatsPeriod statsPeriod, UUID playerId, String gameName )
