@@ -65,7 +65,19 @@ public class GUI implements InventoryHolder
             }
         }
         if( this.plugin.getLoadedConfig().isGuiButtonEnabled( "stats" ) ) {
-            int slot = this.addButton( "stats", new GUIButtonStats( this.plugin ) );
+            int slot = this.addButton( "stats", new GUIButtonStats( this.plugin, StatsPeriod.TOTAL ) );
+            slotsOccupied[slot] = true;
+        }
+        if( this.plugin.getLoadedConfig().isGuiButtonEnabled( "stats_monthly" ) ) {
+            int slot = this.addButton( "stats_monthly", new GUIButtonStats( this.plugin, StatsPeriod.MONTHLY ) );
+            slotsOccupied[slot] = true;
+        }
+        if( this.plugin.getLoadedConfig().isGuiButtonEnabled( "stats_weekly" ) ) {
+            int slot = this.addButton( "stats_weekly", new GUIButtonStats( this.plugin, StatsPeriod.WEEKLY ) );
+            slotsOccupied[slot] = true;
+        }
+        if( this.plugin.getLoadedConfig().isGuiButtonEnabled( "stats_daily" ) ) {
+            int slot = this.addButton( "stats_daily", new GUIButtonStats( this.plugin, StatsPeriod.DAILY ) );
             slotsOccupied[slot] = true;
         }
         if( this.plugin.getLoadedConfig().isGuiButtonEnabled( "top_total" ) ) {

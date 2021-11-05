@@ -9,6 +9,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SubCommandSetSign extends AbstractSubCommand
@@ -72,7 +73,23 @@ public class SubCommandSetSign extends AbstractSubCommand
                         break;
                     case "stats":
                         sign.setLine( line++, plugin.getLoadedConfig().getSignStats() );
-                        if( args.length == 3 ) sign.setLine( line++, this.getGameNameForSign( args[2] ) );
+                        if( args.length >= 3 ) {
+                            switch( args[2].toLowerCase() ) {
+                                case "daily":
+                                    sign.setLine( line++, plugin.getLoadedConfig().getSignDaily() );
+                                    break;
+                                case "weekly":
+                                    sign.setLine( line++, plugin.getLoadedConfig().getSignWeekly() );
+                                    break;
+                                case "monthly":
+                                    sign.setLine( line++, plugin.getLoadedConfig().getSignMonthly() );
+                                    break;
+                                default:
+                                    if( args.length == 3 ) sign.setLine( line++, this.getGameNameForSign( args[2] ) );
+                                    break;
+                            }
+                        }
+                        if( args.length == 4 ) sign.setLine( line++, this.getGameNameForSign( args[3] ) );
                         break;
                     case "top":
                         sign.setLine( line++, plugin.getLoadedConfig().getSignTop() );
@@ -121,15 +138,18 @@ public class SubCommandSetSign extends AbstractSubCommand
         if( args.length == 2 ) return signCommands;
         if( args.length == 3 ) {
             String arg1lower = args[1].toLowerCase();
-            if( arg1lower.equals( "join" ) || arg1lower.equals( "stats" ) || arg1lower.equals( "win" ) ) {
+            if( arg1lower.equals( "join" ) || arg1lower.equals( "win" ) ) {
                 return plugin.getGameManager().getGameNames();
-            } else if( arg1lower.equals( "top" ) ) {
-                return StatsPeriod.getStatsPeriods();
+            } else if( arg1lower.equals( "top" ) || arg1lower.equals( "stats" ) ) {
+                List<String> returnList = new ArrayList<>();
+                returnList.addAll( StatsPeriod.getStatsPeriods() );
+                returnList.addAll( plugin.getGameManager().getGameNames() );
+                return returnList;
             }
         }
         if( args.length == 4 ) {
             String arg1lower = args[1].toLowerCase();
-            if( arg1lower.equals( "top" ) ) {
+            if( arg1lower.equals( "top" ) || arg1lower.equals( "stats" ) ) {
                 return plugin.getGameManager().getGameNames();
             }
         }

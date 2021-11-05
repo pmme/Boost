@@ -43,6 +43,30 @@ gui:
         - "&7查询玩家的统计信息"
       row: 4
       col: 1
+    stats_monthly:
+      enabled: true
+      item: "PAPER"
+      name: "&fYour monthly stats"
+      lore:
+        - "&7Click to show your monthly game stats"
+      row: 4
+      col: 2
+    stats_weekly:
+      enabled: true
+      item: "PAPER"
+      name: "&fYour weekly stats"
+      lore:
+        - "&7Click to show your weekly game stats"
+      row: 4
+      col: 3
+    stats_daily:
+      enabled: false
+      item: "PAPER"
+      name: "&fYour daily stats"
+      lore:
+        - "&7Click to show your daily game stats"
+      row: 4
+      col: 4
     top_total:
       enabled: true
       item: "MAP"

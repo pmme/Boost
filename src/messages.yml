@@ -120,9 +120,9 @@ command_usage_user:
   - "&5Boost commands:"
   - "&f/boost join Arena1 &3- Join the named game."
   - "&f/boost leave &3- Leave your current game."
-  - "&f/boost stats <player> <Arena1> &3- Display game stats for player."
+  - "&f/boost stats <player> <daily|weekly|monthly> <Arena1> &3- Display game stats for player."
   - "&f/boost top &3- Display leader board."
-  - "&f/boost top <Daily/Weekly/Monthly> <Arena1> &3- Display period leader board."
+  - "&f/boost top <daily|weekly|monthly> <Arena1> &3- Display period leader board."
   - "&f/boost status &3- Get a list of games and their status."
 
 command_usage_admin:

@@ -266,7 +266,7 @@ public class GameManager
         }
     }
 
-    public void displayPlayerStats( CommandSender sender, OfflinePlayer player, String gameName )
+    public void displayPlayerStats( CommandSender sender, OfflinePlayer player, StatsPeriod statsPeriod, String gameName )
     {
         String playerName = player.getName();
         Game game = gameName != null ? plugin.getGameManager().getGame( gameName ) : null;
@@ -274,7 +274,7 @@ public class GameManager
         boolean isParkour = game != null && game.getGameConfig().getGameType() == GameType.PARKOUR;
         List<String> playerStatsTemplate = isParkour ? plugin.getLoadedConfig().getPlayerParkourStatsTemplate() : plugin.getLoadedConfig().getPlayerStatsTemplate();
         List<String> playerStatsMessage = new ArrayList<>();
-        PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( StatsPeriod.TOTAL, player.getUniqueId(), gameName, isParkour );
+        PlayerStats playerStats = plugin.getDataHandler().queryPlayerStats( statsPeriod, player.getUniqueId(), gameName, isParkour );
         if( playerStats == null ) {
             plugin.messageSender( sender, Messages.PLAYER_NO_STATS, "", "%player%", playerName != null ? playerName : player.getUniqueId().toString() );
         } else {
@@ -306,7 +306,7 @@ public class GameManager
         String playerEntryTemplate = isParkour ? plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_ENTRY_PARKOUR ) : plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_ENTRY );
         List<String> leaderBoardMessage = new ArrayList<>();
         leaderBoardMessage.add( ChatColor.translateAlternateColorCodes( '&', plugin.getLoadedConfig().getMessage( Messages.LEADER_BOARD_TITLE ) ) );
-        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard( statsPeriod, gameName, 10, isParkour ? true : false, isParkour );
+        List<PlayerStats> playerStatsList = plugin.getDataHandler().queryLeaderBoard( statsPeriod, gameName, 10, isParkour, isParkour );
         if( playerStatsList != null ) {
             int index = 1;
             for( PlayerStats playerStats : playerStatsList ) {

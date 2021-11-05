@@ -31,8 +31,8 @@ public class PlayerStats
     }
 
     public String getName() { return this.name; }
-    public UUID getUuid() { return uuid; }
-    public String getGameName() { return gameName; }
+    public UUID getUuid() { return this.uuid; }
+    public String getGameName() { return this.gameName; }
     public int getGames() { return this.games; }
     public int getWins() { return this.wins; }
     public int getLosses() { return this.losses; }

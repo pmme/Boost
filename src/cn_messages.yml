@@ -120,9 +120,9 @@ command_usage_user:
   - "&5平台争霸指令:"
   - "&f/boost join Arena1 &3- 加入游戏"
   - "&f/boost leave &3- 离开当前游戏"
-  - "&f/boost stats <player> <Arena1> &3- 查询玩家的统计信息"
+  - "&f/boost stats <player> <daily|weekly|monthly> <Arena1> &3- 查询玩家的统计信息"
   - "&f/boost top &3- 查询排行榜"
-  - "&f/boost top <天/周/月> <Arena1> &3- 查询 天/周/月 的排行榜"
+  - "&f/boost top <daily|weekly|monthly> <Arena1> &3- 查询 天/周/月 的排行榜"
   - "&f/boost status &3- 查询当前所有游戏的状态列表"
 
 command_usage_admin:
