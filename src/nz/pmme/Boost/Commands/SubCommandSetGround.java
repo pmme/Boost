@@ -1,5 +1,6 @@
 package nz.pmme.Boost.Commands;
 
+import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
@@ -36,7 +37,7 @@ public class SubCommandSetGround extends AbstractSubCommand
                     plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
                     int startSpawnsMinY = game.getGameConfig().getStartSpawnsMinY();
-                    if( y != -1 && game.getGameConfig().hasStartSpawn() && startSpawnsMinY <= y ) {
+                    if( GameConfig.isValidY(y) && game.getGameConfig().hasStartSpawn() && startSpawnsMinY <= y ) {
                         String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( startSpawnsMinY ) )
                                 .replaceAll( "%ground%", String.valueOf( y ) );
                         plugin.messageSender( sender, message );
@@ -57,7 +58,7 @@ public class SubCommandSetGround extends AbstractSubCommand
                     plugin.messageSender( sender, Messages.GROUND_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
                     int startSpawnsMinY = game.getGameConfig().getStartSpawnsMinY();
-                    if( y != -1 && game.getGameConfig().hasStartSpawn() && startSpawnsMinY <= y ) {
+                    if( GameConfig.isValidY(y) && game.getGameConfig().hasStartSpawn() && startSpawnsMinY <= y ) {
                         String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( startSpawnsMinY ) )
                                 .replaceAll( "%ground%", String.valueOf( y ) );
                         plugin.messageSender( sender, message );

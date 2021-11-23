@@ -35,8 +35,11 @@ import java.util.logging.Level;
 
 public class Config
 {
+    public static final int UNSET_CONFIG_VERSION = 1;
+    public static final int LATEST_CONFIG_VERSION = 2;
     private Main plugin;
 
+    private int configVersion;
     private String languagePrefix;
     private List<String> languagePrefixes;
 
@@ -347,6 +350,8 @@ public class Config
 
     private void load()
     {
+        configVersion = plugin.getConfig().getInt( "config_version", UNSET_CONFIG_VERSION );
+
         // See https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for preferred codes.
         String languagePrefixSetting = plugin.getConfig().getString( "language" );
         languagePrefix = ( languagePrefixSetting == null || languagePrefixSetting.equalsIgnoreCase( "en" ) ) ? "" : ( languagePrefixSetting + "_" );
@@ -457,7 +462,7 @@ public class Config
         ConfigurationSection gamesSection = plugin.getConfig().getConfigurationSection( "games" );
         if( gamesSection != null ) {
             for( String gameName : gamesSection.getKeys( false ) ) {
-                GameConfig gameConfig = new GameConfig( plugin, gameName );
+                GameConfig gameConfig = new GameConfig( plugin, gameName, configVersion );
                 gameConfigList.add( gameConfig );
             }
         }
@@ -486,6 +491,12 @@ public class Config
         trackedDay = statsResetConfig.getInt( "day", 0 );
         trackedWeek = statsResetConfig.getInt( "week", 0 );
         trackedMonth = statsResetConfig.getInt( "month", 0 );
+
+        if( configVersion == UNSET_CONFIG_VERSION ) {
+            configVersion = LATEST_CONFIG_VERSION;
+            plugin.getConfig().set( "config_version", configVersion );
+            plugin.saveConfig();
+        }
     }
 
     public List<String> getLanguagePrefixes() { return languagePrefixes; }

@@ -61,12 +61,12 @@ public class SubCommandSetStart extends AbstractSubCommand
                 game.getGameConfig().setStartSpawn( spawn, args[2] );
                 plugin.messageSender( sender, Messages.START_SPAWN_SET, game.getGameConfig().getDisplayName(), "%name%", args[2] );
 
-                if( spawn.getBlockY() <= game.getGameConfig().getGroundLevel() && game.getGameConfig().getGroundLevel() != -1 ) {
+                if( game.getGameConfig().hasGroundLevel() && spawn.getBlockY() <= game.getGameConfig().getGroundLevel() ) {
                     String message = plugin.formatMessage( Messages.GROUND_HIGHER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) )
                             .replaceAll( "%ground%", String.valueOf( game.getGameConfig().getGroundLevel() ) );
                     plugin.messageSender( sender, message );
                 }
-                if( spawn.getBlockY() >= game.getGameConfig().getCeilingLevel() && game.getGameConfig().getCeilingLevel() != -1 ) {
+                if( game.getGameConfig().hasCeilingLevel() && spawn.getBlockY() >= game.getGameConfig().getCeilingLevel() ) {
                     String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( spawn.getBlockY() ) )
                             .replaceAll( "%ceiling%", String.valueOf( game.getGameConfig().getCeilingLevel() ) );
                     plugin.messageSender( sender, message );

@@ -361,7 +361,7 @@ public class EventsListener implements Listener
             if( game == null ) return;
             if( game.isActiveInGame( event.getPlayer() ) ) {
                 if( event.getTo() != null ) {
-                    if( event.getTo().getBlockY() <= game.getGameConfig().getGroundLevel() && game.getGameConfig().getGroundLevel() != -1 ) {
+                    if( game.getGameConfig().hasGroundLevel() && event.getTo().getBlockY() <= game.getGameConfig().getGroundLevel() ) {
                         if( game.getGameConfig().isReturnToStartAtGround() ) {
                             event.getPlayer().setVelocity( EventsListener.VECTOR_0 );
                             event.getPlayer().setFlying( false );
@@ -370,7 +370,7 @@ public class EventsListener implements Listener
                             game.setPlayerLost( event.getPlayer() );
                         }
                     }
-                    else if( event.getTo().getBlockY() >= game.getGameConfig().getCeilingLevel() && game.getGameConfig().getCeilingLevel() != -1 ) {
+                    else if( game.getGameConfig().hasCeilingLevel() && event.getTo().getBlockY() >= game.getGameConfig().getCeilingLevel() ) {
                         game.setPlayerWon( event.getPlayer() );
                     }
                     else if( game.getGameConfig().getBoostBlock() != null ) {

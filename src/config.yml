@@ -101,7 +101,7 @@ bar:
 #      name: '&aArena1'
 #      game_type: ELIMINATION
 #      ground: 64
-#      ceiling: -1
+#      ceiling: -32768
 #      return_to_start_at_ground: false
 #      target_dist: 150
 #      target_players: true

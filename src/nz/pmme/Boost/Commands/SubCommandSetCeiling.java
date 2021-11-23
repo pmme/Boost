@@ -1,5 +1,6 @@
 package nz.pmme.Boost.Commands;
 
+import nz.pmme.Boost.Config.GameConfig;
 import nz.pmme.Boost.Config.Messages;
 import nz.pmme.Boost.Game.Game;
 import nz.pmme.Boost.Main;
@@ -36,7 +37,7 @@ public class SubCommandSetCeiling extends AbstractSubCommand
                     plugin.messageSender( sender, Messages.CEILING_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
                     int startSpawnsMaxY = game.getGameConfig().getStartSpawnsMaxY();
-                    if( y != -1 && game.getGameConfig().hasStartSpawn() && startSpawnsMaxY >= y ) {
+                    if( GameConfig.isValidY(y) && game.getGameConfig().hasStartSpawn() && startSpawnsMaxY >= y ) {
                         String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( startSpawnsMaxY ) )
                                 .replaceAll( "%ceiling%", String.valueOf( y ) );
                         plugin.messageSender( sender, message );
@@ -57,7 +58,7 @@ public class SubCommandSetCeiling extends AbstractSubCommand
                     plugin.messageSender( sender, Messages.CEILING_SET, game.getGameConfig().getDisplayName(), "%y%", String.valueOf(y) );
 
                     int startSpawnsMaxY = game.getGameConfig().getStartSpawnsMaxY();
-                    if( y != -1 && game.getGameConfig().hasStartSpawn() && startSpawnsMaxY >= y ) {
+                    if( GameConfig.isValidY(y) && game.getGameConfig().hasStartSpawn() && startSpawnsMaxY >= y ) {
                         String message = plugin.formatMessage( Messages.CEILING_LOWER, game.getGameConfig().getDisplayName(), "%y%", String.valueOf( startSpawnsMaxY ) )
                                 .replaceAll( "%ceiling%", String.valueOf( y ) );
                         plugin.messageSender( sender, message );
