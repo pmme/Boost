@@ -579,7 +579,7 @@ public class Config
         return this.commandsAllowedWhilePlaying.contains( cmdLower ) || cmdLower.equals( "boost" ) || cmdLower.equals( "bst" );
     }
 
-    public void allowCommandWhilePlaying( String command ) {
+    public void setCommandAllowedWhilePlaying( String command ) {
         String cmdLower = command.toLowerCase();
         if( !this.commandsAllowedWhilePlaying.contains( cmdLower ) ) {
             this.commandsAllowedWhilePlaying.add( cmdLower );
@@ -588,13 +588,20 @@ public class Config
         }
     }
 
-    public void blockCommandWhilePlaying( String command ) {
+    public void setCommandBlockedWhilePlaying( String command ) {
         String cmdLower = command.toLowerCase();
+        boolean needsUpdate = false;
         if( this.commandsAllowedWhilePlaying.contains( cmdLower ) ) {
             this.commandsAllowedWhilePlaying.remove( cmdLower );
             plugin.getConfig().set( "other_commands.allowed_commands", new ArrayList<>( this.commandsAllowedWhilePlaying ) );
-            plugin.saveConfig();
+            needsUpdate = true;
         }
+        if( !this.commandsBlockedWhilePlaying ) {
+            this.commandsBlockedWhilePlaying = true;
+            plugin.getConfig().set( "other_commands.block_while_playing", this.commandsBlockedWhilePlaying );
+            needsUpdate = true;
+        }
+        if( needsUpdate ) plugin.saveConfig();
     }
 
     public BoostParticle getBoostParticleForPlayer( Player player )

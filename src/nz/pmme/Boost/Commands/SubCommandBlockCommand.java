@@ -20,7 +20,7 @@ public class SubCommandBlockCommand extends AbstractSubCommand
     @Override
     protected boolean executeSubCommand( CommandSender sender, String[] args ) {
         if( args.length == 2 ) {
-            plugin.getLoadedConfig().blockCommandWhilePlaying( args[1].toLowerCase() );
+            plugin.getLoadedConfig().setCommandBlockedWhilePlaying( args[1].toLowerCase() );
             plugin.messageSender( sender, Messages.COMMAND_NOW_BLOCKED, "%cmd%", args[1].toLowerCase() );
             return true;
         }
