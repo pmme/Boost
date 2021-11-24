@@ -30,7 +30,7 @@ main_lobby:
 
 sounds:
   world_sound_range: 80
-  tick: 'ITEM_FLINTANDSTEEL_USE'
+  tick: 'BLOCK_NOTE_BLOCK_HAT'
   join: 'UI_LOOM_SELECT_PATTERN'
   leave: 'UI_LOOM_TAKE_RESULT'
   start: 'ENTITY_EVOKER_PREPARE_SUMMON'
@@ -134,4 +134,4 @@ bar:
 #        z: 0
 #        yaw: 0
 #      win_commands: []
-#  
+#
