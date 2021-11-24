@@ -63,11 +63,13 @@ public class GameConfig
         if( configVersion == Config.UNSET_CONFIG_VERSION && this.groundLevel == -1 ) {  // Change previous un-set ground value of -1 to UNSET_Y for MC 1.18 change in height range.
             this.groundLevel = UNSET_Y;
             needsUpdate = true;
+            plugin.getLogger().warning( "Disabled value for " + configPath + "ground changed to " + UNSET_Y + " in config.yml" );
         }
         this.ceilingLevel = plugin.getConfig().getInt( configPath + "ceiling", UNSET_Y );
         if( configVersion == Config.UNSET_CONFIG_VERSION && this.ceilingLevel == -1 ) { // Change previous un-set ceiling value of -1 to UNSET_Y for MC 1.18 change in height range.
             this.ceilingLevel = UNSET_Y;
             needsUpdate = true;
+            plugin.getLogger().warning( "Disabled value for " + configPath + "ceiling changed to " + UNSET_Y + " in config.yml" );
         }
         this.returnToStartAtGround = plugin.getConfig().getBoolean( configPath + "return_to_start_at_ground", false );
         if( this.gameType == null ) {
@@ -118,6 +120,7 @@ public class GameConfig
                 plugin.getConfig().set( configPath + "game_starts.Start1", oldStartSpawnConfigSection );
                 plugin.getConfig().set( configPath + "game_start", null );
                 plugin.saveConfig();
+                plugin.getLogger().warning( "Single-position " + configPath + "game_start configuration section changed to multi-position " + configPath + "game_starts.Start1 in config.yml" );
             }
         }
         ConfigurationSection gameStartsSection = plugin.getConfig().getConfigurationSection( configPath + "game_starts" );

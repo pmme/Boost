@@ -217,6 +217,7 @@ public class Config
             this.saveMessagesConfig();
             plugin.getConfig().set( "signs", null );
             plugin.saveConfig();
+            plugin.getLogger().warning( "signs configuration section moved from config.yml to messages.yml." );
         }
 
         // Check for previous structure with messages at root level. These are now under "messages".
@@ -230,6 +231,7 @@ public class Config
                 this.messagesConfig.set( "messages", oldMessagesConfigSection );
             }
             this.saveMessagesConfig();
+            plugin.getLogger().warning( "messages moved into messages configuration section in messages.yml." );
         }
     }
 
@@ -256,6 +258,7 @@ public class Config
                 this.saveSticksConfig();
                 plugin.getConfig().set( "boost_sticks", null );
                 plugin.saveConfig();
+                plugin.getLogger().warning( "boost_sticks configuration section moved from config.yml to boostSticks.yml." );
             } else {
                 try {
                     plugin.saveResource( sticksConfigFileName, false );
@@ -493,6 +496,7 @@ public class Config
         trackedMonth = statsResetConfig.getInt( "month", 0 );
 
         if( configVersion == UNSET_CONFIG_VERSION ) {
+            plugin.getLogger().warning( "Configuration updated from version " + configVersion + " to " + LATEST_CONFIG_VERSION );
             configVersion = LATEST_CONFIG_VERSION;
             plugin.getConfig().set( "config_version", configVersion );
             plugin.saveConfig();
