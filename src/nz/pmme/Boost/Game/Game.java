@@ -113,22 +113,14 @@ public class Game implements Comparable<Game>
             plugin.messageSender( player, Messages.GAME_NOT_AVAILABLE, gameConfig.getDisplayName() );
             return false;
         }
-        if( this.gameConfig.getGameType() != GameType.PARKOUR && gameState != GameState.QUEUING )
-        {
-            switch( gameState )
-            {
-                case RUNNING:
-                    plugin.messageSender( player, Messages.NO_JOIN_GAME_RUNNING, gameConfig.getDisplayName() );
-                    break;
-                case STOPPED:
-                    plugin.messageSender( player, Messages.NO_JOIN_GAME_STOPPED, gameConfig.getDisplayName() );
-                    break;
-            }
-            return false;
-        }
-        else if( this.gameConfig.getGameType() == GameType.PARKOUR && gameState == GameState.STOPPED )
+        if( gameState == GameState.STOPPED )
         {
             plugin.messageSender( player, Messages.NO_JOIN_GAME_STOPPED, gameConfig.getDisplayName() );
+            return false;
+        }
+        if( gameState == GameState.RUNNING && this.gameConfig.getGameType() != GameType.PARKOUR )
+        {
+            plugin.messageSender( player, Messages.NO_JOIN_GAME_RUNNING, gameConfig.getDisplayName() );
             return false;
         }
         if( gameConfig.getMaxPlayers() > 0 && this.getPlayerCount() >= gameConfig.getMaxPlayers() )
